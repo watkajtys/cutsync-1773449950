@@ -90,6 +90,9 @@ test.describe('Dashboard and Project Management', () => {
     // Wait for app to load
     await expect(page.locator('text=CutSync')).toBeVisible();
 
+    // Wait for the initial data fetch to complete to prevent race conditions
+    await expect(page.locator('text=Loading...')).not.toBeVisible();
+
     // Click "New Project" button
     await page.locator('button:has-text("New Project")').click();
 
@@ -111,6 +114,6 @@ test.describe('Dashboard and Project Management', () => {
     await expect(page.locator(`h3:has-text("${projectTitle}")`).first()).toBeVisible();
 
     // Take screenshot as required
-    await page.screenshot({ path: 'evidence_old.png' });
+    await page.screenshot({ path: 'evidence.png' });
   });
 });
