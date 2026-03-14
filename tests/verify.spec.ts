@@ -11,13 +11,13 @@ test('Verify that the React app loads and displays the main dashboard shell with
   await expect(sidebar).toBeVisible();
   
   // Check for the presence of standard navigation items
-  await expect(page.locator('button:has-text("Projects")').first()).toBeVisible();
-  await expect(page.locator('button:has-text("Recent Assets")').first()).toBeVisible();
-  await expect(page.locator('button:has-text("Settings")').first()).toBeVisible();
+  await expect(page.locator('a:has-text("Projects")').first()).toBeVisible();
+  await expect(page.locator('a:has-text("Recent Assets")').first()).toBeVisible();
+  await expect(page.locator('a:has-text("Settings")').first()).toBeVisible();
 
   // Wait for the ChronologicalRiver component container to appear
   await expect(page.locator('h3:has-text("Mock Project Alpha")').first()).toBeVisible();
   
   // Take screenshot at the end
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
