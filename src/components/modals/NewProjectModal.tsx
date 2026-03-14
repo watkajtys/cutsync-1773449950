@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 interface NewProjectModalProps {
   onClose: () => void;
   onSubmit: (title: string, description: string) => Promise<void>;
+  onSuccess?: () => void;
 }
 
-export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onSubmit }) => {
+export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onSubmit, onSuccess }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -17,6 +18,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onSub
     setIsSubmitting(true);
     try {
       await onSubmit(title, description);
+      if (onSuccess) {
+        onSuccess();
+      }
       onClose();
     } catch (error) {
       console.error("Failed to create project:", error);

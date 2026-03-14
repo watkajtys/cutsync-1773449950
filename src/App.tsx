@@ -50,7 +50,6 @@ function DashboardContent() {
   const handleCreateProject = async (title: string, description: string) => {
     try {
       await pb.collection('projects').create({ title, description }, { requestKey: null });
-      await fetchProjects();
     } catch (error) {
       console.error("Error creating project:", error);
       throw error;
@@ -140,6 +139,7 @@ function DashboardContent() {
         <NewProjectModal 
           onClose={closeNewProjectModal} 
           onSubmit={handleCreateProject} 
+          onSuccess={fetchProjects}
         />
       )}
     </div>
