@@ -49,9 +49,13 @@ function DashboardContent() {
 
   const handleCreateProject = async (title: string, description: string) => {
     try {
-      await pb.collection('projects').create({ title, description }, { requestKey: null });
-    } catch (error) {
+      const newProject = await pb.collection('projects').create<Project>({ title, description }, { requestKey: null });
+      setProjects((prev) => [newProject, ...prev]);
+    } catch (error: any) {
       console.error("Error creating project:", error);
+      if (error?.response) {
+        console.error("PocketBase Error Response:", error.response);
+      }
       throw error;
     }
   };
@@ -139,7 +143,7 @@ function DashboardContent() {
         <NewProjectModal 
           onClose={closeNewProjectModal} 
           onSubmit={handleCreateProject} 
-          onSuccess={fetchProjects}
+          onSuccess={() => {}}
         />
       )}
     </div>
