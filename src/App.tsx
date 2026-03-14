@@ -20,6 +20,7 @@ function DashboardContent() {
     try {
       const records = await pb.collection('projects').getFullList<Project>({
         sort: '-created',
+        requestKey: null,
       });
       setProjects(records);
     } catch (err) {

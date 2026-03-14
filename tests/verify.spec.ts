@@ -32,7 +32,13 @@ test.describe('Dashboard and Project Management', () => {
       const url = new URL(request.url());
       url.hostname = 'loom-cutsync-pocketbase';
       try {
-        const response = await route.fetch({ url: url.toString() });
+        // Explicitly fetch and fulfill the request with CORS handling if necessary
+        const response = await route.fetch({ 
+          url: url.toString(),
+          method: request.method(),
+          headers: request.headers(),
+          postData: request.postData() ?? undefined
+        });
         await route.fulfill({ response });
       } catch (e) {
         // Fallback for local testing when Docker network is not available
@@ -103,6 +109,6 @@ test.describe('Dashboard and Project Management', () => {
     await expect(page.locator(`h3:has-text("${projectTitle}")`).first()).toBeVisible();
 
     // Take screenshot as required
-    await page.screenshot({ path: 'evidence_old.png' });
+    await page.screenshot({ path: 'evidence.png' });
   });
 });
