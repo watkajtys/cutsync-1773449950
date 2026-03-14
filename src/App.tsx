@@ -51,6 +51,10 @@ function DashboardContent() {
     try {
       const newProject = await pb.collection('projects').create<Project>({ title, description }, { requestKey: null });
       setProjects((prev) => [newProject, ...prev]);
+      
+      // Explicitly refetch the project list immediately upon successful submission 
+      // to ensure state is synchronized with the database per the directive.
+      await fetchProjects();
     } catch (error: any) {
       console.error("Error creating project:", error);
       if (error?.response) {

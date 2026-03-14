@@ -17,7 +17,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onSub
     
     setIsSubmitting(true);
     try {
+      console.log("Submitting API call to create project with title:", title);
       await onSubmit(title, description);
+      console.log("Successfully created project API call returned 200/201");
       if (onSuccess) {
         onSuccess();
       }

@@ -1,5 +1,7 @@
 /* eslint-disable */
 migrate((db) => {
+  // Provision the PocketBase database schema by creating the required projects collection
+  // using the Global Data Model provided in the spec so the backend can actually accept the frontend's API calls.
   const collection = new Collection({
     "id": "pbc123456789012",
     "created": "2024-01-01 00:00:00.000Z",
