@@ -1,8 +1,5 @@
 /* eslint-disable */
 migrate((db) => {
-  const dao = new Dao(db);
-
-  // 1. Create 'projects' collection
   const projectsCollection = new Collection({
     "id": "pbc123456789001",
     "created": "2024-01-01 00:00:00.000Z",
@@ -40,23 +37,16 @@ migrate((db) => {
     "deleteRule": "",
     "options": {}
   });
-  dao.saveCollection(projectsCollection);
 
+  new Dao(db).saveCollection(projectsCollection);
 }, (db) => {
   const dao = new Dao(db);
-  
-  const collectionsToRemove = [
-    "projects"
-  ];
-
-  for (const name of collectionsToRemove) {
-    try {
-      const collection = dao.findCollectionByNameOrId(name);
-      if (collection) {
-        dao.deleteCollection(collection);
-      }
-    } catch (err) {
-      // Collection might not exist, ignore
+  try {
+    const collection = dao.findCollectionByNameOrId("projects");
+    if (collection) {
+      dao.deleteCollection(collection);
     }
+  } catch (err) {
+    // ignore
   }
-})
+});
