@@ -1,11 +1,11 @@
---- Spawned at 1773459414.1903312 ---
+--- Spawned at 1773460232.4646726 ---
 
 > app@0.0.0 dev
 > vite --host
 
-3:36:54 AM [vite] (client) Re-optimizing dependencies because lockfile has changed
+3:50:32 AM [vite] (client) Re-optimizing dependencies because lockfile has changed
 
-  VITE v6.4.1  ready in 205 ms
+  VITE v6.4.1  ready in 360 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: http://172.22.0.3:5173/
