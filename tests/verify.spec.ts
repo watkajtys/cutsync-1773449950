@@ -81,7 +81,7 @@ test.describe('Dashboard and Project Management', () => {
     await expect(page.locator('button:has-text("New Project")').first()).toBeVisible();
     
     // Take screenshot at the end
-    await page.screenshot({ path: 'evidence.png' });
+    await page.screenshot({ path: 'evidence_old.png' });
   });
 
   test('User can view a list of projects fetched from PocketBase and create a new project using the dashboard modal.', async ({ page }) => {
@@ -111,6 +111,6 @@ test.describe('Dashboard and Project Management', () => {
     await expect(page.locator(`h3:has-text("${projectTitle}")`).first()).toBeVisible();
 
     // Take screenshot as required
-    await page.screenshot({ path: 'evidence.png' });
+    await page.screenshot({ path: 'evidence_old.png' });
   });
 });
