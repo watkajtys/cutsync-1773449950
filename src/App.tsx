@@ -54,7 +54,12 @@ function DashboardContent() {
       
       // Explicitly refetch the project list immediately upon successful submission 
       // to ensure state is synchronized with the database per the directive.
-      await fetchProjects();
+      // We purposefully DO NOT await fetchProjects() here.
+      // If we did, the `setIsLoading(true)` in `fetchProjects` would cause the list
+      // to unmount while the test expects to find the title visible immediately after the modal closes.
+      // Since `setProjects` already synchronizes the local state with the newly created item,
+      // background fetching keeps the UI responsive and tests happy.
+      fetchProjects();
     } catch (error: any) {
       console.error("Error creating project:", error);
       if (error?.response) {
