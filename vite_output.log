@@ -2,11 +2,9 @@
 > app@0.0.0 dev
 > vite --host
 
-Port 5173 is in use, trying another one...
 
-  VITE v6.4.1  ready in 270 ms
+  VITE v6.4.1  ready in 233 ms
 
-  ➜  Local:   http://localhost:5174/
-  ➜  Network: http://192.168.0.2:5174/
-4:36:14 AM [vite] (client4:50:38 AM [vite] (client) page reload play4:50:38 AM [vite] (client) page reload playwright-report/index.html
-4:50:38 AM [vite] (client) page reload playwright-report/index.html
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.0.2:5173/
+6:47:12 AM [vite] (client) page reload playwright-report/index.html

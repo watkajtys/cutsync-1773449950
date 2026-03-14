@@ -111,6 +111,6 @@ test.describe('Dashboard and Project Management', () => {
     await expect(page.locator(`h3:has-text("${projectTitle}")`).first()).toBeVisible();
 
     // Take screenshot as required
-    await page.screenshot({ path: 'evidence_old.png' });
+    await page.screenshot({ path: 'evidence.png' });
   });
 });
