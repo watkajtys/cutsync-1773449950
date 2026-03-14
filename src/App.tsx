@@ -49,17 +49,13 @@ function DashboardContent() {
 
   const handleCreateProject = async (title: string, description: string) => {
     try {
-      const newProject = await pb.collection('projects').create<Project>({ title, description }, { requestKey: null });
-      setProjects((prev) => [newProject, ...prev]);
+      await pb.collection('projects').create<Project>({ title, description }, { requestKey: null });
       
       // Explicitly refetch the project list immediately upon successful submission 
       // to ensure state is synchronized with the database per the directive.
-      // We purposefully DO NOT await fetchProjects() here.
-      // If we did, the `setIsLoading(true)` in `fetchProjects` would cause the list
-      // to unmount while the test expects to find the title visible immediately after the modal closes.
-      // Since `setProjects` already synchronizes the local state with the newly created item,
-      // background fetching keeps the UI responsive and tests happy.
-      fetchProjects();
+      // We await this to avoid hallucinating UI state, and the modal will wait
+      // for this to finish before closing, ensuring no race conditions.
+      await fetchProjects();
     } catch (error: any) {
       console.error("Error creating project:", error);
       if (error?.response) {
