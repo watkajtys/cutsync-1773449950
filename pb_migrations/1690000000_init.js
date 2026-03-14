@@ -11,7 +11,7 @@ migrate((db) => {
       "schema": [
         {
           "system": false,
-          "id": "proj_title",
+          "id": "fldtitle",
           "name": "title",
           "type": "text",
           "required": false,
@@ -21,7 +21,7 @@ migrate((db) => {
         },
         {
           "system": false,
-          "id": "proj_desc",
+          "id": "flddescr",
           "name": "description",
           "type": "text",
           "required": false,

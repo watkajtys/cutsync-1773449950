@@ -21,13 +21,13 @@ test.describe('Dashboard and Project Management', () => {
 
   test.beforeEach(async ({ page }) => {
     // Proxy PocketBase requests from the browser to the Docker network container
-    // This allows the client-side code (which calls http://127.0.0.1:8090) 
+    // This allows the client-side code (which calls http://127.0.0.1:8090 or localhost:8090) 
     // to correctly reach the PocketBase instance inside the evaluation Docker network.
     
     // We use a local mock state so tests pass outside Docker
     const mockProjects: any[] = [];
     
-    await page.route('http://127.0.0.1:8090/**', async route => {
+    await page.route(/.*:8090\/api\/.*/, async route => {
       const request = route.request();
       const url = new URL(request.url());
       url.hostname = 'loom-cutsync-pocketbase';
@@ -109,6 +109,6 @@ test.describe('Dashboard and Project Management', () => {
     await expect(page.locator(`h3:has-text("${projectTitle}")`).first()).toBeVisible();
 
     // Take screenshot as required
-    await page.screenshot({ path: 'evidence_old.png' });
+    await page.screenshot({ path: 'evidence.png' });
   });
 });
