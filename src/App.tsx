@@ -8,6 +8,7 @@ import { Film, LayoutGrid, Settings, Plus, Folder } from 'lucide-react';
 function DashboardContent() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   
@@ -16,18 +17,15 @@ function DashboardContent() {
 
   const fetchProjects = async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const records = await pb.collection('projects').getFullList<Project>({
         sort: '-created',
       });
       setProjects(records);
-    } catch (error) {
-      console.error("Failed to fetch projects:", error);
-      // Fallback for visual testing if PocketBase is not running during local dev
-      setProjects([
-        { id: '1', title: 'Mock Project Alpha', description: 'A test project since DB connection failed.' },
-        { id: '2', title: 'Beta Commercial', description: 'Q3 marketing materials.' }
-      ]);
+    } catch (err) {
+      console.error("Failed to fetch projects:", err);
+      setError("Failed to load projects. Please try again later.");
     } finally {
       setIsLoading(false);
     }
@@ -122,6 +120,10 @@ function DashboardContent() {
           {isLoading ? (
             <div className="flex items-center justify-center h-full text-slate-500">
               Loading...
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center h-full text-red-500">
+              {error}
             </div>
           ) : (
             <>
