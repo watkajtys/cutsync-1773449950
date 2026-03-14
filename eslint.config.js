@@ -3,7 +3,7 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['node_modules/**', 'dist/**', 'build/**', 'playwright.config.ts', 'vite.config.ts', 'postcss.config.js', 'tailwind.config.js'],
+    ignores: ['pb_data/**', 'node_modules/**', 'dist/**', 'build/**', 'playwright.config.ts', 'vite.config.ts', 'postcss.config.js', 'tailwind.config.js'],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
