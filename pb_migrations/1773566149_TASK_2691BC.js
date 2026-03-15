@@ -1,3 +1,4 @@
+/* eslint-disable */
 migrate((app) => {
   // 1. Update existing "projects" collection to match roadmap
   const projects = app.findCollectionByNameOrId("projects");

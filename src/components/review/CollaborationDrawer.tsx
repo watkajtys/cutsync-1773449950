@@ -9,6 +9,7 @@ export const CollaborationDrawer: React.FC = () => {
   const [notes, setNotes] = useState<ReviewNote[]>([]);
   const [newNoteText, setNewNoteText] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isDisconnected, setIsDisconnected] = useState(false);
 
   // Mock values until the player state is integrated in phase 4
   const mockCurrentTime = 725.11; // 00:12:05
@@ -18,9 +19,15 @@ export const CollaborationDrawer: React.FC = () => {
     const loadNotes = async () => {
       if (assetId) {
         setIsLoading(true);
-        const fetchedNotes = await fetchReviewNotes(assetId);
-        setNotes(fetchedNotes);
-        setIsLoading(false);
+        setIsDisconnected(false);
+        try {
+          const fetchedNotes = await fetchReviewNotes(assetId);
+          setNotes(fetchedNotes);
+        } catch (error) {
+          setIsDisconnected(true);
+        } finally {
+          setIsLoading(false);
+        }
       } else {
         setIsLoading(false);
       }
@@ -74,6 +81,10 @@ export const CollaborationDrawer: React.FC = () => {
             {isLoading ? (
               <div className="flex justify-center items-center h-full">
                 <span className="text-xs text-slate-500">Loading comments...</span>
+              </div>
+            ) : isDisconnected ? (
+              <div className="flex justify-center items-center h-full">
+                <div className="text-red-500 text-sm font-bold">Disconnected - Check PocketBase Port 8090</div>
               </div>
             ) : notes.length === 0 ? (
               <div className="flex justify-center items-center h-full">

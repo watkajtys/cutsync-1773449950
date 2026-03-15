@@ -11,7 +11,7 @@ export const fetchReviewNotes = async (assetId: string): Promise<ReviewNote[]> =
     return records;
   } catch (error) {
     console.error("Failed to fetch review notes:", error);
-    return [];
+    throw error;
   }
 };
 

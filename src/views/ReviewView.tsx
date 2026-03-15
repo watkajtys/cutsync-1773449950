@@ -40,7 +40,11 @@ export const ReviewView: React.FC = () => {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-between pb-16 pt-4 px-8 bg-black relative overflow-hidden">
+      <div className="w-full bg-[#0a0c10] border-b border-white/5 shadow-2xl z-40">
+        <ChronologicalRiver />
+      </div>
+
+      <main className="flex-1 flex flex-col items-center justify-center pb-16 pt-4 px-8 bg-black relative overflow-hidden">
         <div className="video-container w-full max-w-6xl relative bg-black shadow-[0_0_100px_rgba(0,0,0,1)] ring-1 ring-white/5 shrink shrink-0" style={{ aspectRatio: '21 / 9', maxHeight: '55vh' }}>
           <img alt="Cinematic Content" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6C5kYDZtuJGpypOT0LOGUpiCxJ04IluVt0NtnMAYUS0KaSK5rKBHTwWoYhRpLCNOguVUdp4x8aElSCab-FeEK7zcRCeuHU09MwP0oiIT5O_vpnu-iQwo0k07ImqxZdPfYPfMFQKnaQwX-Wl0tvjk7lo0Pi7_cRyvPMARNGos_9HZqCOHcf0btx6Orh5Dhmwglxkvzm0IXdotBjZVGV4PDMpTrBRk3k76aJZybsz3wmBGGcOzodO_09Q9sDm26sZlRvo3MJm24asg"/>
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
@@ -56,8 +60,7 @@ export const ReviewView: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full max-w-5xl z-10 mt-2 shrink-0">
-          <ChronologicalRiver />
+        <div className="flex flex-col items-center justify-center w-full max-w-5xl z-10 mt-6 shrink-0">
           <PlaybackControls />
         </div>
 

@@ -21,7 +21,7 @@ test('Verify that the React app loads and displays the main dashboard shell with
   let assetType = '';
   let processingStatus = '';
 
-  await page.route('**/api/collections/assets/records*', async (route, request) => {
+  await page.route(/.*:8090\/api\/collections\/assets\/records.*/, async (route, request) => {
     if (request.method() === 'POST') {
       assetCreated = true;
       const postData = request.postData();
@@ -55,7 +55,7 @@ test('Verify that the React app loads and displays the main dashboard shell with
 
   // Need to intercept the initial GET request to PocketBase as well
   // so the mock data loads correctly during the test
-  await page.route('**/api/collections/projects/records*', async (route, request) => {
+  await page.route(/.*:8090\/api\/collections\/projects\/records.*/, async (route, request) => {
     if (request.method() === 'POST') {
       projectCreated = true;
       await route.fulfill({
@@ -110,7 +110,7 @@ test('Verify the "Project Create" flow correctly routes through useProjectAction
   let assetType = '';
   let processingStatus = '';
 
-  await page.route('**/api/collections/assets/records*', async (route, request) => {
+  await page.route(/.*:8090\/api\/collections\/assets\/records.*/, async (route, request) => {
     if (request.method() === 'POST') {
       assetCreated = true;
       const postData = request.postData();
@@ -141,7 +141,7 @@ test('Verify the "Project Create" flow correctly routes through useProjectAction
     }
   });
 
-  await page.route('**/api/collections/projects/records*', async (route, request) => {
+  await page.route(/.*:8090\/api\/collections\/projects\/records.*/, async (route, request) => {
     if (request.method() === 'POST') {
       projectCreated = true;
       await route.fulfill({
@@ -234,7 +234,7 @@ test('Verify the shared ChronologicalRiver component renders in ReviewView', asy
 
 test('Verify the newly implemented Theater Mode structure and styling in Review Mode', async ({ page }) => {
   // Use page.route to mock the PocketBase API requests for review notes
-  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+  await page.route(/.*:8090\/api\/collections\/review_notes\/records.*/, async (route, request) => {
     if (request.method() === 'GET') {
       await route.fulfill({
         status: 200,
