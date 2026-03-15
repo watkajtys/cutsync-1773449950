@@ -4,13 +4,14 @@ import { AssetUploader } from '../assets/AssetUploader';
 
 interface NewProjectModalProps {
   onClose: () => void;
-  onSubmit: (title: string, description: string) => Promise<void>;
+  onSubmit: (title: string, description: string, file: File | null, assetType: string) => Promise<void>;
 }
 
 export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onSubmit }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [assetType, setAssetType] = useState<string>('source_clip');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,14 +20,18 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onSub
     
     setIsSubmitting(true);
     try {
-      // In Phase 2, the file would also be passed to onSubmit or handled separately.
-      await onSubmit(title, description);
+      await onSubmit(title, description, file, assetType);
       onClose();
     } catch (error) {
       console.error("Failed to create project:", error);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleFileSelect = (selectedFile: File | null, selectedAssetType: string) => {
+    setFile(selectedFile);
+    setAssetType(selectedAssetType);
   };
 
   return (
@@ -74,9 +79,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onSub
 
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">
-              Source Asset
+              Asset
             </label>
-            <AssetUploader onFileSelect={setFile} />
+            <AssetUploader onFileSelect={handleFileSelect} />
           </div>
           
           <div className="mt-4 flex justify-end gap-3 pt-4 border-t border-slate-800">

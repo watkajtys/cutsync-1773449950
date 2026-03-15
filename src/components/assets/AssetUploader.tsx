@@ -2,12 +2,13 @@ import React, { useRef, useState } from 'react';
 import { UploadCloud, FileVideo, X } from 'lucide-react';
 
 interface AssetUploaderProps {
-  onFileSelect: (file: File | null) => void;
+  onFileSelect: (file: File | null, assetType: string) => void;
 }
 
 export const AssetUploader: React.FC<AssetUploaderProps> = ({ onFileSelect }) => {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [assetType, setAssetType] = useState<string>('source_clip');
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleDrag = (e: React.DragEvent) => {
@@ -40,9 +41,17 @@ export const AssetUploader: React.FC<AssetUploaderProps> = ({ onFileSelect }) =>
   const handleFileSelection = (file: File) => {
     if (file.type === "video/mp4" || file.type === "video/webm") {
       setSelectedFile(file);
-      onFileSelect(file);
+      onFileSelect(file, assetType);
     } else {
       alert("Please upload an MP4 or WebM video file.");
+    }
+  };
+
+  const handleAssetTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newType = e.target.value;
+    setAssetType(newType);
+    if (selectedFile) {
+      onFileSelect(selectedFile, newType);
     }
   };
 
@@ -53,12 +62,27 @@ export const AssetUploader: React.FC<AssetUploaderProps> = ({ onFileSelect }) =>
   const removeFile = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedFile(null);
-    onFileSelect(null);
+    onFileSelect(null, assetType);
     if (inputRef.current) inputRef.current.value = '';
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full space-y-4">
+      <div>
+        <label htmlFor="asset_type" className="block text-sm font-medium text-slate-300 mb-1">
+          Asset Type
+        </label>
+        <select
+          id="asset_type"
+          value={assetType}
+          onChange={handleAssetTypeChange}
+          className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
+        >
+          <option value="source_clip">Source Clip</option>
+          <option value="review_edit">Review Edit</option>
+        </select>
+      </div>
+
       {!selectedFile ? (
         <div 
           className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center transition-colors cursor-pointer ${

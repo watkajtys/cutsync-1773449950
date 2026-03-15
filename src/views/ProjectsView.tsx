@@ -5,6 +5,7 @@ import { ChronologicalRiver } from '../components/dashboard/ChronologicalRiver';
 import { NewProjectModal } from '../components/modals/NewProjectModal';
 import { Project } from '../types/project';
 import { fetchProjects, createProject } from '../api/projects';
+import { createAsset } from '../api/assets';
 
 export const ProjectsView: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -39,8 +40,13 @@ export const ProjectsView: React.FC = () => {
     setSearchParams(params);
   };
 
-  const handleCreateProject = async (title: string, description: string) => {
-    await createProject(title, description);
+  const handleCreateProject = async (title: string, description: string, file: File | null, assetType: string) => {
+    const newProject = await createProject(title, description);
+    
+    if (file) {
+      await createAsset(file, newProject.id, assetType);
+    }
+
     await loadProjects();
   };
 

@@ -17,7 +17,42 @@ test('Verify that the React app loads and displays the main dashboard shell with
 
   // Intercept the POST request to PocketBase
   let projectCreated = false;
-  
+  let assetCreated = false;
+  let assetType = '';
+  let processingStatus = '';
+
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'POST') {
+      assetCreated = true;
+      const postData = request.postData();
+      if (postData) {
+        // Simple string check since it's multipart/form-data
+        if (postData.includes('name="asset_type"') && postData.includes('source_clip')) {
+          assetType = 'source_clip';
+        }
+        if (postData.includes('name="processing_status"') && postData.includes('pending')) {
+          processingStatus = 'pending';
+        }
+      }
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'ast1234567890xx',
+          project_id: 'pbc1234567890xx',
+          file: 'test_video.mp4',
+          asset_type: 'source_clip',
+          processing_status: 'pending',
+          created: new Date().toISOString(),
+          updated: new Date().toISOString()
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
   // Need to intercept the initial GET request to PocketBase as well
   // so the mock data loads correctly during the test
   await page.route('**/api/collections/projects/records*', async (route, request) => {
@@ -70,6 +105,22 @@ test('Verify that the React app loads and displays the main dashboard shell with
   await page.fill('input#title', 'Integration Test Project');
   await page.fill('textarea#description', 'A project created via test');
 
+  // Select 'source_clip' in the asset_type dropdown
+  await page.selectOption('select#asset_type', 'source_clip');
+
+  // Mock file upload
+  const fileChooserPromise = page.waitForEvent('filechooser');
+  await page.click('text=Drag & drop source video');
+  const fileChooser = await fileChooserPromise;
+  await fileChooser.setFiles({
+    name: 'test_video.mp4',
+    mimeType: 'video/mp4',
+    buffer: Buffer.from('fake video content')
+  });
+
+  // Wait for file to be selected and shown
+  await expect(page.locator('text=test_video.mp4')).toBeVisible();
+
   // Submit the form
   await page.click('button:has-text("Create Project")');
   
@@ -78,10 +129,13 @@ test('Verify that the React app loads and displays the main dashboard shell with
 
   // Verify the POST request was made
   expect(projectCreated).toBe(true);
+  expect(assetCreated).toBe(true);
+  expect(assetType).toBe('source_clip');
+  expect(processingStatus).toBe('pending');
   
   // Wait for the ChronologicalRiver component container to show the new project
   await expect(page.locator('h3:has-text("Integration Test Project")').first()).toBeVisible();
 
   // Take screenshot at the end
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
