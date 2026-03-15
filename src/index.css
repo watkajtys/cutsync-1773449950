@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.video-container {
+    aspect-ratio: 21 / 9;
+}
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #2d3446;
+    border-radius: 10px;
+}
+.river-gradient {
+    background: linear-gradient(to right, transparent, rgba(43,108,238,0.05) 50%, transparent);
+}

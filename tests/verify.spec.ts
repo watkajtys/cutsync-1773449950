@@ -193,3 +193,25 @@ test('Verify the Review Mode uses proper lucide icons after refactoring', async 
 
   await page.screenshot({ path: 'evidence_old.png' });
 });
+
+test('Verify the newly implemented Theater Mode structure and styling', async ({ page }) => {
+  await page.goto('/theater/test-asset-123');
+
+  // Verify Header content specific to new design
+  await expect(page.locator('text=THEATER MODE')).toBeVisible();
+  await expect(page.locator('text=CINEMATIC WIDE')).toBeVisible();
+  await expect(page.locator('text=CURRENT TIMECODE')).toBeVisible();
+
+  // Verify the Ratio element
+  await expect(page.locator('text=2.39:1 Cinemascope')).toBeVisible();
+
+  // Verify Drawer text
+  await expect(page.locator('text=Collaboration & Review Drawer')).toBeVisible();
+  
+  // Verify the Annotate and Approve actions are rendered
+  await expect(page.locator('text=Annotate')).toBeVisible();
+  await expect(page.locator('text=Approve')).toBeVisible();
+
+  // Take screenshot of the new feature at the end
+  await page.screenshot({ path: 'evidence.png' });
+});
