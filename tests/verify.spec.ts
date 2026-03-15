@@ -232,29 +232,68 @@ test('Verify the shared ChronologicalRiver component renders in ReviewView', asy
 });
 
 test('Verify the newly implemented Theater Mode structure and styling in Review Mode', async ({ page }) => {
+  // Use page.route to mock the PocketBase API requests for review notes
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          page: 1,
+          perPage: 30,
+          totalItems: 0,
+          totalPages: 1,
+          items: []
+        })
+      });
+    } else if (request.method() === 'POST') {
+      const postData = JSON.parse(request.postData() || '{}');
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'rvn123456789012',
+          collectionId: 'rvn123456789012',
+          collectionName: 'review_notes',
+          created: '2024-03-15 00:00:00.000Z',
+          updated: '2024-03-15 00:00:00.000Z',
+          ...postData
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
   await page.goto('/review/test-asset-123');
+
+  // Wait for the mock loading state to finish
+  await expect(page.locator('text=Loading comments...')).not.toBeVisible();
 
   // Verify Header content specific to new design
   await expect(page.locator('text=THEATER MODE')).toBeVisible();
-  await expect(page.locator('text=CINEMATIC WIDE')).toBeVisible();
+  await expect(page.locator('text=Silent Horizon + Scene 04')).toBeVisible();
   await expect(page.locator('text=CURRENT TIMECODE')).toBeVisible();
 
   // Verify the Ratio element
   await expect(page.locator('text=2.39:1 Cinemascope')).toBeVisible();
 
-  // Verify Drawer text
-  await expect(page.locator('text=Collaboration & Review Drawer')).toBeVisible();
-  
-  // Verify the Annotate and Approve actions are rendered
-  await expect(page.locator('text=Annotate')).toBeVisible();
-  await expect(page.locator('text=Approve')).toBeVisible();
+  // Verify Sidebar tabs
+  await expect(page.locator('button', { hasText: 'Comments' })).toBeVisible();
+  await expect(page.locator('button', { hasText: 'History' })).toBeVisible();
+  await expect(page.locator('text=Metadata').first()).toBeVisible();
 
-  // Verify mock timestamped notes in the Collaboration Drawer
-  await expect(page.locator('text=Sarah J.')).toBeVisible();
-  
-  // Verify the text area for adding a comment
-  const textarea = page.locator('textarea[placeholder*="Drop a note..."]');
+  // Verify the text area for adding a comment is visible and functional
+  const textarea = page.locator('textarea[placeholder*="Add a comment"]');
   await expect(textarea).toBeVisible();
+
+  // Add a new comment to test the database integration
+  await textarea.fill('The mist in the background feels a bit too heavy.');
+  await page.click('button:has(svg.lucide-send)');
+
+  // Verify the newly created comment is displayed from PocketBase
+  await expect(page.locator('text=Alex Rivers')).toBeVisible();
+  await expect(page.locator('text=The mist in the background feels a bit too heavy.')).toBeVisible();
 
   // Verify the Chronological River timeline section
   await expect(page.locator('text=Chronological River • Frame-by-Frame Navigation').first()).toBeVisible();
