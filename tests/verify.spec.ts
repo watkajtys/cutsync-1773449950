@@ -172,5 +172,5 @@ test('Verify the Review Mode shell and layout for a specific asset', async ({ pa
   await expect(page.locator('text=CURRENT: 20187').first()).toBeVisible();
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
