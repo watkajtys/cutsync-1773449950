@@ -1,20 +1,6 @@
 import { test, expect } from '@playwright/test';
 
 test('Verify that the React app loads and displays the main dashboard shell with navigation.', async ({ page }) => {
-  await page.goto('/');
-  
-  // Wait for the app to finish loading the initial mock state
-  await expect(page.locator('text=CutSync')).toBeVisible();
-
-  // Verify that the navigation shell is present
-  const sidebar = page.locator('nav').first();
-  await expect(sidebar).toBeVisible();
-  
-  // Check for the presence of standard navigation items
-  await expect(page.locator('a:has-text("Projects")').first()).toBeVisible();
-  await expect(page.locator('a:has-text("Recent Assets")').first()).toBeVisible();
-  await expect(page.locator('a:has-text("Settings")').first()).toBeVisible();
-
   // Intercept the POST request to PocketBase
   let projectCreated = false;
   let assetCreated = false;
@@ -94,16 +80,26 @@ test('Verify that the React app loads and displays the main dashboard shell with
     }
   });
 
+  await page.goto('/');
+  
+  // Wait for the app to finish loading the initial mock state
+  await expect(page.locator('text=CutSync')).toBeVisible();
+
+  // Verify that the navigation shell is present
+  const sidebar = page.locator('nav').first();
+  await expect(sidebar).toBeVisible();
+  
+  // Check for the presence of standard navigation items
+  await expect(page.locator('a:has-text("Projects")').first()).toBeVisible();
+  await expect(page.locator('a:has-text("Recent Assets")').first()).toBeVisible();
+  await expect(page.locator('a:has-text("Settings")').first()).toBeVisible();
+
+
   // Wait for the ProjectGrid component container to show the mock projects
   await expect(page.locator('h3:has-text("Mock Project Alpha")').first()).toBeVisible();
 });
 
 test('Verify the "Project Create" flow correctly routes through useProjectActions to hit PocketBase SDK', async ({ page }) => {
-  await page.goto('/');
-
-  // Wait for the app to finish loading the initial mock state
-  await expect(page.locator('text=CutSync')).toBeVisible();
-
   // Intercept the POST request to PocketBase
   let projectCreated = false;
   let assetCreated = false;
@@ -179,6 +175,11 @@ test('Verify the "Project Create" flow correctly routes through useProjectAction
     }
   });
 
+  await page.goto('/');
+
+  // Wait for the app to finish loading the initial mock state
+  await expect(page.locator('text=CutSync')).toBeVisible();
+
   // Open the New Project Modal
   await page.click('button:has-text("New Project")');
   await expect(page.locator('h2:has-text("New Project")').first()).toBeVisible();
@@ -222,7 +223,7 @@ test('Verify the "Project Create" flow correctly routes through useProjectAction
   await expect(page.locator('h3:has-text("Integration Test Project")').first()).toBeVisible();
 
   // Take screenshot at the end
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify the shared ChronologicalRiver component renders in ReviewView', async ({ page }) => {
@@ -296,7 +297,8 @@ test('Verify the newly implemented Theater Mode structure and styling in Review 
   await expect(page.locator('text=The mist in the background feels a bit too heavy.')).toBeVisible();
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify the Review Mode uses proper lucide icons after refactoring', async ({ page }) => {
