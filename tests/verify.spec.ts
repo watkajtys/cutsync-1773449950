@@ -223,7 +223,7 @@ test('Verify the "Project Create" flow correctly routes through useProjectAction
   await expect(page.locator('h3:has-text("Integration Test Project")').first()).toBeVisible();
 
   // Take screenshot at the end
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify the shared ChronologicalRiver component renders in ReviewView', async ({ page }) => {
@@ -323,7 +323,7 @@ test('Verify the newly implemented Theater Mode structure and styling in Review 
   await expect(page.locator('[data-testid="active-tab-panel-title"]')).toContainText('export', { ignoreCase: true });
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify the Review Mode uses proper lucide icons after refactoring', async ({ page }) => {
@@ -338,5 +338,5 @@ test('Verify the Review Mode uses proper lucide icons after refactoring', async 
   const settingsIcon = page.locator('footer svg.lucide-settings').first();
   await expect(settingsIcon).toBeVisible();
 
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
