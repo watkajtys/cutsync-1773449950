@@ -3,21 +3,8 @@
 > vite --host
 
 
-  VITE v6.4.1  ready in 310 ms
+  VITE v6.4.1  ready in 472 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: http://192.168.0.2:5173/
-3:07:28 PM [vite] (client) page reload playwright-report/index.html
-3:15:03 PM [vite] (client) hmr update /src/views/ReviewView.tsx, /src/index.css
-3:15:49 PM [vite] (client) hmr update /src/components/review/CollaborationDrawer.tsx, /src/index.css
-3:16:08 PM [vite] (client) hmr update /src/components/theater/PlaybackControls.tsx, /src/index.css
-3:16:58 PM [vite] (client) hmr update /src/components/review/CollaborationDrawer.tsx, /src/index.css
-3:18:24 PM [vite] (client) hmr update /src/components/review/CollaborationDrawer.tsx, /src/index.css
-3:19:09 PM [vite] (client) page reload playwright-report/index.html
-3:19:09 PM [vite] (client) page reload playwright-report/index.html
-3:19:23 PM [vite] (client) hmr update /src/components/theater/PlaybackControls.tsx, /src/index.css
-3:19:46 PM [vite] (client) hmr update /src/views/ReviewView.tsx, /src/index.css
-3:20:08 PM [vite] (client) page reload playwright-report/index.html
-3:20:55 PM [vite] (client) page reload playwright-report/index.html
-3:43:39 PM [vite] (client) page reload playwright-report/index.html
-3:43:39 PM [vite] (client) page reload playwright-report/index.html
+8:53:03 PM [vite] (client) page reload playwright-report/index.html
