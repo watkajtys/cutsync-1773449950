@@ -6,6 +6,8 @@ import { CollaborationDrawer } from '../components/review/CollaborationDrawer';
 import { PlaybackControls } from '../components/theater/PlaybackControls';
 
 export const ReviewView: React.FC = () => {
+  const [activeTab, setActiveTab] = React.useState<'metadata' | 'versions' | 'export' | null>(null);
+
   return (
     <>
       <header className="h-14 flex items-center justify-between px-6 border-b border-white/5 bg-black/40 backdrop-blur-2xl z-50 shrink-0">
@@ -44,18 +46,34 @@ export const ReviewView: React.FC = () => {
           <img alt="Cinematic Content" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6C5kYDZtuJGpypOT0LOGUpiCxJ04IluVt0NtnMAYUS0KaSK5rKBHTwWoYhRpLCNOguVUdp4x8aElSCab-FeEK7zcRCeuHU09MwP0oiIT5O_vpnu-iQwo0k07ImqxZdPfYPfMFQKnaQwX-Wl0tvjk7lo0Pi7_cRyvPMARNGos_9HZqCOHcf0btx6Orh5Dhmwglxkvzm0IXdotBjZVGV4PDMpTrBRk3k76aJZybsz3wmBGGcOzodO_09Q9sDm26sZlRvo3MJm24asg" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
           <div className="absolute top-6 left-6 flex items-center gap-4">
-            <div className="flex flex-col">
-              <span className="text-[10px] text-white/40 font-bold tracking-widest uppercase">Project</span>
-              <span className="text-xs text-white/80 font-medium">SILENT HORIZON_V03.mxf</span>
+            <div className="flex flex-col drop-shadow-md">
+              <span className="text-[10px] text-white/60 font-bold tracking-widest uppercase text-shadow">Project</span>
+              <span className="text-xs text-white font-bold text-shadow">SILENT HORIZON_V03.mxf</span>
             </div>
           </div>
-          <div className="absolute bottom-6 right-6 text-right">
-            <span className="text-[10px] text-white/40 font-bold tracking-widest uppercase">Ratio</span>
-            <p className="text-xs text-white/80 font-medium tracking-tight">2.39:1 Cinemascope</p>
+          <div className="absolute bottom-6 right-6 text-right drop-shadow-md">
+            <span className="text-[10px] text-white/60 font-bold tracking-widest uppercase text-shadow">Ratio</span>
+            <p className="text-xs text-white font-bold tracking-tight text-shadow">2.39:1 Cinemascope</p>
           </div>
         </div>
 
-        <PlaybackControls />
+        <PlaybackControls activeTab={activeTab} setActiveTab={setActiveTab} />
+
+        {activeTab && (
+          <div className="absolute right-0 top-14 bottom-8 w-1/4 bg-surface/95 backdrop-blur-3xl border-l border-white/10 z-[100] p-6 pointer-events-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white" data-testid="active-tab-panel-title">
+                {activeTab} PANEL
+              </h3>
+              <button onClick={() => setActiveTab(null)} className="text-slate-500 hover:text-white transition-colors">
+                <span className="material-symbols-outlined text-sm">close</span>
+              </button>
+            </div>
+            <div className="text-slate-400 text-sm">
+              <p>Content for {activeTab} goes here...</p>
+            </div>
+          </div>
+        )}
 
         <CollaborationDrawer />
       </main>

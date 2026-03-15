@@ -223,7 +223,7 @@ test('Verify the "Project Create" flow correctly routes through useProjectAction
   await expect(page.locator('h3:has-text("Integration Test Project")').first()).toBeVisible();
 
   // Take screenshot at the end
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify the shared ChronologicalRiver component renders in ReviewView', async ({ page }) => {
@@ -243,9 +243,18 @@ test('Verify the newly implemented Theater Mode structure and styling in Review 
         body: JSON.stringify({
           page: 1,
           perPage: 30,
-          totalItems: 0,
+          totalItems: 1,
           totalPages: 1,
-          items: []
+          items: [{
+            id: 'rvn123456789011',
+            collectionId: 'rvn123456789012',
+            collectionName: 'review_notes',
+            created: '2024-03-15 00:00:00.000Z',
+            updated: '2024-03-15 00:00:00.000Z',
+            author: 'Mock Author',
+            note_text: 'A mock comment from backend',
+            timestamp: 12.34
+          }]
         })
       });
     } else if (request.method() === 'POST') {
@@ -288,6 +297,10 @@ test('Verify the newly implemented Theater Mode structure and styling in Review 
   const textarea = page.locator('textarea[placeholder*="Drop a note..."]');
   await expect(textarea).toBeVisible();
 
+  // Verify the initial mock comment loaded successfully from the mocked API
+  await expect(page.locator('text=Mock Author')).toBeVisible();
+  await expect(page.locator('text=A mock comment from backend')).toBeVisible();
+
   // Add a new comment to test the database integration
   await textarea.fill('The mist in the background feels a bit too heavy.');
   await page.click('button:has(svg.lucide-arrow-up-right)');
@@ -296,9 +309,21 @@ test('Verify the newly implemented Theater Mode structure and styling in Review 
   await expect(page.locator('text=Alex Rivers')).toBeVisible();
   await expect(page.locator('text=The mist in the background feels a bit too heavy.')).toBeVisible();
 
+  // Test the newly added Navigation tab elements
+  await page.locator('[data-testid="nav-btn-metadata"]').click({ force: true });
+  await page.waitForTimeout(500);
+  await expect(page.locator('[data-testid="active-tab-panel-title"]')).toContainText('metadata', { ignoreCase: true });
+
+  await page.locator('[data-testid="nav-btn-versions"]').click({ force: true });
+  await page.waitForTimeout(500);
+  await expect(page.locator('[data-testid="active-tab-panel-title"]')).toContainText('versions', { ignoreCase: true });
+
+  await page.locator('[data-testid="nav-btn-export"]').click({ force: true });
+  await page.waitForTimeout(500);
+  await expect(page.locator('[data-testid="active-tab-panel-title"]')).toContainText('export', { ignoreCase: true });
+
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence_old.png' });
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify the Review Mode uses proper lucide icons after refactoring', async ({ page }) => {
@@ -313,5 +338,5 @@ test('Verify the Review Mode uses proper lucide icons after refactoring', async 
   const settingsIcon = page.locator('footer svg.lucide-settings').first();
   await expect(settingsIcon).toBeVisible();
 
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });

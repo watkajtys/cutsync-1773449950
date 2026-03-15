@@ -2,9 +2,9 @@ import React from 'react';
 
 export const ChronologicalRiver: React.FC = () => {
   return (
-    <div className="bg-black/80 border-b border-white/5 h-20 overflow-hidden relative group">
+    <div className="bg-black/80 border-b border-white/5 h-24 overflow-hidden relative group pt-4">
       <div className="absolute inset-0 river-gradient pointer-events-none"></div>
-      <div className="flex items-center h-full px-2 gap-1 overflow-x-auto custom-scrollbar">
+      <div className="flex items-center h-full px-2 gap-1 overflow-x-auto custom-scrollbar pb-2">
         <div className="flex items-center gap-1 min-w-max px-4">
           <div className="w-24 h-12 rounded-sm border border-white/10 overflow-hidden opacity-30 hover:opacity-60 transition-opacity cursor-pointer">
             <img alt="Frame" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6C5kYDZtuJGpypOT0LOGUpiCxJ04IluVt0NtnMAYUS0KaSK5rKBHTwWoYhRpLCNOguVUdp4x8aElSCab-FeEK7zcRCeuHU09MwP0oiIT5O_vpnu-iQwo0k07ImqxZdPfYPfMFQKnaQwX-Wl0tvjk7lo0Pi7_cRyvPMARNGos_9HZqCOHcf0btx6Orh5Dhmwglxkvzm0IXdotBjZVGV4PDMpTrBRk3k76aJZybsz3wmBGGcOzodO_09Q9sDm26sZlRvo3MJm24asg"/>
@@ -23,8 +23,11 @@ export const ChronologicalRiver: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/5">
-        <div className="h-full bg-primary/50 w-[42%]"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/5 flex">
+        <div className="w-[120px] shrink-0"></div>
+        <div className="w-[100px] shrink-0"></div>
+        <div className="w-[100px] shrink-0"></div>
+        <div className="h-full bg-primary/80 w-28 rounded-full shadow-[0_0_8px_rgba(43,108,238,0.8)] mx-1"></div>
       </div>
     </div>
   );
