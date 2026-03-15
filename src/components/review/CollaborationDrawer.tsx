@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { PenTool, CheckCircle, Send } from 'lucide-react';
+import { PenTool, CheckCircle, ArrowUpRight } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { ReviewNote } from '../../types/review';
 import { fetchReviewNotes, createReviewNote } from '../../hooks/useReviewNotes';
@@ -144,7 +144,7 @@ export const CollaborationDrawer: React.FC = () => {
               onClick={handleAddNote}
               disabled={!newNoteText.trim()}
             >
-              <Send className="w-4 h-4" />
+              <ArrowUpRight className="w-4 h-4" strokeWidth={2.5} />
             </button>
           </div>
         </div>

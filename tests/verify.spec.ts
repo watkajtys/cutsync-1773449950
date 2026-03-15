@@ -290,7 +290,7 @@ test('Verify the newly implemented Theater Mode structure and styling in Review 
 
   // Add a new comment to test the database integration
   await textarea.fill('The mist in the background feels a bit too heavy.');
-  await page.click('button:has(svg.lucide-send)');
+  await page.click('button:has(svg.lucide-arrow-up-right)');
 
   // Verify the newly created comment is displayed from PocketBase
   await expect(page.locator('text=Alex Rivers')).toBeVisible();
