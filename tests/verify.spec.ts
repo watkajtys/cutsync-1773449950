@@ -174,3 +174,22 @@ test('Verify the Review Mode shell and layout for a specific asset', async ({ pa
   // Take screenshot of the new feature at the end
   await page.screenshot({ path: 'evidence_old.png' });
 });
+
+test('Verify the Review Mode uses proper lucide icons after refactoring', async ({ page }) => {
+  await page.goto('/review/test-asset-123');
+  
+  // Verify lucide-react icons are loaded in the DOM (usually they have lucide class or are SVGs)
+  // Check the Database icon in the header
+  const databaseIcon = page.locator('header svg.lucide-database').first();
+  await expect(databaseIcon).toBeVisible();
+
+  // Check PlayCircle icon
+  const playCircleIcon = page.locator('header svg').nth(1);
+  await expect(playCircleIcon).toBeVisible();
+
+  // Check CloudCog in footer
+  const cloudCogIcon = page.locator('footer svg').first();
+  await expect(cloudCogIcon).toBeVisible();
+
+  await page.screenshot({ path: 'evidence.png' });
+});

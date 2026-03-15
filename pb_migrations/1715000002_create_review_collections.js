@@ -9,7 +9,7 @@ migrate((db) => {
       "schema": [
         {
           "system": false,
-          "id": "fldasset0",
+          "id": "fldaset0",
           "name": "asset_id",
           "type": "relation",
           "required": false,
@@ -68,7 +68,7 @@ migrate((db) => {
       "schema": [
         {
           "system": false,
-          "id": "fldasset1",
+          "id": "fldaset1",
           "name": "asset_id",
           "type": "relation",
           "required": false,
@@ -141,7 +141,7 @@ migrate((db) => {
       "schema": [
         {
           "system": false,
-          "id": "fldasset2",
+          "id": "fldaset2",
           "name": "asset_id",
           "type": "relation",
           "required": false,
