@@ -27,10 +27,10 @@ export const ReviewView: React.FC = () => {
           </nav>
         </div>
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-lg px-4 py-1.5">
+          <div className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-lg px-3 py-1">
             <div className="flex flex-col items-center">
-              <span className="text-[9px] text-slate-500 font-bold leading-none mb-1">CURRENT TIMECODE</span>
-              <span className="text-sm font-mono text-white font-medium tracking-widest">00:14:02:11</span>
+              <span className="text-[9px] text-slate-500 font-bold leading-none mb-0.5">CURRENT TIMECODE</span>
+              <span className="text-[13px] font-mono text-white font-medium tracking-widest">00:14:02:11</span>
             </div>
           </div>
           <div className="h-8 w-8 rounded-full border border-white/10 overflow-hidden">
@@ -60,7 +60,7 @@ export const ReviewView: React.FC = () => {
         <PlaybackControls activeTab={activeTab} setActiveTab={setActiveTab} />
 
         {activeTab && (
-          <div className="absolute right-0 top-14 bottom-8 w-1/4 bg-surface/95 backdrop-blur-3xl border-l border-white/10 z-[100] p-6 pointer-events-auto">
+          <div className="absolute right-0 top-14 bottom-12 w-1/4 bg-surface/95 backdrop-blur-3xl border-l border-white/10 z-[100] p-6 pointer-events-auto shadow-2xl transition-transform">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white" data-testid="active-tab-panel-title">
                 {activeTab} PANEL
@@ -78,7 +78,7 @@ export const ReviewView: React.FC = () => {
         <CollaborationDrawer />
       </main>
 
-      <footer className="h-8 bg-black border-t border-white/5 px-6 flex items-center justify-between text-[9px] font-bold text-slate-600 uppercase tracking-widest z-50">
+      <footer className="h-8 bg-black border-t border-white/5 px-6 flex items-center justify-between text-[9px] font-bold text-slate-600 uppercase tracking-widest z-[150] relative">
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2">
             <span className="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
