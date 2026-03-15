@@ -1,6 +1,6 @@
 /* eslint-disable */
 migrate((db) => {
-  const collection = new da.Collection({
+  const collection = new Collection({
     "id": "pbc123456789013",
     "created": "2024-01-01 00:00:00.000Z",
     "updated": "2024-01-01 00:00:00.000Z",

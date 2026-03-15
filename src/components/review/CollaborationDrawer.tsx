@@ -65,8 +65,8 @@ export const CollaborationDrawer: React.FC = () => {
 
   return (
     <div className="absolute bottom-0 left-0 right-0 bg-surface/90 backdrop-blur-3xl border-t border-white/10 transform translate-y-[calc(100%-48px)] hover:translate-y-0 transition-transform duration-500 ease-in-out z-40">
-      <div className="h-12 flex items-center justify-center cursor-pointer border-b border-white/5">
-        <div className="w-12 h-1 bg-white/20 rounded-full absolute top-2"></div>
+      <div className="h-12 relative flex items-center justify-center cursor-pointer border-b border-white/5 pt-1">
+        <div className="w-12 h-1 bg-white/20 rounded-full absolute top-1.5 left-1/2 -translate-x-1/2"></div>
         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Collaboration & Review Drawer</span>
       </div>
       <div className="h-64 flex divide-x divide-white/5">

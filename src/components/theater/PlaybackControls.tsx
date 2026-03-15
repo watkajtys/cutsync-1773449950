@@ -11,16 +11,16 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({ activeTab, s
     <div className="mt-8 flex flex-col items-center gap-6 z-[100] relative pointer-events-auto">
       <div className="flex items-center gap-12">
         <button className="text-slate-500 hover:text-white transition-colors">
-          <SkipBack className="w-6 h-6" strokeWidth={2} />
+          <SkipBack className="w-7 h-7" strokeWidth={1.5} />
         </button>
         <button className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform">
-          <Play className="w-8 h-8 fill-black translate-x-0.5" strokeWidth={1} />
+          <Play className="w-10 h-10 fill-black translate-x-0.5" strokeWidth={1.5} />
         </button>
         <button className="text-slate-500 hover:text-white transition-colors">
-          <SkipForward className="w-6 h-6" strokeWidth={2} />
+          <SkipForward className="w-7 h-7" strokeWidth={1.5} />
         </button>
       </div>
-      <div className="flex items-center gap-8 text-[10px] font-bold tracking-[0.2em] text-slate-600">
+      <div className="flex items-center gap-8 text-[11px] font-bold tracking-[0.2em] text-slate-400">
         <button
           className={`hover:text-primary transition-colors uppercase ${activeTab === 'metadata' ? 'text-primary' : ''} relative z-50`}
           onClick={() => setActiveTab(activeTab === 'metadata' ? null : 'metadata')}

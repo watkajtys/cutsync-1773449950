@@ -221,7 +221,7 @@ migrate((db) => {
   ];
 
   for (const col of collections) {
-    const collection = new da.Collection(col);
+    const collection = new Collection(col);
     new Dao(db).saveCollection(collection);
   }
 }, (db) => {

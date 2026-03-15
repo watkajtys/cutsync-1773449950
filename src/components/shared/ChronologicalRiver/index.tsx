@@ -23,11 +23,11 @@ export const ChronologicalRiver: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/5 flex">
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/5 flex">
         <div className="w-[120px] shrink-0"></div>
         <div className="w-[100px] shrink-0"></div>
         <div className="w-[100px] shrink-0"></div>
-        <div className="h-full bg-primary/80 w-28 rounded-full shadow-[0_0_8px_rgba(43,108,238,0.8)] mx-1"></div>
+        <div className="h-full bg-primary w-28 rounded-t shadow-[0_-2px_10px_rgba(43,108,238,0.5)] mx-1"></div>
       </div>
     </div>
   );

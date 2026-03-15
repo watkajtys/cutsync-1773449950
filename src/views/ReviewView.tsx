@@ -91,8 +91,8 @@ export const ReviewView: React.FC = () => {
         </div>
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-4">
-            <Settings className="w-4 h-4 hover:text-white cursor-pointer transition-colors" />
-            <Maximize className="w-4 h-4 hover:text-white cursor-pointer transition-colors" />
+            <Settings className="w-5 h-5 hover:text-white cursor-pointer transition-colors" strokeWidth={2} />
+            <Maximize className="w-5 h-5 hover:text-white cursor-pointer transition-colors" strokeWidth={2} />
           </div>
           <div className="text-slate-800">BUILD 0.92-ALPHA</div>
         </div>
