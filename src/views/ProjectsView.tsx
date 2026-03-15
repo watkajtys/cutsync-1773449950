@@ -1,32 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Plus } from 'lucide-react';
-import { ChronologicalRiver } from '../components/dashboard/ChronologicalRiver';
+import { ProjectGrid } from '../components/dashboard/ProjectGrid';
 import { NewProjectModal } from '../components/modals/NewProjectModal';
-import { Project } from '../types/project';
-import { fetchProjects, createProject } from '../api/projects';
-import { createAsset } from '../api/assets';
+import { useProjectActions } from '../hooks/useProjectActions';
 
 export const ProjectsView: React.FC = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { projects, isLoading, handleCreateProject } = useProjectActions();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const isNewProjectModalOpen = searchParams.get('modal') === 'new-project';
-
-  const loadProjects = async () => {
-    setIsLoading(true);
-    try {
-      const records = await fetchProjects();
-      setProjects(records);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadProjects();
-  }, []);
 
   const openNewProjectModal = () => {
     const params = new URLSearchParams(searchParams.toString());
@@ -38,16 +21,6 @@ export const ProjectsView: React.FC = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('modal');
     setSearchParams(params);
-  };
-
-  const handleCreateProject = async (title: string, description: string, file: File | null, assetType: string) => {
-    const newProject = await createProject(title, description);
-    
-    if (file) {
-      await createAsset(file, newProject.id, assetType);
-    }
-
-    await loadProjects();
   };
 
   return (
@@ -70,7 +43,7 @@ export const ProjectsView: React.FC = () => {
             Loading...
           </div>
         ) : (
-          <ChronologicalRiver projects={projects} />
+          <ProjectGrid projects={projects} />
         )}
       </div>
 

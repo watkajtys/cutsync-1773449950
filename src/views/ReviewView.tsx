@@ -4,7 +4,7 @@ import { CloudCog, Users } from 'lucide-react';
 import { ReviewHeader } from '../components/review/ReviewHeader';
 import { TheaterPlayer } from '../components/review/TheaterPlayer';
 import { NotesSidebar } from '../components/review/NotesSidebar';
-import { ChronologicalRiver } from '../components/review/ChronologicalRiver';
+import { ChronologicalRiver } from '../components/shared/ChronologicalRiver/index';
 
 export const ReviewView: React.FC = () => {
   const { assetId } = useParams();

@@ -94,6 +94,91 @@ test('Verify that the React app loads and displays the main dashboard shell with
     }
   });
 
+  // Wait for the ProjectGrid component container to show the mock projects
+  await expect(page.locator('h3:has-text("Mock Project Alpha")').first()).toBeVisible();
+});
+
+test('Verify the "Project Create" flow correctly routes through useProjectActions to hit PocketBase SDK', async ({ page }) => {
+  await page.goto('/');
+
+  // Wait for the app to finish loading the initial mock state
+  await expect(page.locator('text=CutSync')).toBeVisible();
+
+  // Intercept the POST request to PocketBase
+  let projectCreated = false;
+  let assetCreated = false;
+  let assetType = '';
+  let processingStatus = '';
+
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'POST') {
+      assetCreated = true;
+      const postData = request.postData();
+      if (postData) {
+        if (postData.includes('name="asset_type"') && postData.includes('source_clip')) {
+          assetType = 'source_clip';
+        }
+        if (postData.includes('name="processing_status"') && postData.includes('pending')) {
+          processingStatus = 'pending';
+        }
+      }
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'ast1234567890xx',
+          project_id: 'pbc1234567890xx',
+          file: 'test_video.mp4',
+          asset_type: 'source_clip',
+          processing_status: 'pending',
+          created: new Date().toISOString(),
+          updated: new Date().toISOString()
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.route('**/api/collections/projects/records*', async (route, request) => {
+    if (request.method() === 'POST') {
+      projectCreated = true;
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'pbc1234567890xx',
+          title: 'Integration Test Project',
+          description: 'A project created via test',
+          created: new Date().toISOString(),
+          updated: new Date().toISOString()
+        })
+      });
+    } else if (request.method() === 'GET') {
+      const items = projectCreated ? [
+        { id: '1', title: 'Mock Project Alpha', description: 'A test project.' },
+        { id: 'pbc1234567890xx', title: 'Integration Test Project', description: 'A project created via test' }
+      ] : [
+        { id: '1', title: 'Mock Project Alpha', description: 'A test project.' }
+      ];
+      
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          page: 1,
+          perPage: 30,
+          totalItems: items.length,
+          totalPages: 1,
+          items: items
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
   // Open the New Project Modal
   await page.click('button:has-text("New Project")');
   await expect(page.locator('h2:has-text("New Project")').first()).toBeVisible();
@@ -133,11 +218,21 @@ test('Verify that the React app loads and displays the main dashboard shell with
   expect(assetType).toBe('source_clip');
   expect(processingStatus).toBe('pending');
   
-  // Wait for the ChronologicalRiver component container to show the new project
+  // Wait for the ProjectGrid component container to show the new project
   await expect(page.locator('h3:has-text("Integration Test Project")').first()).toBeVisible();
 
   // Take screenshot at the end
   await page.screenshot({ path: 'evidence_old.png' });
+});
+
+test('Verify the shared ChronologicalRiver component renders in TheaterView and ReviewView', async ({ page }) => {
+  // Test TheaterView
+  await page.goto('/theater/test-asset-123');
+  await expect(page.locator('text=Chronological River • Frame-by-Frame Navigation').first()).toBeVisible();
+
+  // Test ReviewView
+  await page.goto('/review/test-asset-123');
+  await expect(page.locator('text=Chronological River • Frame-by-Frame Navigation').first()).toBeVisible();
 });
 
 test('Verify the Review Mode shell and layout for a specific asset', async ({ page }) => {

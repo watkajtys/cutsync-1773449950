@@ -1,11 +1,11 @@
 import React from 'react';
 import { Project } from '../../types/project';
 
-interface ChronologicalRiverProps {
+interface ProjectGridProps {
   projects: Project[];
 }
 
-export const ChronologicalRiver: React.FC<ChronologicalRiverProps> = ({ projects }) => {
+export const ProjectGrid: React.FC<ProjectGridProps> = ({ projects }) => {
   if (projects.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-8 bg-slate-900 rounded-lg text-slate-400">

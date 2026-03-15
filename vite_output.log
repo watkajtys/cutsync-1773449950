@@ -3,20 +3,32 @@
 > vite --host
 
 
-  VITE v6.4.1  ready in 310 ms
+  VITE v6.4.1  ready in 515 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: http://192.168.0.2:5173/
-3:27:33 AM [vite] (client) page reload playwright-report/index.html
-3:27:33 AM [vite] (client) page reload playwright-report/index.html
-3:27:46 AM [vite] (client) hmr update /src/views/ReviewView.tsx, /src/index.css
-3:28:52 AM [vite] (client) hmr update /src/App.tsx, /src/index.css
-3:28:59 AM [vite] (client) hmr update /src/layouts/DashboardLayout.tsx, /src/index.css
-3:30:17 AM [vite] (client) page reload playwright-report/index.html
-3:33:47 AM [vite] (client) hmr update /src/views/TheaterView.tsx, /src/index.css
-3:36:45 AM [vite] (client) hmr update /src/views/TheaterView.tsx, /src/index.css
-3:36:46 AM [vite] (client) hmr update /src/views/TheaterView.tsx, /src/index.css
-3:37:14 AM [vite] (client) hmr update /src/views/TheaterView.tsx, /src/index.css
-3:37:27 AM [vite] (client) hmr update /src/views/TheaterView.tsx, /src/index.css
-3:39:34 AM [vite] (client) page reload playwright-report/index.html
-3:39:34 AM [vite] (client) page reload playwright-report/index.html
+3:47:25 AM [vite] (client) page reload playwright-report/index.html
+3:47:25 AM [vite] (client) page reload playwright-report/index.html
+3:50:31 AM [vite] (client) hmr update /src/components/dashboard/ChronologicalRiver.tsx, /src/index.css
+3:50:37 AM [vite] (client) hmr update /src/views/ProjectsView.tsx, /src/index.css
+3:50:48 AM [vite] (client) hmr update /src/components/review/ChronologicalRiver.tsx, /src/index.css
+3:50:58 AM [vite] (client) hmr update /src/views/ReviewView.tsx, /src/index.css
+3:51:10 AM [vite] (client) hmr update /src/components/theater/ChronologicalRiverTop.tsx, /src/index.css
+3:51:30 AM [vite] (client) hmr update /src/views/TheaterView.tsx, /src/index.css
+3:51:43 AM [vite] (client) page reload playwright-report/index.html
+3:52:36 AM [vite] (client) hmr update /src/views/TheaterView.tsx, /src/index.css
+3:53:11 AM [vite] (client) hmr update /src/views/ProjectsView.tsx, /src/index.css
+3:54:39 AM [vite] (client) page reload playwright-report/index.html
+3:57:58 AM [vite] (client) hmr update /src/components/shared/ChronologicalRiver.tsx, /src/index.css
+3:58:16 AM [vite] (client) hmr update /src/views/TheaterView.tsx, /src/index.css
+3:58:33 AM [vite] (client) hmr update /src/components/theater/CollaborationDrawer.tsx, /src/index.css
+3:58:52 AM [vite] (client) hmr update /src/views/ProjectsView.tsx, /src/index.css
+3:59:04 AM [vite] (client) hmr update /src/views/ProjectsView.tsx, /src/index.css
+4:01:41 AM [vite] (client) Pre-transform error: Failed to load url /src/components/shared/ChronologicalRiver.tsx (resolved id: /app/src/components/shared/ChronologicalRiver.tsx) in /app/src/views/ReviewView.tsx. Does the file exist?
+4:02:16 AM [vite] (client) page reload playwright-report/index.html
+4:02:16 AM [vite] (client) page reload playwright-report/index.html
+4:02:34 AM [vite] (client) hmr update /src/views/ReviewView.tsx, /src/index.css
+4:02:37 AM [vite] (client) hmr update /src/views/TheaterView.tsx, /src/index.css
+4:02:47 AM [vite] (client) page reload playwright-report/index.html
+4:04:16 AM [vite] (client) hmr update /src/views/TheaterView.tsx, /src/index.css
+4:05:29 AM [vite] (client) page reload playwright-report/index.html
