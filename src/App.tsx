@@ -3,6 +3,7 @@ import { DashboardLayout } from './layouts/DashboardLayout';
 import { ProjectsView } from './views/ProjectsView';
 import { RecentView } from './views/RecentView';
 import { SettingsView } from './views/SettingsView';
+import { ReviewView } from './views/ReviewView';
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
           <Route path="recent" element={<RecentView />} />
           <Route path="settings" element={<SettingsView />} />
         </Route>
+        <Route path="/review/:assetId" element={<ReviewView />} />
       </Routes>
     </Router>
   );

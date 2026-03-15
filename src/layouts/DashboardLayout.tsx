@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { Film, LayoutGrid, Settings, Folder } from 'lucide-react';
+import { Film, LayoutGrid, Settings, Folder, PlayCircle } from 'lucide-react';
 
 export const DashboardLayout: React.FC = () => {
   return (
@@ -35,6 +35,15 @@ export const DashboardLayout: React.FC = () => {
             >
               <Folder size={18} />
               Recent Assets
+            </NavLink>
+            <NavLink 
+              to="/review/test-asset"
+              className={({ isActive }) => 
+                `w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${isActive ? 'bg-blue-600/10 text-blue-400 font-medium' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`
+              }
+            >
+              <PlayCircle size={18} />
+              Review Pipeline
             </NavLink>
           </div>
         </div>
