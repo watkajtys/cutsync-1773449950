@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Plus } from 'lucide-react';
-import { ChronologicalRiver, Project } from '../components/dashboard/ChronologicalRiver';
+import { ChronologicalRiver } from '../components/dashboard/ChronologicalRiver';
 import { NewProjectModal } from '../components/modals/NewProjectModal';
+import { Project } from '../types/project';
 import { fetchProjects, createProject } from '../api/projects';
 
 export const ProjectsView: React.FC = () => {

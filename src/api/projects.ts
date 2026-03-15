@@ -1,5 +1,5 @@
 import { pb } from '../lib/pocketbase';
-import { Project } from '../components/dashboard/ChronologicalRiver';
+import { Project } from '../types/project';
 
 export const fetchProjects = async (): Promise<Project[]> => {
   try {

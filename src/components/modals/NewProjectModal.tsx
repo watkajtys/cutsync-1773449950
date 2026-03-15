@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Save } from 'lucide-react';
+import { AssetUploader } from '../assets/AssetUploader';
 
 interface NewProjectModalProps {
   onClose: () => void;
@@ -9,6 +10,7 @@ interface NewProjectModalProps {
 export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onSubmit }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [file, setFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -17,6 +19,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onSub
     
     setIsSubmitting(true);
     try {
+      // In Phase 2, the file would also be passed to onSubmit or handled separately.
       await onSubmit(title, description);
       onClose();
     } catch (error) {
@@ -67,6 +70,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ onClose, onSub
               className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all resize-none"
               placeholder="Brief overview of the project scope..."
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1">
+              Source Asset
+            </label>
+            <AssetUploader onFileSelect={setFile} />
           </div>
           
           <div className="mt-4 flex justify-end gap-3 pt-4 border-t border-slate-800">

@@ -1,7 +1,7 @@
 /* eslint-disable */
 migrate((db) => {
-  const projectsCollection = new Collection({
-    "id": "pbc123456789001",
+  const collection = new Collection({
+    "id": "pbc123456789012",
     "created": "2024-01-01 00:00:00.000Z",
     "updated": "2024-01-01 00:00:00.000Z",
     "name": "projects",
@@ -16,7 +16,11 @@ migrate((db) => {
         "required": false,
         "presentable": false,
         "unique": false,
-        "options": { "min": null, "max": null, "pattern": "" }
+        "options": {
+          "min": null,
+          "max": null,
+          "pattern": ""
+        }
       },
       {
         "system": false,
@@ -26,7 +30,11 @@ migrate((db) => {
         "required": false,
         "presentable": false,
         "unique": false,
-        "options": { "min": null, "max": null, "pattern": "" }
+        "options": {
+          "min": null,
+          "max": null,
+          "pattern": ""
+        }
       }
     ],
     "indexes": [],
@@ -38,15 +46,10 @@ migrate((db) => {
     "options": {}
   });
 
-  new Dao(db).saveCollection(projectsCollection);
+  return new Dao(db).saveCollection(collection);
 }, (db) => {
   const dao = new Dao(db);
-  try {
-    const collection = dao.findCollectionByNameOrId("projects");
-    if (collection) {
-      dao.deleteCollection(collection);
-    }
-  } catch (err) {
-    // ignore
-  }
-});
+  const collection = dao.findCollectionByNameOrId("pbc123456789012");
+
+  return dao.deleteCollection(collection);
+})

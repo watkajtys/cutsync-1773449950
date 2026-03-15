@@ -1,10 +1,5 @@
 import React from 'react';
-
-export interface Project {
-  id: string;
-  title: string;
-  description: string;
-}
+import { Project } from '../../types/project';
 
 interface ChronologicalRiverProps {
   projects: Project[];
