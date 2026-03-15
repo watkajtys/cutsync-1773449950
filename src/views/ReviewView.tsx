@@ -1,16 +1,13 @@
 import React from 'react';
+import { Database, Settings, Maximize, Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { 
-  Database, 
-  Settings, Maximize, Activity
-} from 'lucide-react';
 import { ChronologicalRiver } from '../components/shared/ChronologicalRiver/index';
 import { CollaborationDrawer } from '../components/review/CollaborationDrawer';
 import { PlaybackControls } from '../components/theater/PlaybackControls';
 
 export const ReviewView: React.FC = () => {
   return (
-    <div className="text-slate-300 h-screen overflow-hidden flex flex-col bg-[#050608] w-full font-display">
+    <>
       <header className="h-14 flex items-center justify-between px-6 border-b border-white/5 bg-black/40 backdrop-blur-2xl z-50 shrink-0">
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2.5">
@@ -33,54 +30,44 @@ export const ReviewView: React.FC = () => {
               <span className="text-[9px] text-slate-500 font-bold leading-none mb-1">CURRENT TIMECODE</span>
               <span className="text-sm font-mono text-white font-medium tracking-widest">00:14:02:11</span>
             </div>
-            <div className="w-[1px] h-6 bg-white/10 mx-1"></div>
-            <div className="flex flex-col items-center">
-              <span className="text-[9px] text-slate-500 font-bold leading-none mb-1">FRAME</span>
-              <span className="text-sm font-mono text-white font-medium tracking-widest">20211</span>
-            </div>
           </div>
           <div className="h-8 w-8 rounded-full border border-white/10 overflow-hidden">
-            <img alt="User" className="w-full h-full object-cover grayscale opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKrR0gaqFvnHYP_Yysmi98tV5mR20XmbS1FPtbP9ShGhx_ybqp2HLKkM8XkPy7oHPd7Qm5DIfdw7akfyiXxhKvXBLulA7ZXN4j3O2qv_52kC5RK6hkcL61b5w6_Qmz8fKTA-uy-S3Y6VeXWXiUZus3orcutLGDrPKKNLJ5EVDzCQBKR3gVImTAVaSzLl79zfLsYU9kUHxuqt3lwVzjE5tb7wbvogw9lzDaHFO1XNT7tXOyUlDxw3alQlUlniwizYEZrOr-tu4o05E"/>
+            <img alt="User" className="w-full h-full object-cover grayscale opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKrR0gaqFvnHYP_Yysmi98tV5mR20XmbS1FPtbP9ShGhx_ybqp2HLKkM8XkPy7oHPd7Qm5DIfdw7akfyiXxhKvXBLulA7ZXN4j3O2qv_52kC5RK6hkcL61b5w6_Qmz8fKTA-uy-S3Y6VeXWXiUZus3orcutLGDrPKKNLJ5EVDzCQBKR3gVImTAVaSzLl79zfLsYU9kUHxuqt3lwVzjE5tb7wbvogw9lzDaHFO1XNT7tXOyUlDxw3alQlUlniwizYEZrOr-tu4o05E" />
           </div>
         </div>
       </header>
 
-      <div className="w-full bg-[#0a0c10] border-b border-white/5 shadow-2xl z-40">
-        <ChronologicalRiver />
-      </div>
+      <ChronologicalRiver />
 
-      <main className="flex-1 flex flex-col items-center justify-center pb-16 pt-4 px-8 bg-black relative overflow-hidden">
-        <div className="video-container w-full max-w-6xl relative bg-black shadow-[0_0_100px_rgba(0,0,0,1)] ring-1 ring-white/5 shrink shrink-0" style={{ aspectRatio: '21 / 9', maxHeight: '55vh' }}>
-          <img alt="Cinematic Content" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6C5kYDZtuJGpypOT0LOGUpiCxJ04IluVt0NtnMAYUS0KaSK5rKBHTwWoYhRpLCNOguVUdp4x8aElSCab-FeEK7zcRCeuHU09MwP0oiIT5O_vpnu-iQwo0k07ImqxZdPfYPfMFQKnaQwX-Wl0tvjk7lo0Pi7_cRyvPMARNGos_9HZqCOHcf0btx6Orh5Dhmwglxkvzm0IXdotBjZVGV4PDMpTrBRk3k76aJZybsz3wmBGGcOzodO_09Q9sDm26sZlRvo3MJm24asg"/>
+      <main className="flex-1 flex flex-col items-center justify-center p-8 bg-black relative overflow-hidden">
+        <div className="video-container w-full max-w-7xl relative bg-black shadow-[0_0_100px_rgba(0,0,0,1)] ring-1 ring-white/5">
+          <img alt="Cinematic Content" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6C5kYDZtuJGpypOT0LOGUpiCxJ04IluVt0NtnMAYUS0KaSK5rKBHTwWoYhRpLCNOguVUdp4x8aElSCab-FeEK7zcRCeuHU09MwP0oiIT5O_vpnu-iQwo0k07ImqxZdPfYPfMFQKnaQwX-Wl0tvjk7lo0Pi7_cRyvPMARNGos_9HZqCOHcf0btx6Orh5Dhmwglxkvzm0IXdotBjZVGV4PDMpTrBRk3k76aJZybsz3wmBGGcOzodO_09Q9sDm26sZlRvo3MJm24asg" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent pointer-events-none h-32"></div>
-          <div className="absolute top-6 left-6 flex items-center gap-4 drop-shadow-md">
+          <div className="absolute top-6 left-6 flex items-center gap-4">
             <div className="flex flex-col">
-              <span className="text-[10px] text-white/60 font-bold tracking-widest uppercase">Project</span>
-              <span className="text-xs text-white/90 font-medium">SILENT HORIZON_V03.mxf</span>
+              <span className="text-[10px] text-white/40 font-bold tracking-widest uppercase">Project</span>
+              <span className="text-xs text-white/80 font-medium">SILENT HORIZON_V03.mxf</span>
             </div>
           </div>
-          <div className="absolute bottom-6 right-6 text-right drop-shadow-md">
-            <span className="text-[10px] text-white/60 font-bold tracking-widest uppercase">Ratio</span>
-            <p className="text-xs text-white/90 font-medium tracking-tight">2.39:1 Cinemascope</p>
+          <div className="absolute bottom-6 right-6 text-right">
+            <span className="text-[10px] text-white/40 font-bold tracking-widest uppercase">Ratio</span>
+            <p className="text-xs text-white/80 font-medium tracking-tight">2.39:1 Cinemascope</p>
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center w-full max-w-5xl z-10 mt-6 shrink-0">
-          <PlaybackControls />
-        </div>
+        <PlaybackControls />
 
         <CollaborationDrawer />
       </main>
 
-      <footer className="h-8 flex-shrink-0 bg-black border-t border-white/5 px-8 flex items-center justify-between text-[9px] font-bold text-slate-600 uppercase tracking-widest z-50">
-        <div className="flex items-center gap-8 pl-4">
+      <footer className="h-8 bg-black border-t border-white/5 px-6 flex items-center justify-between text-[9px] font-bold text-slate-600 uppercase tracking-widest z-50">
+        <div className="flex items-center gap-8">
           <div className="flex items-center gap-2">
             <span className="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
             ACTIVE SESSION: ALEX_RIVERS
           </div>
           <div className="flex items-center gap-2">
-            <Activity className="w-3 h-3" />
+            <Activity className="w-3 h-3 text-[12px]" />
             SYNCED: 42.1 MS LATENCY
           </div>
         </div>
@@ -92,6 +79,6 @@ export const ReviewView: React.FC = () => {
           <div className="text-slate-800">BUILD 0.92-ALPHA</div>
         </div>
       </footer>
-    </div>
+    </>
   );
 };

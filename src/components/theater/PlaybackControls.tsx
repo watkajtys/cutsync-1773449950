@@ -3,12 +3,12 @@ import { Play, SkipBack, SkipForward } from 'lucide-react';
 
 export const PlaybackControls: React.FC = () => {
   return (
-    <div className="mt-8 flex flex-col items-center gap-6 w-full">
+    <div className="mt-8 flex flex-col items-center gap-6">
       <div className="flex items-center gap-12">
         <button className="text-slate-500 hover:text-white transition-colors">
           <SkipBack className="w-6 h-6" strokeWidth={2} />
         </button>
-        <button className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+        <button className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform">
           <Play className="w-8 h-8 fill-black translate-x-0.5" strokeWidth={1} />
         </button>
         <button className="text-slate-500 hover:text-white transition-colors">
