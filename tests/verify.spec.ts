@@ -261,7 +261,7 @@ test('Verify the newly implemented Theater Mode structure and styling in Review 
   await expect(page.locator('text=CURRENT: 20187').first()).toBeVisible();
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify the Review Mode uses proper lucide icons after refactoring', async ({ page }) => {
