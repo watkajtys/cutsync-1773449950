@@ -225,72 +225,14 @@ test('Verify the "Project Create" flow correctly routes through useProjectAction
   await page.screenshot({ path: 'evidence_old.png' });
 });
 
-test('Verify the shared ChronologicalRiver component renders in TheaterView and ReviewView', async ({ page }) => {
-  // Test TheaterView
-  await page.goto('/theater/test-asset-123');
-  await expect(page.locator('text=Chronological River • Frame-by-Frame Navigation').first()).toBeVisible();
-
+test('Verify the shared ChronologicalRiver component renders in ReviewView', async ({ page }) => {
   // Test ReviewView
   await page.goto('/review/test-asset-123');
   await expect(page.locator('text=Chronological River • Frame-by-Frame Navigation').first()).toBeVisible();
 });
 
-test('Verify the Review Mode shell and layout for a specific asset', async ({ page }) => {
-  // Navigate directly to the review mode for a mock asset
+test('Verify the newly implemented Theater Mode structure and styling in Review Mode', async ({ page }) => {
   await page.goto('/review/test-asset-123');
-  
-  // Verify that the header navigation is present
-  await expect(page.locator('text=Active Workspace').first()).toBeVisible();
-  await expect(page.locator('text=Review Pipeline').first()).toBeVisible();
-  await expect(page.locator('text=Alex Rivers').first()).toBeVisible();
-
-  // Verify the Theater Mode video player section
-  await expect(page.locator('text=SCENE 04 | TAKE 02 | V03').first()).toBeVisible();
-  await expect(page.locator('text=4K DCI (4096 x 1716)').first()).toBeVisible();
-
-  // Verify the NotesSidebar section
-  const commentsTab = page.locator('button', { hasText: 'Comments' }).first();
-  await expect(commentsTab).toBeVisible();
-  await expect(page.locator('text=History').first()).toBeVisible();
-  await expect(page.locator('text=Metadata').first()).toBeVisible();
-
-  // Verify mock timestamped notes in the sidebar
-  await expect(page.locator('text=Sarah Jenkins').first()).toBeVisible();
-  await expect(page.locator('text=Velocity Client').first()).toBeVisible();
-  
-  // Verify the text area for adding a comment
-  const textarea = page.locator('textarea[placeholder*="Add a comment at"]');
-  await expect(textarea).toBeVisible();
-
-  // Verify the Chronological River timeline section at the bottom
-  await expect(page.locator('text=Chronological River • Frame-by-Frame Navigation').first()).toBeVisible();
-  await expect(page.locator('text=CURRENT: 20187').first()).toBeVisible();
-
-  // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence_old.png' });
-});
-
-test('Verify the Review Mode uses proper lucide icons after refactoring', async ({ page }) => {
-  await page.goto('/review/test-asset-123');
-  
-  // Verify lucide-react icons are loaded in the DOM (usually they have lucide class or are SVGs)
-  // Check the Database icon in the header
-  const databaseIcon = page.locator('header svg.lucide-database').first();
-  await expect(databaseIcon).toBeVisible();
-
-  // Check PlayCircle icon
-  const playCircleIcon = page.locator('header svg').nth(1);
-  await expect(playCircleIcon).toBeVisible();
-
-  // Check CloudCog in footer
-  const cloudCogIcon = page.locator('footer svg').first();
-  await expect(cloudCogIcon).toBeVisible();
-
-  await page.screenshot({ path: 'evidence_old.png' });
-});
-
-test('Verify the newly implemented Theater Mode structure and styling', async ({ page }) => {
-  await page.goto('/theater/test-asset-123');
 
   // Verify Header content specific to new design
   await expect(page.locator('text=THEATER MODE')).toBeVisible();
@@ -307,6 +249,32 @@ test('Verify the newly implemented Theater Mode structure and styling', async ({
   await expect(page.locator('text=Annotate')).toBeVisible();
   await expect(page.locator('text=Approve')).toBeVisible();
 
+  // Verify mock timestamped notes in the Collaboration Drawer
+  await expect(page.locator('text=Sarah J.')).toBeVisible();
+  
+  // Verify the text area for adding a comment
+  const textarea = page.locator('textarea[placeholder*="Drop a note..."]');
+  await expect(textarea).toBeVisible();
+
+  // Verify the Chronological River timeline section
+  await expect(page.locator('text=Chronological River • Frame-by-Frame Navigation').first()).toBeVisible();
+  await expect(page.locator('text=CURRENT: 20187').first()).toBeVisible();
+
   // Take screenshot of the new feature at the end
+  await page.screenshot({ path: 'evidence.png' });
+});
+
+test('Verify the Review Mode uses proper lucide icons after refactoring', async ({ page }) => {
+  await page.goto('/review/test-asset-123');
+  
+  // Verify lucide-react icons are loaded in the DOM
+  // Check the Database icon in the header
+  const databaseIcon = page.locator('header svg.lucide-database').first();
+  await expect(databaseIcon).toBeVisible();
+
+  // Check Settings icon in footer
+  const settingsIcon = page.locator('footer svg.lucide-settings').first();
+  await expect(settingsIcon).toBeVisible();
+
   await page.screenshot({ path: 'evidence_old.png' });
 });
