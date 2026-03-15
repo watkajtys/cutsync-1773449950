@@ -9,9 +9,11 @@ export default {
     extend: {
       colors: {
         "primary": "#2b6cee",
-        "surface": "#121212",
-        "surface-accent": "#1a1f2e",
-        "border-subtle": "#2d3446",
+        "surface": "#0c0e14",
+        "surface-accent": "#161922",
+        "border-subtle": "#242936",
+        "forest-dark": "#0A120D",
+        "sage": "#A3B18A",
       },
       fontFamily: {
         "display": ["Inter", "sans-serif"]

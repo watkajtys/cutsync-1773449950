@@ -11,7 +11,7 @@ import { PlaybackControls } from '../components/theater/PlaybackControls';
 export const ReviewView: React.FC = () => {
   return (
     <div className="text-slate-300 h-screen overflow-hidden flex flex-col bg-[#050608] w-full font-display">
-      <header className="h-14 flex items-center justify-between px-6 border-b border-white/5 bg-black/40 backdrop-blur-2xl z-50">
+      <header className="h-14 flex items-center justify-between px-6 border-b border-white/5 bg-black/40 backdrop-blur-2xl z-50 shrink-0">
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2.5">
             <Link to="/" className="bg-primary p-1 rounded-md flex items-center justify-center hover:opacity-80 transition-opacity">
@@ -24,7 +24,7 @@ export const ReviewView: React.FC = () => {
               THEATER MODE
             </span>
             <span className="text-slate-800 mx-1">•</span>
-            <span className="text-primary">Silent Horizon + Scene 04</span>
+            <span className="text-primary">CINEMATIC WIDE</span>
           </nav>
         </div>
         <div className="flex items-center gap-6">
@@ -40,10 +40,8 @@ export const ReviewView: React.FC = () => {
         </div>
       </header>
 
-      <ChronologicalRiver />
-
-      <main className="flex-1 flex flex-col items-center justify-center p-8 bg-black relative overflow-hidden">
-        <div className="video-container w-full max-w-7xl relative bg-black shadow-[0_0_100px_rgba(0,0,0,1)] ring-1 ring-white/5" style={{ aspectRatio: '21 / 9' }}>
+      <main className="flex-1 flex flex-col items-center justify-between pb-16 pt-4 px-8 bg-black relative overflow-hidden">
+        <div className="video-container w-full max-w-6xl relative bg-black shadow-[0_0_100px_rgba(0,0,0,1)] ring-1 ring-white/5 shrink shrink-0" style={{ aspectRatio: '21 / 9', maxHeight: '55vh' }}>
           <img alt="Cinematic Content" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6C5kYDZtuJGpypOT0LOGUpiCxJ04IluVt0NtnMAYUS0KaSK5rKBHTwWoYhRpLCNOguVUdp4x8aElSCab-FeEK7zcRCeuHU09MwP0oiIT5O_vpnu-iQwo0k07ImqxZdPfYPfMFQKnaQwX-Wl0tvjk7lo0Pi7_cRyvPMARNGos_9HZqCOHcf0btx6Orh5Dhmwglxkvzm0IXdotBjZVGV4PDMpTrBRk3k76aJZybsz3wmBGGcOzodO_09Q9sDm26sZlRvo3MJm24asg"/>
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
           <div className="absolute top-6 left-6 flex items-center gap-4">
@@ -58,12 +56,15 @@ export const ReviewView: React.FC = () => {
           </div>
         </div>
 
-        <PlaybackControls />
+        <div className="flex flex-col items-center justify-center w-full max-w-5xl z-10 mt-2 shrink-0">
+          <ChronologicalRiver />
+          <PlaybackControls />
+        </div>
 
         <CollaborationDrawer />
       </main>
 
-      <footer className="h-8 bg-black border-t border-white/5 px-6 flex items-center justify-between text-[9px] font-bold text-slate-600 uppercase tracking-widest z-50">
+      <footer className="h-8 flex-shrink-0 bg-black border-t border-white/5 px-6 flex items-center justify-between text-[9px] font-bold text-slate-600 uppercase tracking-widest z-50">
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2">
             <span className="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>

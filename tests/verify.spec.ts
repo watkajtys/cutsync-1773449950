@@ -273,7 +273,7 @@ test('Verify the newly implemented Theater Mode structure and styling in Review 
 
   // Verify Header content specific to new design
   await expect(page.locator('text=THEATER MODE')).toBeVisible();
-  await expect(page.locator('text=Silent Horizon + Scene 04')).toBeVisible();
+  await expect(page.locator('text=CINEMATIC WIDE')).toBeVisible();
   await expect(page.locator('text=CURRENT TIMECODE')).toBeVisible();
 
   // Verify the Ratio element
