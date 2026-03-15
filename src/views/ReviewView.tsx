@@ -5,12 +5,12 @@ import {
   Settings, Maximize, Activity
 } from 'lucide-react';
 import { ChronologicalRiver } from '../components/shared/ChronologicalRiver/index';
-import { NotesSidebar } from '../components/review/NotesSidebar';
+import { CollaborationDrawer } from '../components/review/CollaborationDrawer';
 import { PlaybackControls } from '../components/theater/PlaybackControls';
 
 export const ReviewView: React.FC = () => {
   return (
-    <div className="text-slate-300 h-screen overflow-hidden flex flex-col bg-[#050608] w-full">
+    <div className="text-slate-300 h-screen overflow-hidden flex flex-col bg-[#050608] w-full font-display">
       <header className="h-14 flex items-center justify-between px-6 border-b border-white/5 bg-black/40 backdrop-blur-2xl z-50">
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2.5">
@@ -40,33 +40,27 @@ export const ReviewView: React.FC = () => {
         </div>
       </header>
 
-      <main className="flex-1 flex overflow-hidden">
-        <div className="flex-1 flex flex-col bg-black relative justify-between">
-          <div className="flex-1 flex flex-col items-center justify-center p-8 overflow-y-auto">
-            <div className="video-container w-full max-w-7xl relative bg-black shadow-[0_0_100px_rgba(0,0,0,1)] ring-1 ring-white/5" style={{ aspectRatio: '21 / 9' }}>
-              <img alt="Cinematic Content" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6C5kYDZtuJGpypOT0LOGUpiCxJ04IluVt0NtnMAYUS0KaSK5rKBHTwWoYhRpLCNOguVUdp4x8aElSCab-FeEK7zcRCeuHU09MwP0oiIT5O_vpnu-iQwo0k07ImqxZdPfYPfMFQKnaQwX-Wl0tvjk7lo0Pi7_cRyvPMARNGos_9HZqCOHcf0btx6Orh5Dhmwglxkvzm0IXdotBjZVGV4PDMpTrBRk3k76aJZybsz3wmBGGcOzodO_09Q9sDm26sZlRvo3MJm24asg"/>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
-              <div className="absolute top-6 left-6 flex items-center gap-4">
-                <div className="flex flex-col">
-                  <span className="text-[10px] text-white/40 font-bold tracking-widest uppercase">Project</span>
-                  <span className="text-xs text-white/80 font-medium">SILENT HORIZON_V03.mxf</span>
-                </div>
-              </div>
-              <div className="absolute bottom-6 right-6 text-right">
-                <span className="text-[10px] text-white/40 font-bold tracking-widest uppercase">Ratio</span>
-                <p className="text-xs text-white/80 font-medium tracking-tight">2.39:1 Cinemascope</p>
-              </div>
-            </div>
+      <ChronologicalRiver />
 
-            <PlaybackControls />
+      <main className="flex-1 flex flex-col items-center justify-center p-8 bg-black relative overflow-hidden">
+        <div className="video-container w-full max-w-7xl relative bg-black shadow-[0_0_100px_rgba(0,0,0,1)] ring-1 ring-white/5" style={{ aspectRatio: '21 / 9' }}>
+          <img alt="Cinematic Content" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6C5kYDZtuJGpypOT0LOGUpiCxJ04IluVt0NtnMAYUS0KaSK5rKBHTwWoYhRpLCNOguVUdp4x8aElSCab-FeEK7zcRCeuHU09MwP0oiIT5O_vpnu-iQwo0k07ImqxZdPfYPfMFQKnaQwX-Wl0tvjk7lo0Pi7_cRyvPMARNGos_9HZqCOHcf0btx6Orh5Dhmwglxkvzm0IXdotBjZVGV4PDMpTrBRk3k76aJZybsz3wmBGGcOzodO_09Q9sDm26sZlRvo3MJm24asg"/>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+          <div className="absolute top-6 left-6 flex items-center gap-4">
+            <div className="flex flex-col">
+              <span className="text-[10px] text-white/40 font-bold tracking-widest uppercase">Project</span>
+              <span className="text-xs text-white/80 font-medium">SILENT HORIZON_V03.mxf</span>
+            </div>
           </div>
-          
-          <div className="shrink-0">
-            <ChronologicalRiver />
+          <div className="absolute bottom-6 right-6 text-right">
+            <span className="text-[10px] text-white/40 font-bold tracking-widest uppercase">Ratio</span>
+            <p className="text-xs text-white/80 font-medium tracking-tight">2.39:1 Cinemascope</p>
           </div>
         </div>
 
-        <NotesSidebar />
+        <PlaybackControls />
+
+        <CollaborationDrawer />
       </main>
 
       <footer className="h-8 bg-black border-t border-white/5 px-6 flex items-center justify-between text-[9px] font-bold text-slate-600 uppercase tracking-widest z-50">

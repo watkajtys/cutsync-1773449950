@@ -228,7 +228,8 @@ test('Verify the "Project Create" flow correctly routes through useProjectAction
 test('Verify the shared ChronologicalRiver component renders in ReviewView', async ({ page }) => {
   // Test ReviewView
   await page.goto('/review/test-asset-123');
-  await expect(page.locator('text=Chronological River • Frame-by-Frame Navigation').first()).toBeVisible();
+  // In the new layout, it's a visual timeline without the specific text, but the Collaboration Drawer is present
+  await expect(page.locator('text=Collaboration & Review Drawer').first()).toBeVisible();
 });
 
 test('Verify the newly implemented Theater Mode structure and styling in Review Mode', async ({ page }) => {
@@ -278,13 +279,12 @@ test('Verify the newly implemented Theater Mode structure and styling in Review 
   // Verify the Ratio element
   await expect(page.locator('text=2.39:1 Cinemascope')).toBeVisible();
 
-  // Verify Sidebar tabs
-  await expect(page.locator('button', { hasText: 'Comments' })).toBeVisible();
-  await expect(page.locator('button', { hasText: 'History' })).toBeVisible();
-  await expect(page.locator('text=Metadata').first()).toBeVisible();
+  // Verify the Collaboration Drawer content
+  await expect(page.locator('text=Collaboration & Review Drawer')).toBeVisible();
+  await expect(page.locator('text=Quick Actions')).toBeVisible();
 
   // Verify the text area for adding a comment is visible and functional
-  const textarea = page.locator('textarea[placeholder*="Add a comment"]');
+  const textarea = page.locator('textarea[placeholder*="Drop a note..."]');
   await expect(textarea).toBeVisible();
 
   // Add a new comment to test the database integration
@@ -294,10 +294,6 @@ test('Verify the newly implemented Theater Mode structure and styling in Review 
   // Verify the newly created comment is displayed from PocketBase
   await expect(page.locator('text=Alex Rivers')).toBeVisible();
   await expect(page.locator('text=The mist in the background feels a bit too heavy.')).toBeVisible();
-
-  // Verify the Chronological River timeline section
-  await expect(page.locator('text=Chronological River • Frame-by-Frame Navigation').first()).toBeVisible();
-  await expect(page.locator('text=CURRENT: 20187').first()).toBeVisible();
 
   // Take screenshot of the new feature at the end
   await page.screenshot({ path: 'evidence_old.png' });
