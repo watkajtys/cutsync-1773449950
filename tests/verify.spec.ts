@@ -213,5 +213,5 @@ test('Verify the newly implemented Theater Mode structure and styling', async ({
   await expect(page.locator('text=Approve')).toBeVisible();
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
