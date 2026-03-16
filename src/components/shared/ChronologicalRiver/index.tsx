@@ -23,8 +23,10 @@ export const ChronologicalRiver: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/5">
-        <div className="h-full bg-primary/50 w-[42%]"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/5 group-hover:h-2 transition-all cursor-pointer">
+        <div className="h-full bg-primary relative" style={{ width: '42%' }}>
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-[0_0_10px_rgba(43,108,238,0.8)] opacity-0 group-hover:opacity-100 transition-opacity translate-x-1/2"></div>
+        </div>
       </div>
     </div>
   );

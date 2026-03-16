@@ -23,7 +23,7 @@ export const ReviewView: React.FC = () => {
               THEATER MODE
             </span>
             <span className="text-slate-800 mx-1">•</span>
-            <span className="text-primary">CINEMATIC WIDE</span>
+            <span className="text-slate-400">CINEMATIC WIDE</span>
           </nav>
         </div>
         <div className="flex items-center gap-6">
@@ -46,12 +46,26 @@ export const ReviewView: React.FC = () => {
           <div className="video-container w-full max-w-7xl relative bg-black shadow-[0_0_100px_rgba(0,0,0,1)] ring-1 ring-white/5">
             <img alt="Cinematic Content" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6C5kYDZtuJGpypOT0LOGUpiCxJ04IluVt0NtnMAYUS0KaSK5rKBHTwWoYhRpLCNOguVUdp4x8aElSCab-FeEK7zcRCeuHU09MwP0oiIT5O_vpnu-iQwo0k07ImqxZdPfYPfMFQKnaQwX-Wl0tvjk7lo0Pi7_cRyvPMARNGos_9HZqCOHcf0btx6Orh5Dhmwglxkvzm0IXdotBjZVGV4PDMpTrBRk3k76aJZybsz3wmBGGcOzodO_09Q9sDm26sZlRvo3MJm24asg" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+            
             <div className="absolute top-6 left-6 flex items-center gap-4">
               <div className="flex flex-col">
                 <span className="text-[10px] text-white/40 font-bold tracking-widest uppercase">Project</span>
                 <span className="text-xs text-white/80 font-medium">SILENT HORIZON_V03.mxf</span>
               </div>
             </div>
+
+            <div className="absolute top-6 right-6 flex flex-col items-end gap-2">
+              <div className="flex items-center gap-2 bg-red-600/90 backdrop-blur-md px-3 py-1 rounded shadow-lg">
+                <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                <span className="text-[10px] font-black text-white tracking-[0.2em] uppercase">Live Review</span>
+              </div>
+              <div className="flex items-center gap-3 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded border border-white/10">
+                <span className="text-[10px] font-mono text-white/80 tracking-widest">4K DCI</span>
+                <span className="w-1 h-1 rounded-full bg-white/20"></span>
+                <span className="text-[10px] font-mono text-white/80 tracking-widest">23.976 FPS</span>
+              </div>
+            </div>
+
             <div className="absolute bottom-6 right-6 text-right">
               <span className="text-[10px] text-white/40 font-bold tracking-widest uppercase">Ratio</span>
               <p className="text-xs text-white/80 font-medium tracking-tight">2.39:1 Cinemascope</p>

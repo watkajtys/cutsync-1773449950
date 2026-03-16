@@ -129,26 +129,28 @@ export const CollaborationDrawer: React.FC = () => {
             </button>
           </div>
           <div className="relative mt-auto">
-            <textarea 
-              className="w-full bg-surface border border-white/10 rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-slate-600 resize-none" 
-              placeholder="Drop a note..." 
-              rows={2}
-              value={newNoteText}
-              onChange={(e) => setNewNoteText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleAddNote();
-                }
-              }}
-            ></textarea>
-            <button 
-              className="absolute bottom-2 right-2 bg-primary text-white p-1.5 rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
-              onClick={handleAddNote}
-              disabled={!newNoteText.trim()}
-            >
-              <ArrowUpRight className="w-4 h-4" strokeWidth={2.5} />
-            </button>
+            <div className="relative rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md overflow-hidden focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all shadow-[0_4px_24px_-8px_rgba(0,0,0,0.5)]">
+              <textarea 
+                className="w-full bg-transparent border-none p-4 pr-12 text-sm text-white focus:ring-0 placeholder:text-slate-500 resize-none outline-none block" 
+                placeholder="Drop a note..." 
+                rows={2}
+                value={newNoteText}
+                onChange={(e) => setNewNoteText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleAddNote();
+                  }
+                }}
+              ></textarea>
+              <button 
+                className="absolute bottom-3 right-3 bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-primary/90 hover:scale-105 transition-all disabled:opacity-30 disabled:hover:scale-100"
+                onClick={handleAddNote}
+                disabled={!newNoteText.trim()}
+              >
+                <ArrowUpRight className="w-4 h-4" strokeWidth={2.5} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
