@@ -154,17 +154,16 @@ test('Verify the Review Mode shell and layout for a specific asset', async ({ pa
   await expect(page.locator('text=4K DCI (4096 x 1716)').first()).toBeVisible();
 
   // Verify the NotesSidebar section
-  const commentsTab = page.locator('button', { hasText: 'Comments' }).first();
-  await expect(commentsTab).toBeVisible();
-  await expect(page.locator('text=History').first()).toBeVisible();
-  await expect(page.locator('text=Metadata').first()).toBeVisible();
+  await expect(page.locator('h3:has-text("Technical Metadata")').first()).toBeVisible();
+  await expect(page.locator('text=File Info').first()).toBeVisible();
+  await expect(page.locator('text=Color Space').first()).toBeVisible();
 
   // Verify mock timestamped notes in the sidebar
-  await expect(page.locator('text=Sarah Jenkins').first()).toBeVisible();
-  await expect(page.locator('text=Velocity Client').first()).toBeVisible();
+  await expect(page.locator('text=Sarah J.').first()).toBeVisible();
+  await expect(page.locator('text=Mark K.').first()).toBeVisible();
   
   // Verify the text area for adding a comment
-  const textarea = page.locator('textarea[placeholder*="Add a comment at"]');
+  const textarea = page.locator('textarea[placeholder*="Add note at"]');
   await expect(textarea).toBeVisible();
 
   // Verify the Chronological River timeline section at the bottom
@@ -173,6 +172,37 @@ test('Verify the Review Mode shell and layout for a specific asset', async ({ pa
 
   // Take screenshot of the new feature at the end
   await page.screenshot({ path: 'evidence_old.png' });
+});
+
+test('View the review route and ensure the right 30% sidebar renders a scrollable list of styled mock notes with timestamps, alongside an input field at the bottom.', async ({ page }) => {
+  await page.goto('/review/test-asset-123');
+  
+  // Verify the Sidebar container (should be ~30% equivalent width logic based on the design - e.g. w-80 or flex-basis)
+  const sidebar = page.locator('aside').first();
+  await expect(sidebar).toBeVisible();
+
+  // Verify the Technical Metadata section
+  await expect(sidebar.locator('text=Technical Metadata')).toBeVisible();
+  
+  // Verify the Review Notes section and count
+  await expect(sidebar.locator('text=Review Notes (4)')).toBeVisible();
+
+  // Verify the scrollable list container for notes
+  const notesContainer = sidebar.locator('.overflow-y-auto.custom-scrollbar').nth(1);
+  await expect(notesContainer).toBeVisible();
+
+  // Verify a specific styled note with timestamp
+  const firstNote = notesContainer.locator('text=Adjust color grade on this shot').first();
+  await expect(firstNote).toBeVisible();
+  await expect(notesContainer.locator('text=00:12:05:00').first()).toBeVisible();
+
+  // Verify the input field at the bottom
+  const inputField = sidebar.locator('textarea[placeholder*="Add note at"]');
+  await expect(inputField).toBeVisible();
+  const sendButton = sidebar.locator('button:has(svg.lucide-send)').first();
+  await expect(sendButton).toBeVisible();
+
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify the Review Mode uses proper lucide icons after refactoring', async ({ page }) => {
