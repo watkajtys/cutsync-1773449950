@@ -5,11 +5,13 @@ import { ReviewHeader } from '../components/review/ReviewHeader';
 import { TheaterPlayer } from '../components/review/TheaterPlayer';
 import { NotesSidebar } from '../components/review/NotesSidebar';
 import { ChronologicalRiver } from '../components/review/ChronologicalRiver';
+import { ReviewProvider } from '../contexts/ReviewContext';
 
 export const ReviewView: React.FC = () => {
   const { assetId } = useParams();
 
   return (
+    <ReviewProvider>
     <div className="text-slate-300 h-screen overflow-hidden flex flex-col bg-[#0c0e14] w-full">
       <ReviewHeader />
       <main className="flex-1 flex overflow-hidden">
@@ -37,5 +39,6 @@ export const ReviewView: React.FC = () => {
         </div>
       </footer>
     </div>
+    </ReviewProvider>
   );
 };

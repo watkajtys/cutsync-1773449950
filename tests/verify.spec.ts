@@ -249,3 +249,30 @@ test('Verify the Review Mode uses proper lucide icons after refactoring', async 
 
   await page.screenshot({ path: 'evidence_old.png' });
 });
+
+test('Verify the visual annotation tools render a drawing toolbar and overlay canvas in Review Mode', async ({ page }) => {
+  await page.goto('/review/test-asset-123');
+  
+  // Verify the drawing toolbar is present
+  const toolbar = page.locator('div').filter({ hasText: 'Ptr' }).first();
+  await expect(toolbar).toBeVisible();
+
+  // Verify the tools are present
+  await expect(page.locator('button:has-text("Ptr")')).toBeVisible();
+  await expect(page.locator('button:has-text("Pen")')).toBeVisible();
+  await expect(page.locator('button:has-text("Box")')).toBeVisible();
+  await expect(page.locator('button:has-text("Arr")')).toBeVisible();
+
+  // Verify the canvas is present inside the video container
+  const canvas = page.locator('.video-container canvas').first();
+  await expect(canvas).toBeVisible();
+
+  // Click the 'Box' tool to select it
+  await page.click('button:has-text("Box")');
+
+  // Verify the canvas cursor changes (class includes 'cursor-crosshair')
+  await expect(canvas).toHaveClass(/cursor-crosshair/);
+
+  // Take screenshot of the new feature at the end
+  await page.screenshot({ path: 'evidence.png' });
+});

@@ -1,7 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Info, ListFilter, Send } from 'lucide-react';
+import { useReview } from '../../contexts/ReviewContext';
 
 export const NotesSidebar: React.FC = () => {
+  const { clearDrawing, setActiveTool } = useReview();
+  const [noteText, setNoteText] = useState('');
+
+  const handleSubmitNote = () => {
+    if (!noteText.trim()) return;
+    // Here would be logic to save to PocketBase
+    setNoteText('');
+    clearDrawing();
+    setActiveTool('pointer');
+  };
+
   return (
     <aside className="w-80 border-l border-white/5 bg-surface flex flex-col">
       <section className="h-[45%] flex flex-col border-b border-white/5">
@@ -101,9 +113,23 @@ export const NotesSidebar: React.FC = () => {
         
         <div className="p-4 bg-black/40 border-t border-white/5">
           <div className="relative">
-            <textarea className="w-full bg-surface border border-white/10 rounded-lg p-2.5 text-xs focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-slate-600 resize-none h-16" placeholder="Add note at 00:14:02:11..."></textarea>
+            <textarea
+              className="w-full bg-surface border border-white/10 rounded-lg p-2.5 text-xs focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-slate-600 resize-none h-16"
+              placeholder="Add note at 00:14:02:11..."
+              value={noteText}
+              onChange={(e) => setNoteText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmitNote();
+                }
+              }}
+            ></textarea>
             <div className="absolute bottom-2 right-2 flex items-center gap-2">
-              <button className="bg-primary hover:bg-primary/90 text-white p-1 rounded transition-colors">
+              <button
+                onClick={handleSubmitNote}
+                className="bg-primary hover:bg-primary/90 text-white p-1 rounded transition-colors"
+              >
                 <Send size={14} strokeWidth={1.5} />
               </button>
             </div>
