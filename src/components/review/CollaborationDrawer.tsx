@@ -64,18 +64,17 @@ export const CollaborationDrawer: React.FC = () => {
   };
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 bg-surface/90 backdrop-blur-3xl border-t border-white/10 transform translate-y-[calc(100%-48px)] hover:translate-y-0 transition-transform duration-500 ease-in-out z-40">
-      <div className="h-12 flex items-center justify-center cursor-pointer border-b border-white/5 relative">
-        <div className="w-12 h-1 bg-white/20 rounded-full absolute top-2"></div>
+    <div className="h-full flex flex-col w-full">
+      <div className="h-12 flex items-center px-6 border-b border-white/5 shrink-0 bg-surface">
         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Collaboration & Review Drawer</span>
       </div>
-      <div className="h-64 flex divide-x divide-white/5">
-        <div className="flex-1 p-6 flex flex-col">
-          <div className="flex items-center justify-between mb-4">
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 p-6 flex flex-col overflow-hidden">
+          <div className="flex items-center justify-between mb-4 shrink-0">
             <h4 className="text-[10px] font-bold text-white/60 uppercase tracking-widest">Active Comments ({notes.length})</h4>
             <button className="text-primary text-[10px] font-bold uppercase">View All</button>
           </div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4">
+          <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-2">
             {isLoading ? (
               <div className="flex justify-center items-center h-full">
                 <span className="text-xs text-slate-500">Loading comments...</span>
@@ -115,7 +114,7 @@ export const CollaborationDrawer: React.FC = () => {
             )}
           </div>
         </div>
-        <div className="w-1/3 p-6 flex flex-col bg-black/20">
+        <div className="p-6 flex flex-col bg-black/20 border-t border-white/5 shrink-0">
           <div className="mb-4">
             <h4 className="text-[10px] font-bold text-white/60 uppercase tracking-widest">Quick Actions</h4>
           </div>
