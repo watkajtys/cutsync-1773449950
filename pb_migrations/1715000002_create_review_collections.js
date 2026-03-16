@@ -220,10 +220,12 @@ migrate((db) => {
     }
   ];
 
-  for (const col of collections) {
-    const collection = new Collection(col);
-    new Dao(db).saveCollection(collection);
-  }
+  const c1 = new Collection(collections[0]);
+  new Dao(db).saveCollection(c1);
+  const c2 = new Collection(collections[1]);
+  new Dao(db).saveCollection(c2);
+  const c3 = new Collection(collections[2]);
+  new Dao(db).saveCollection(c3);
 }, (db) => {
   const dao = new Dao(db);
   try {

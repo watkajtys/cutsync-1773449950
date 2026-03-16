@@ -4,6 +4,9 @@ import subprocess
 import urllib.request
 import urllib.parse
 import json
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 PB_URL = os.getenv("POCKETBASE_URL", "http://127.0.0.1:8090")
 
@@ -12,22 +15,25 @@ def update_asset_status(asset_id, status):
     data = json.dumps({"processing_status": status}).encode('utf-8')
     req = urllib.request.Request(url, data=data, method="PATCH")
     req.add_header('Content-Type', 'application/json')
+    logging.info(f"[{asset_id}] Requesting status update to '{status}' at {url}")
     with urllib.request.urlopen(req) as response:
-        return json.loads(response.read().decode())
+        result = json.loads(response.read().decode())
+        logging.info(f"[{asset_id}] Successfully updated status to '{status}'")
+        return result
 
 def process_asset(asset):
     asset_id = asset.get("id")
     file_name = asset.get("file")
     
     if not asset_id or not file_name:
-        print(f"[{asset_id}] Invalid asset record, missing ID or file name.")
+        logging.error(f"[{asset_id}] Invalid asset record, missing ID or file name. Record data: {asset}")
         return
 
-    print(f"[{asset_id}] Found pending asset. Changing status to extracting_audio...")
+    logging.info(f"[{asset_id}] Found pending asset. Transitioning status: pending -> extracting_audio")
     try:
         update_asset_status(asset_id, "extracting_audio")
     except Exception as e:
-        print(f"[{asset_id}] Failed to update status to extracting_audio: {e}")
+        logging.error(f"[{asset_id}] Failed to update status to extracting_audio: {e}")
         return
         
     try:
@@ -39,7 +45,7 @@ def process_asset(asset):
         local_video_path = os.path.join(temp_dir, f"{asset_id}_{file_name}")
         local_audio_path = os.path.join(temp_dir, f"{asset_id}_audio.mp3")
         
-        print(f"[{asset_id}] Downloading {file_name} from {file_url}...")
+        logging.info(f"[{asset_id}] Downloading {file_name} from {file_url}...")
         req = urllib.request.Request(file_url)
         with urllib.request.urlopen(req) as response:
             with open(local_video_path, 'wb') as f:
@@ -49,7 +55,7 @@ def process_asset(asset):
                         break
                     f.write(chunk)
                 
-        print(f"[{asset_id}] Download complete. Extracting audio...")
+        logging.info(f"[{asset_id}] Download complete. Executing ffmpeg for audio extraction...")
         
         subprocess.run([
             "ffmpeg", "-i", local_video_path, 
@@ -57,26 +63,30 @@ def process_asset(asset):
             "-y", local_audio_path
         ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
-        print(f"[{asset_id}] Audio extraction complete. Updating status to analyzing...")
+        logging.info(f"[{asset_id}] Audio extraction complete. Transitioning status: extracting_audio -> analyzing")
         update_asset_status(asset_id, "analyzing")
         
     except Exception as e:
-        print(f"[{asset_id}] Error processing asset: {e}")
+        logging.error(f"[{asset_id}] Error processing asset during download or ffmpeg extraction: {e}")
         try:
             update_asset_status(asset_id, "error")
         except Exception as inner_e:
-            print(f"[{asset_id}] Failed to set error status: {inner_e}")
+            logging.error(f"[{asset_id}] Failed to set error status fallback: {inner_e}")
 
 def get_pending_assets():
     filter_expr = urllib.parse.quote("asset_type='source_clip' && processing_status='pending'")
     url = f"{PB_URL}/api/collections/assets/records?filter={filter_expr}&perPage=500"
+    logging.debug(f"Polling {url}")
     req = urllib.request.Request(url)
     with urllib.request.urlopen(req) as response:
         data = json.loads(response.read().decode())
-        return data.get("items", [])
+        items = data.get("items", [])
+        if items:
+            logging.info(f"Found {len(items)} pending assets matching criteria.")
+        return items
 
 def main():
-    print(f"Starting extractor daemon, polling {PB_URL}...")
+    logging.info(f"Starting extractor daemon, polling {PB_URL} for pending assets...")
     
     oneshot = os.getenv("ONESHOT", "false").lower() == "true"
     
@@ -88,9 +98,10 @@ def main():
                 process_asset(record)
                 
         except Exception as e:
-            print(f"Error during polling: {e}")
+            logging.error(f"Error during polling PocketBase: {e}")
             
         if oneshot:
+            logging.info("ONESHOT execution complete. Exiting daemon.")
             break
             
         time.sleep(5)
