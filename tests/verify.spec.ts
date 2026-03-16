@@ -707,5 +707,5 @@ test('Upload a source_clip video via the React UI. Run extractor_agent.py. Verif
   expect(fs.existsSync(expectedAudioPath)).toBe(true);
   
   // Take screenshot as required
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
