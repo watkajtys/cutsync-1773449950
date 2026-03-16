@@ -17,11 +17,6 @@ export const TheaterPlayer: React.FC = () => {
             <p className="text-[10px] font-bold text-white/40 tracking-widest uppercase">Resolution</p>
             <p className="text-xs font-bold text-white/80">4K DCI (4096 x 1716)</p>
           </div>
-          <div className="absolute inset-0 flex items-center justify-center group-hover:opacity-0 transition-opacity">
-            <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center">
-              <Play className="text-white fill-current" size={48} />
-            </div>
-          </div>
           <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/10">
             <div className="h-full bg-primary w-[34%] relative">
               <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full border-2 border-white shadow-lg"></div>
