@@ -533,26 +533,21 @@ test('Verify the visual annotation tools render a drawing toolbar and overlay ca
 });
 
 test('User saves a note at 0:15, it persists in PocketBase. Clicking an older note at 0:05 scrubs the video directly to 0:05.', async ({ page, request }) => {
-  const pbUrl = process.env.VITE_POCKETBASE_URL || 'http://loom-cutsync-pocketbase:8090';
+  const pbUrl = process.env.VITE_POCKETBASE_URL || 'http://127.0.0.1:8090';
 
   // 1. Create an asset to avoid 404s
   const projectRes = await request.post(`${pbUrl}/api/collections/projects/records`, {
     data: { title: 'Test Project', description: 'Test' }
   });
-  let project;
-  if (projectRes.ok()) {
-    project = await projectRes.json();
-  } else {
-    // If projects doesn't exist, we might just use a fake asset ID and create the notes anyway
-    // Wait, the schema says asset_id must be a relation to assets.
-    // Let's try to just use a random asset ID, if constraints are disabled it works, if not we need the asset.
-  }
+  expect(projectRes.ok()).toBeTruthy();
+  const project = await projectRes.json();
   
   const assetRes = await request.post(`${pbUrl}/api/collections/assets/records`, {
-    data: { project_id: project ? project.id : undefined, asset_type: 'review_edit', processing_status: 'ready' }
+    data: { project_id: project.id, asset_type: 'review_edit', processing_status: 'ready' }
   });
+  expect(assetRes.ok()).toBeTruthy();
   const asset = await assetRes.json();
-  const assetId = asset.id || 'test-asset-123';
+  const assetId = asset.id || 'testasset123456';
 
   // Create an older note at 0:05
   await request.post(`${pbUrl}/api/collections/review_notes/records`, {
