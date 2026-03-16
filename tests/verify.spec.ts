@@ -531,3 +531,96 @@ test('Verify the visual annotation tools render a drawing toolbar and overlay ca
   // Take screenshot of the new feature at the end
   await page.screenshot({ path: 'evidence_old.png' });
 });
+
+test('User saves a note at 0:15, it persists in PocketBase. Clicking an older note at 0:05 scrubs the video directly to 0:05.', async ({ page, request }) => {
+  const pbUrl = 'http://127.0.0.1:8090';
+
+  // 1. Create an asset to avoid 404s
+  const projectRes = await request.post(`${pbUrl}/api/collections/projects/records`, {
+    data: { title: 'Test Project', description: 'Test' }
+  });
+  let project;
+  if (projectRes.ok()) {
+    project = await projectRes.json();
+  } else {
+    // If projects doesn't exist, we might just use a fake asset ID and create the notes anyway
+    // Wait, the schema says asset_id must be a relation to assets.
+    // Let's try to just use a random asset ID, if constraints are disabled it works, if not we need the asset.
+  }
+  
+  const assetRes = await request.post(`${pbUrl}/api/collections/assets/records`, {
+    data: { project_id: project ? project.id : undefined, asset_type: 'review_edit', processing_status: 'ready' }
+  });
+  const asset = await assetRes.json();
+  const assetId = asset.id || 'test-asset-123';
+
+  // Create an older note at 0:05
+  await request.post(`${pbUrl}/api/collections/review_notes/records`, {
+    data: {
+      asset_id: assetId,
+      author: 'Mark K.',
+      timestamp: 5,
+      note_text: 'Older note at 0:05.'
+    }
+  });
+
+  // Navigate directly to the review mode for this asset
+  await page.goto(`/review/${assetId}`);
+
+  // Wait for the older note to be visible
+  const oldNote = page.locator('text=Older note at 0:05.').first();
+  await expect(oldNote).toBeVisible();
+
+  // Test scrubbing to 0:05 by clicking the older note
+  await oldNote.click();
+  
+  await page.waitForTimeout(500);
+
+  // Assert video time
+  const currentTime = await page.evaluate(() => {
+    const video = document.querySelector('video');
+    return video ? video.currentTime : 0;
+  });
+  expect(currentTime).toBeCloseTo(5, 1);
+
+  // Now, simulate saving a note at 0:15
+  await page.evaluate(() => {
+    const video = document.querySelector('video');
+    if (video) {
+      video.currentTime = 15;
+      video.dispatchEvent(new Event('timeupdate'));
+    }
+  });
+  
+  await page.waitForTimeout(100);
+
+  // Focus textarea and type
+  const textarea = page.locator('textarea[placeholder*="Add note at"]');
+  await expect(textarea).toBeVisible();
+  
+  await textarea.fill('New note at 0:15');
+  
+  // Click send button
+  const sendButton = page.locator('button:has(svg.lucide-send)').first();
+  await sendButton.click();
+
+  // Wait for UI to update
+  await expect(page.locator('text=New note at 0:15')).toBeVisible();
+
+  // Verify backend persistence
+  const notesRes = await request.get(`${pbUrl}/api/collections/review_notes/records?filter=(asset_id='${assetId}')`);
+  const notesData = await notesRes.json();
+  const notes = notesData.items || [];
+  
+  const savedNote = notes.find((n) => n.note_text === 'New note at 0:15');
+  expect(savedNote).toBeDefined();
+  expect(savedNote.timestamp).toBe(15);
+  expect(savedNote.asset_id).toBe(assetId);
+
+  // Hard reload to confirm persistence
+  await page.reload();
+  await expect(page.locator('text=New note at 0:15')).toBeVisible();
+
+  // Take screenshot of evidence
+  await page.screenshot({ path: 'evidence.png' });
+});
