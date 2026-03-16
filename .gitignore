@@ -9,3 +9,7 @@ playwright-report
 test-results
 evidence.png
 jules.patch
+pb_data
+*.log
+*.png
+*.png.old
