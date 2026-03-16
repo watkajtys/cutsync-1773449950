@@ -23,6 +23,8 @@ interface ReviewContextType {
   inputRef: React.RefObject<HTMLTextAreaElement>;
   videoRef: React.RefObject<HTMLVideoElement>;
   seekToTime: (time: number) => void;
+  currentTime: number;
+  setCurrentTime: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const ReviewContext = createContext<ReviewContextType | undefined>(undefined);
@@ -32,6 +34,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [activeColor, setActiveColor] = useState<string>('#ef4444');
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
+  const [currentTime, setCurrentTime] = useState<number>(0);
 
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
@@ -44,6 +47,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const seekToTime = (time: number) => {
     if (videoRef.current) {
       videoRef.current.currentTime = time;
+      setCurrentTime(time);
     }
   };
 
@@ -56,7 +60,9 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       clearDrawing,
       inputRef,
       videoRef,
-      seekToTime
+      seekToTime,
+      currentTime,
+      setCurrentTime
     }}>
       {children}
     </ReviewContext.Provider>

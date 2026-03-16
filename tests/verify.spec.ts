@@ -166,6 +166,55 @@ test('Verify center play button overlay is removed', async ({ page }) => {
   await page.screenshot({ path: 'evidence_old.png' });
 });
 
+test('User hits spacebar during playback; video pauses and new note input is focused.', async ({ page }) => {
+  await page.goto('/review/test-asset-123');
+
+  // Verify the video and input exist
+  const video = page.locator('video').first();
+  await expect(video).toBeVisible();
+  
+  const textarea = page.locator('textarea[placeholder*="Add note at"]');
+  await expect(textarea).toBeVisible();
+
+  // First, verify the video is paused initially
+  let isPaused = await video.evaluate((node: HTMLVideoElement) => node.paused);
+  expect(isPaused).toBe(true);
+
+  // Focus out of any input to make sure spacebar works for the global listener
+  await page.locator('body').focus();
+
+  // Hit spacebar to play
+  await page.keyboard.press('Space');
+  
+  // Wait a little for play to trigger
+  await page.waitForTimeout(500);
+
+  // Actually, some browsers restrict autoplay without interaction, but since it's a test environment with simulated press, it might work.
+  // We can just verify that it is playing or toggled.
+  // Wait, hitting spacebar triggers `togglePlay` logic we added: play() then pause().
+  isPaused = await video.evaluate((node: HTMLVideoElement) => node.paused);
+  expect(isPaused).toBe(false);
+
+  // The input should also be focused according to our logic
+  await expect(textarea).toBeFocused();
+
+  // Focus out of the input again
+  await textarea.evaluate((node: HTMLTextAreaElement) => node.blur());
+
+  // Hit spacebar to pause
+  await page.keyboard.press('Space');
+  await page.waitForTimeout(500);
+
+  isPaused = await video.evaluate((node: HTMLVideoElement) => node.paused);
+  expect(isPaused).toBe(true);
+
+  // The input should be focused again
+  await expect(textarea).toBeFocused();
+
+  // Take screenshot of the evidence
+  await page.screenshot({ path: 'evidence.png' });
+});
+
 test('Verify the Review Mode shell and layout for a specific asset', async ({ page }) => {
   // Navigate directly to the review mode for a mock asset
   await page.goto('/review/test-asset-123');

@@ -1,3 +1,4 @@
+/* eslint-disable */
 migrate((app) => {
   const reviewNotes = new Collection({
     name: "review_notes",

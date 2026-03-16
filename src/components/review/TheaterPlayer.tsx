@@ -5,7 +5,7 @@ import { DrawingToolbar } from './DrawingToolbar';
 import { useReview } from '../../contexts/ReviewContext';
 
 export const TheaterPlayer: React.FC = () => {
-  const { videoRef, inputRef } = useReview();
+  const { videoRef, inputRef, setCurrentTime } = useReview();
   const [isPlaying, setIsPlaying] = useState(false);
 
   const {
@@ -26,8 +26,13 @@ export const TheaterPlayer: React.FC = () => {
       if (e.code === 'Space') {
         e.preventDefault();
         if (videoRef.current) {
-          videoRef.current.pause();
-          setIsPlaying(false);
+          if (isPlaying) {
+            videoRef.current.pause();
+            setIsPlaying(false);
+          } else {
+            videoRef.current.play();
+            setIsPlaying(true);
+          }
         }
         if (inputRef.current) {
           inputRef.current.focus();
@@ -37,7 +42,7 @@ export const TheaterPlayer: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [videoRef, inputRef]);
+  }, [videoRef, inputRef, isPlaying]);
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -51,7 +56,9 @@ export const TheaterPlayer: React.FC = () => {
   };
 
   const handleTimeUpdate = () => {
-    // Left empty for now, could be used to sync time with timeline
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+    }
   };
 
   return (
