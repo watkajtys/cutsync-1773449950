@@ -46,6 +46,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (videoRef.current) {
       videoRef.current.currentTime = time;
       setCurrentTime(time);
+      videoRef.current.dispatchEvent(new Event('timeupdate'));
     }
   };
 

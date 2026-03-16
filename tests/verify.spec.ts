@@ -533,7 +533,7 @@ test('Verify the visual annotation tools render a drawing toolbar and overlay ca
 });
 
 test('User saves a note at 0:15, it persists in PocketBase. Clicking an older note at 0:05 scrubs the video directly to 0:05.', async ({ page, request }) => {
-  const pbUrl = 'http://127.0.0.1:8090';
+  const pbUrl = process.env.VITE_POCKETBASE_URL || 'http://loom-cutsync-pocketbase:8090';
 
   // 1. Create an asset to avoid 404s
   const projectRes = await request.post(`${pbUrl}/api/collections/projects/records`, {
