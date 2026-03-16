@@ -1,5 +1,4 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import { CloudCog, Users } from 'lucide-react';
 import { ReviewHeader } from '../components/review/ReviewHeader';
 import { TheaterPlayer } from '../components/review/TheaterPlayer';
@@ -8,8 +7,6 @@ import { ChronologicalRiver } from '../components/review/ChronologicalRiver';
 import { ReviewProvider } from '../contexts/ReviewContext';
 
 export const ReviewView: React.FC = () => {
-  const { assetId } = useParams();
-
   return (
     <ReviewProvider>
     <div className="text-slate-300 h-screen overflow-hidden flex flex-col bg-[#0c0e14] w-full">

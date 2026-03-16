@@ -622,5 +622,5 @@ test('User saves a note at 0:15, it persists in PocketBase. Clicking an older no
   await expect(page.locator('text=New note at 0:15')).toBeVisible();
 
   // Take screenshot of evidence
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
