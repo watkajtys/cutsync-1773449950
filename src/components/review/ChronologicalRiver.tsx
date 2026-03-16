@@ -44,7 +44,7 @@ export const ChronologicalRiver: React.FC = () => {
                 style={{ width: `${getPercentage(currentTime)}%` }}
               ></div>
             </div>
-            <span className="absolute bottom-1 right-2 text-[8px] font-mono text-white/80 font-bold">CURRENT: 20187</span>
+            <span className="absolute bottom-1 right-2 text-[8px] font-mono text-white/80 font-bold">CURRENT: {Math.floor(currentTime * 24)}</span>
           </div>
           
           {/* Note Indicators */}
