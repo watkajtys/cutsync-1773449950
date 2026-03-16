@@ -274,5 +274,5 @@ test('Verify the visual annotation tools render a drawing toolbar and overlay ca
   await expect(canvas).toHaveClass(/cursor-crosshair/);
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
