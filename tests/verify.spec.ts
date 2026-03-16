@@ -212,7 +212,7 @@ test('User hits spacebar during playback; video pauses and new note input is foc
   await expect(textarea).toBeFocused();
 
   // Take screenshot of the evidence
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify the Review Mode shell and layout for a specific asset', async ({ page }) => {
