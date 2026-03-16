@@ -20,6 +20,9 @@ interface ReviewContextType {
   currentShape: Shape | null;
   setCurrentShape: React.Dispatch<React.SetStateAction<Shape | null>>;
   clearDrawing: () => void;
+  inputRef: React.RefObject<HTMLTextAreaElement>;
+  videoRef: React.RefObject<HTMLVideoElement>;
+  seekToTime: (time: number) => void;
 }
 
 const ReviewContext = createContext<ReviewContextType | undefined>(undefined);
@@ -30,9 +33,18 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
 
+  const inputRef = React.useRef<HTMLTextAreaElement>(null);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+
   const clearDrawing = () => {
     setShapes([]);
     setCurrentShape(null);
+  };
+
+  const seekToTime = (time: number) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = time;
+    }
   };
 
   return (
@@ -41,7 +53,10 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       activeColor, setActiveColor,
       shapes, setShapes,
       currentShape, setCurrentShape,
-      clearDrawing
+      clearDrawing,
+      inputRef,
+      videoRef,
+      seekToTime
     }}>
       {children}
     </ReviewContext.Provider>

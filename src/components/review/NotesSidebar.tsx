@@ -3,7 +3,7 @@ import { Info, ListFilter, Send } from 'lucide-react';
 import { useReview } from '../../contexts/ReviewContext';
 
 export const NotesSidebar: React.FC = () => {
-  const { clearDrawing, setActiveTool } = useReview();
+  const { clearDrawing, setActiveTool, inputRef, seekToTime } = useReview();
   const [noteText, setNoteText] = useState('');
 
   const handleSubmitNote = () => {
@@ -15,7 +15,7 @@ export const NotesSidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-80 border-l border-white/5 bg-surface flex flex-col">
+    <aside className="w-[30%] border-l border-white/5 bg-surface flex flex-col">
       <section className="h-[45%] flex flex-col border-b border-white/5">
         <div className="p-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
           <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Technical Metadata</h3>
@@ -74,7 +74,10 @@ export const NotesSidebar: React.FC = () => {
         </div>
         
         <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
-          <div className="group relative bg-white/5 p-3 rounded-lg border border-white/5 hover:border-primary/50 transition-colors cursor-pointer">
+          <div 
+            onClick={() => seekToTime(725)} 
+            className="group relative bg-white/5 p-3 rounded-lg border border-white/5 hover:border-primary/50 transition-colors cursor-pointer"
+          >
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-mono text-primary font-bold px-1.5 py-0.5 rounded bg-primary/10">00:12:05:00</span>
               <span className="text-[9px] text-slate-500 font-bold">2m ago</span>
@@ -88,7 +91,10 @@ export const NotesSidebar: React.FC = () => {
             </div>
           </div>
 
-          <div className="group relative bg-white/5 p-3 rounded-lg border border-white/5 hover:border-primary/50 transition-colors cursor-pointer">
+          <div 
+            onClick={() => seekToTime(845.12)}
+            className="group relative bg-white/5 p-3 rounded-lg border border-white/5 hover:border-primary/50 transition-colors cursor-pointer"
+          >
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-mono text-primary font-bold px-1.5 py-0.5 rounded bg-primary/10">00:14:05:12</span>
               <span className="text-[9px] text-slate-500 font-bold">1h ago</span>
@@ -114,6 +120,7 @@ export const NotesSidebar: React.FC = () => {
         <div className="p-4 bg-black/40 border-t border-white/5">
           <div className="relative">
             <textarea
+              ref={inputRef}
               className="w-full bg-surface border border-white/10 rounded-lg p-2.5 text-xs focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-slate-600 resize-none h-16"
               placeholder="Add note at 00:14:02:11..."
               value={noteText}

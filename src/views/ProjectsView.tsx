@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Plus } from 'lucide-react';
-import { ChronologicalRiver } from '../components/dashboard/ChronologicalRiver';
+import { ProjectGrid } from '../components/dashboard/ProjectGrid';
 import { NewProjectModal } from '../components/modals/NewProjectModal';
 import { Project } from '../types/project';
 import { fetchProjects, createProject } from '../api/projects';
@@ -70,7 +70,7 @@ export const ProjectsView: React.FC = () => {
             Loading...
           </div>
         ) : (
-          <ChronologicalRiver projects={projects} />
+          <ProjectGrid projects={projects} />
         )}
       </div>
 

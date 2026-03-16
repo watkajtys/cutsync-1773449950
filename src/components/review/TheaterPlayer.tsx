@@ -1,135 +1,72 @@
-import React, { useRef, useEffect } from 'react';
-import { Play, FastForward, Rewind, SkipBack, SkipForward, Volume2, Subtitles, Settings, Maximize } from 'lucide-react';
-import { useReview } from '../../contexts/ReviewContext';
+import React, { useEffect, useState } from 'react';
+import { Play, Pause, FastForward, Rewind, SkipBack, SkipForward, Volume2, Subtitles, Settings, Maximize } from 'lucide-react';
+import { useCanvasDrawing } from '../../hooks/useCanvasDrawing';
 import { DrawingToolbar } from './DrawingToolbar';
+import { useReview } from '../../contexts/ReviewContext';
 
 export const TheaterPlayer: React.FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const isDrawing = useRef(false);
+  const { videoRef, inputRef } = useReview();
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const {
-    activeTool, activeColor, shapes, currentShape,
-    setShapes, setCurrentShape
-  } = useReview();
-
-  const getCoordinates = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return { x: 0, y: 0 };
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    return {
-      x: (e.clientX - rect.left) * scaleX,
-      y: (e.clientY - rect.top) * scaleY
-    };
-  };
-
-  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (activeTool === 'pointer') return;
-    
-    isDrawing.current = true;
-    const { x, y } = getCoordinates(e);
-    setCurrentShape({
-      tool: activeTool,
-      color: activeColor,
-      points: [{ x, y }]
-    });
-  };
-
-  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (!isDrawing.current || activeTool === 'pointer' || !currentShape) return;
-    
-    const { x, y } = getCoordinates(e);
-    
-    if (activeTool === 'freehand') {
-      setCurrentShape({
-        ...currentShape,
-        points: [...currentShape.points, { x, y }]
-      });
-    } else {
-      // For rect and arrow, just update the second point
-      setCurrentShape({
-        ...currentShape,
-        points: [currentShape.points[0], { x, y }]
-      });
-    }
-  };
-
-  const handlePointerUp = () => {
-    if (!isDrawing.current || activeTool === 'pointer' || !currentShape) return;
-    isDrawing.current = false;
-    setShapes([...shapes, currentShape]);
-    setCurrentShape(null);
-  };
+    canvasRef,
+    activeTool,
+    handlePointerDown,
+    handlePointerMove,
+    handlePointerUp
+  } = useCanvasDrawing();
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    // Set internal canvas resolution to match its display size exactly
-    const rect = canvas.getBoundingClientRect();
-    // Only resize if the display size changed to avoid clearing the canvas unnecessarily
-    if (canvas.width !== rect.width || canvas.height !== rect.height) {
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-    }
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.lineWidth = 3;
-
-    const allShapes = currentShape ? [...shapes, currentShape] : shapes;
-
-    allShapes.forEach(shape => {
-      ctx.strokeStyle = shape.color;
-      ctx.fillStyle = shape.color;
-      ctx.beginPath();
-      
-      if (shape.points.length === 0) return;
-
-      if (shape.tool === 'freehand') {
-        ctx.moveTo(shape.points[0].x, shape.points[0].y);
-        for (let i = 1; i < shape.points.length; i++) {
-          ctx.lineTo(shape.points[i].x, shape.points[i].y);
-        }
-        ctx.stroke();
-      } else if (shape.tool === 'rect') {
-        if (shape.points.length < 2) return;
-        const p1 = shape.points[0];
-        const p2 = shape.points[1];
-        ctx.strokeRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
-      } else if (shape.tool === 'arrow') {
-        if (shape.points.length < 2) return;
-        const p1 = shape.points[0];
-        const p2 = shape.points[1];
-        
-        // Draw main line
-        ctx.moveTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
-        ctx.stroke();
-
-        // Draw arrowhead
-        const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
-        const headlen = 15;
-        ctx.beginPath();
-        ctx.moveTo(p2.x, p2.y);
-        ctx.lineTo(p2.x - headlen * Math.cos(angle - Math.PI / 6), p2.y - headlen * Math.sin(angle - Math.PI / 6));
-        ctx.lineTo(p2.x - headlen * Math.cos(angle + Math.PI / 6), p2.y - headlen * Math.sin(angle + Math.PI / 6));
-        ctx.lineTo(p2.x, p2.y);
-        ctx.fill();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger if user is typing in an input
+      if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
+        return;
       }
-    });
-  }, [shapes, currentShape]);
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (videoRef.current) {
+          videoRef.current.pause();
+          setIsPlaying(false);
+        }
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [videoRef, inputRef]);
+
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    // Left empty for now, could be used to sync time with timeline
+  };
 
   return (
-    <section className="flex-1 bg-black flex flex-col relative group">
+    <section className="w-[70%] bg-black flex flex-col relative group">
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="video-container w-full max-w-6xl relative bg-slate-900 rounded-lg overflow-hidden shadow-2xl border border-white/5" style={{ aspectRatio: '21 / 9' }}>
-          <img alt="Silent Horizon Review" className="w-full h-full object-cover opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6C5kYDZtuJGpypOT0LOGUpiCxJ04IluVt0NtnMAYUS0KaSK5rKBHTwWoYhRpLCNOguVUdp4x8aElSCab-FeEK7zcRCeuHU09MwP0oiIT5O_vpnu-iQwo0k07ImqxZdPfYPfMFQKnaQwX-Wl0tvjk7lo0Pi7_cRyvPMARNGos_9HZqCOHcf0btx6Orh5Dhmwglxkvzm0IXdotBjZVGV4PDMpTrBRk3k76aJZybsz3wmBGGcOzodO_09Q9sDm26sZlRvo3MJm24asg"/>
+          <video 
+            ref={videoRef}
+            src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+            className="w-full h-full object-cover opacity-80"
+            onTimeUpdate={handleTimeUpdate}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            crossOrigin="anonymous"
+          />
           <canvas
             ref={canvasRef}
             className={`absolute inset-0 w-full h-full z-10 touch-none ${activeTool !== 'pointer' ? 'cursor-crosshair' : 'cursor-default'}`}
@@ -165,8 +102,11 @@ export const TheaterPlayer: React.FC = () => {
           <button className="text-slate-400 hover:text-white transition-colors">
             <Rewind size={20} />
           </button>
-          <button className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform">
-            <Play className="fill-current" size={20} />
+          <button 
+            onClick={togglePlay}
+            className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform"
+          >
+            {isPlaying ? <Pause className="fill-current" size={20} /> : <Play className="fill-current" size={20} />}
           </button>
           <button className="text-slate-400 hover:text-white transition-colors">
             <FastForward size={20} />
