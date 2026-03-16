@@ -191,5 +191,5 @@ test('Verify the Review Mode uses proper lucide icons after refactoring', async 
   const cloudCogIcon = page.locator('footer svg').first();
   await expect(cloudCogIcon).toBeVisible();
 
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
