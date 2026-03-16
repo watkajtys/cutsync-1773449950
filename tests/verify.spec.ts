@@ -163,7 +163,7 @@ test('Verify center play button overlay is removed', async ({ page }) => {
   await expect(largePlayButton).toHaveCount(0);
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify the Review Mode shell and layout for a specific asset', async ({ page }) => {
