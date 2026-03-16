@@ -1,17 +1,59 @@
-import React, { useState } from 'react';
-import { Info, ListFilter, Send } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Info, ListFilter, Send, AlertCircle } from 'lucide-react';
+import { useParams } from 'react-router-dom';
 import { useReview } from '../../contexts/ReviewContext';
+import { createReviewNote } from '../../api/reviews';
+
+const formatTimecode = (seconds: number) => {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.floor(seconds % 60);
+  const f = Math.floor((seconds % 1) * 24); // Assuming 24fps
+  
+  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}:${f.toString().padStart(2, '0')}`;
+};
+
+const formatTimeAgo = (dateStr: string) => {
+  const diffMs = Date.now() - new Date(dateStr).getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 60) return `${diffMins}m ago`;
+  const diffHrs = Math.floor(diffMins / 60);
+  if (diffHrs < 24) return `${diffHrs}h ago`;
+  return `${Math.floor(diffHrs / 24)}d ago`;
+};
 
 export const NotesSidebar: React.FC = () => {
-  const { clearDrawing, setActiveTool, inputRef, seekToTime } = useReview();
+  const { assetId } = useParams<{ assetId: string }>();
+  const { clearDrawing, setActiveTool, inputRef, seekToTime, notes, loadNotes, currentTime, shapes, error, setError } = useReview();
   const [noteText, setNoteText] = useState('');
 
-  const handleSubmitNote = () => {
-    if (!noteText.trim()) return;
-    // Here would be logic to save to PocketBase
-    setNoteText('');
-    clearDrawing();
-    setActiveTool('pointer');
+  useEffect(() => {
+    if (assetId) {
+      loadNotes(assetId);
+    }
+  }, [assetId, loadNotes]);
+
+  const handleSubmitNote = async () => {
+    if (!noteText.trim() || !assetId) return;
+    
+    try {
+      setError(null);
+      await createReviewNote(
+        assetId,
+        'Current User', // Mock author for MVP
+        currentTime,
+        noteText,
+        shapes.length > 0 ? shapes : null
+      );
+      
+      setNoteText('');
+      clearDrawing();
+      setActiveTool('pointer');
+      await loadNotes(assetId); // Refresh list
+    } catch (err) {
+      console.error("Failed to save note:", err);
+      setError("Failed to save review note. Please try again.");
+    }
   };
 
   return (
@@ -65,7 +107,7 @@ export const NotesSidebar: React.FC = () => {
 
       <section className="h-[55%] flex flex-col">
         <div className="p-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Review Notes (4)</h3>
+          <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Review Notes ({notes.length})</h3>
           <div className="flex gap-2">
             <button className="text-slate-500 hover:text-white transition-colors">
               <ListFilter size={14} strokeWidth={1.5} />
@@ -74,47 +116,44 @@ export const NotesSidebar: React.FC = () => {
         </div>
         
         <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
-          <div 
-            onClick={() => seekToTime(725)} 
-            className="group relative bg-white/5 p-3 rounded-lg border border-white/5 hover:border-primary/50 transition-colors cursor-pointer"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-mono text-primary font-bold px-1.5 py-0.5 rounded bg-primary/10">00:12:05:00</span>
-              <span className="text-[9px] text-slate-500 font-bold">2m ago</span>
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-lg flex items-start gap-2 mb-2">
+              <AlertCircle size={14} className="text-red-400 mt-0.5 shrink-0" strokeWidth={2} />
+              <p className="text-xs text-red-300 leading-relaxed">{error}</p>
             </div>
-            <p className="text-xs text-slate-300 leading-relaxed italic border-l-2 border-primary/30 pl-2">"Adjust color grade on this shot. Shadows are slightly crushed."</p>
-            <div className="mt-2 flex items-center gap-2">
-              <div className="h-4 w-4 rounded-full overflow-hidden">
-                <img alt="Sarah" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzKhWLSKnAzAauvIwjImoVPnPTt7-K2rcU455fWERDrWZcF8nPI2Q1G38CznoSOoZuwvZ6I01Vb789wHd_c9J01e6L5whT2ItHyaUQaMfx-izq9DyBNaPO5FPxnuh2UxkNcbRMVhQNRdKzrctpCwYbMvGqlOPrugw6B3N9Ot-OyWU131KF-43uxXfwexisEdIJhSoaUz9_ZY9Tw-5_EEBjWATiYcJlclLkKh40HR07xEi22LuZ4wJfpALdgSAPFdU2e0sOIHeZgbM"/>
-              </div>
-              <span className="text-[10px] font-medium text-slate-400">Sarah J.</span>
-            </div>
-          </div>
+          )}
 
-          <div 
-            onClick={() => seekToTime(845.12)}
-            className="group relative bg-white/5 p-3 rounded-lg border border-white/5 hover:border-primary/50 transition-colors cursor-pointer"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-mono text-primary font-bold px-1.5 py-0.5 rounded bg-primary/10">00:14:05:12</span>
-              <span className="text-[9px] text-slate-500 font-bold">1h ago</span>
-            </div>
-            <p className="text-xs text-slate-300 leading-relaxed">Audio peak at 00:14:05. Needs level normalization.</p>
-            <div className="mt-2 flex items-center gap-2">
-              <div className="h-4 w-4 rounded-full bg-slate-800 flex items-center justify-center">
-                <span className="text-[8px] text-white">MK</span>
+          {notes.map(note => (
+            <div 
+              key={note.id}
+              onClick={() => seekToTime(note.timestamp)} 
+              className="group relative bg-white/5 p-3 rounded-lg border border-white/5 hover:border-primary/50 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-mono text-primary font-bold px-1.5 py-0.5 rounded bg-primary/10">{formatTimecode(note.timestamp)}</span>
+                <span className="text-[9px] text-slate-500 font-bold">{formatTimeAgo(note.created)}</span>
               </div>
-              <span className="text-[10px] font-medium text-slate-400">Mark K.</span>
+              <p className={`text-xs text-slate-300 leading-relaxed ${note.canvas_data ? 'italic border-l-2 border-primary/30 pl-2' : ''}`}>
+                {note.canvas_data ? `"${note.note_text}"` : note.note_text}
+              </p>
+              <div className="mt-2 flex items-center gap-2">
+                <div className="h-4 w-4 rounded-full bg-slate-800 flex items-center justify-center overflow-hidden">
+                  {note.author === 'Sarah J.' ? (
+                    <img alt="Sarah" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzKhWLSKnAzAauvIwjImoVPnPTt7-K2rcU455fWERDrWZcF8nPI2Q1G38CznoSOoZuwvZ6I01Vb789wHd_c9J01e6L5whT2ItHyaUQaMfx-izq9DyBNaPO5FPxnuh2UxkNcbRMVhQNRdKzrctpCwYbMvGqlOPrugw6B3N9Ot-OyWU131KF-43uxXfwexisEdIJhSoaUz9_ZY9Tw-5_EEBjWATiYcJlclLkKh40HR07xEi22LuZ4wJfpALdgSAPFdU2e0sOIHeZgbM"/>
+                  ) : (
+                    <span className="text-[8px] text-white">{note.author.substring(0,2).toUpperCase()}</span>
+                  )}
+                </div>
+                <span className="text-[10px] font-medium text-slate-400">{note.author}</span>
+              </div>
             </div>
-          </div>
+          ))}
 
-          <div className="group relative bg-white/5 p-3 rounded-lg border border-white/5 hover:border-primary/50 transition-colors cursor-pointer opacity-60">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-mono text-slate-500 font-bold px-1.5 py-0.5 rounded bg-white/5">00:15:22:00</span>
-              <span className="text-[9px] text-slate-500 font-bold uppercase">Resolved</span>
+          {notes.length === 0 && (
+            <div className="text-center p-4">
+              <p className="text-xs text-slate-500">No notes added yet.</p>
             </div>
-            <p className="text-xs text-slate-400 line-through">Check boom mic shadow in bottom right.</p>
-          </div>
+          )}
         </div>
         
         <div className="p-4 bg-black/40 border-t border-white/5">

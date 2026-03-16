@@ -1,14 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
-
-type Tool = 'pointer' | 'freehand' | 'rect' | 'arrow';
-
-interface Point { x: number; y: number }
-
-interface Shape {
-  tool: Tool;
-  color: string;
-  points: Point[];
-}
+import React, { createContext, useContext, useState, useCallback } from 'react';
+import { fetchReviewNotes } from '../api/reviews';
+import { ReviewNote, Shape, Tool } from '../types/review';
 
 interface ReviewContextType {
   activeTool: Tool;
@@ -25,6 +17,10 @@ interface ReviewContextType {
   seekToTime: (time: number) => void;
   currentTime: number;
   setCurrentTime: React.Dispatch<React.SetStateAction<number>>;
+  notes: ReviewNote[];
+  loadNotes: (assetId: string) => Promise<void>;
+  error: string | null;
+  setError: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const ReviewContext = createContext<ReviewContextType | undefined>(undefined);
@@ -35,6 +31,8 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [currentTime, setCurrentTime] = useState<number>(0);
+  const [notes, setNotes] = useState<ReviewNote[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
@@ -51,6 +49,17 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const loadNotes = useCallback(async (assetId: string) => {
+    try {
+      setError(null);
+      const fetchedNotes = await fetchReviewNotes(assetId);
+      setNotes(fetchedNotes);
+    } catch (err) {
+      console.error("Failed to fetch notes in context", err);
+      setError("Failed to load review notes. Please check your connection.");
+    }
+  }, []);
+
   return (
     <ReviewContext.Provider value={{
       activeTool, setActiveTool,
@@ -62,7 +71,11 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       videoRef,
       seekToTime,
       currentTime,
-      setCurrentTime
+      setCurrentTime,
+      notes,
+      loadNotes,
+      error,
+      setError
     }}>
       {children}
     </ReviewContext.Provider>

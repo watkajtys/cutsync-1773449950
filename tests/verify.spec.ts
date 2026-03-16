@@ -141,6 +141,32 @@ test('Verify that the React app loads and displays the main dashboard shell with
 });
 
 test('Verify center play button overlay is removed', async ({ page }) => {
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ page: 1, perPage: 30, totalItems: 0, totalPages: 1, items: [] })
+      });
+    } else if (request.method() === 'POST') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'mock-new-note',
+          asset_id: 'test-asset-123',
+          author: 'Current User',
+          timestamp: 0,
+          note_text: 'A mock created note',
+          canvas_data: null,
+          created: new Date().toISOString()
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
   await page.goto('/');
 
   // Wait for the app to load
@@ -167,6 +193,32 @@ test('Verify center play button overlay is removed', async ({ page }) => {
 });
 
 test('User hits spacebar during playback; video pauses and new note input is focused.', async ({ page }) => {
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ page: 1, perPage: 30, totalItems: 0, totalPages: 1, items: [] })
+      });
+    } else if (request.method() === 'POST') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'mock-new-note',
+          asset_id: 'test-asset-123',
+          author: 'Current User',
+          timestamp: 0,
+          note_text: 'A mock created note',
+          canvas_data: null,
+          created: new Date().toISOString()
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
   await page.goto('/review/test-asset-123');
 
   // Verify the video and input exist
@@ -216,6 +268,57 @@ test('User hits spacebar during playback; video pauses and new note input is foc
 });
 
 test('Verify the Review Mode shell and layout for a specific asset', async ({ page }) => {
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          page: 1,
+          perPage: 30,
+          totalItems: 2,
+          totalPages: 1,
+          items: [
+            {
+              id: 'mock1',
+              asset_id: 'test-asset-123',
+              author: 'Sarah J.',
+              timestamp: 725,
+              note_text: 'Adjust color grade on this shot. Shadows are slightly crushed.',
+              canvas_data: null,
+              created: new Date(Date.now() - 120000).toISOString()
+            },
+            {
+              id: 'mock2',
+              asset_id: 'test-asset-123',
+              author: 'Mark K.',
+              timestamp: 845.12,
+              note_text: 'Audio peak at 00:14:05. Needs level normalization.',
+              canvas_data: null,
+              created: new Date(Date.now() - 3600000).toISOString()
+            }
+          ]
+        })
+      });
+    } else if (request.method() === 'POST') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'mock-new-note',
+          asset_id: 'test-asset-123',
+          author: 'Current User',
+          timestamp: 0,
+          note_text: 'A mock created note',
+          canvas_data: null,
+          created: new Date().toISOString()
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
   // Navigate directly to the review mode for a mock asset
   await page.goto('/review/test-asset-123');
   
@@ -250,6 +353,57 @@ test('Verify the Review Mode shell and layout for a specific asset', async ({ pa
 });
 
 test('View the review route and ensure the right 30% sidebar renders a scrollable list of styled mock notes with timestamps, alongside an input field at the bottom.', async ({ page }) => {
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          page: 1,
+          perPage: 30,
+          totalItems: 2,
+          totalPages: 1,
+          items: [
+            {
+              id: 'mock1',
+              asset_id: 'test-asset-123',
+              author: 'Sarah J.',
+              timestamp: 725,
+              note_text: 'Adjust color grade on this shot. Shadows are slightly crushed.',
+              canvas_data: null,
+              created: new Date(Date.now() - 120000).toISOString()
+            },
+            {
+              id: 'mock2',
+              asset_id: 'test-asset-123',
+              author: 'Mark K.',
+              timestamp: 845.12,
+              note_text: 'Audio peak at 00:14:05. Needs level normalization.',
+              canvas_data: null,
+              created: new Date(Date.now() - 3600000).toISOString()
+            }
+          ]
+        })
+      });
+    } else if (request.method() === 'POST') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'mock-new-note',
+          asset_id: 'test-asset-123',
+          author: 'Current User',
+          timestamp: 0,
+          note_text: 'A mock created note',
+          canvas_data: null,
+          created: new Date().toISOString()
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
   await page.goto('/review/test-asset-123');
   
   // Verify the Sidebar container (should be ~30% equivalent width logic based on the design - e.g. w-80 or flex-basis)
@@ -260,7 +414,7 @@ test('View the review route and ensure the right 30% sidebar renders a scrollabl
   await expect(sidebar.locator('text=Technical Metadata')).toBeVisible();
   
   // Verify the Review Notes section and count
-  await expect(sidebar.locator('text=Review Notes (4)')).toBeVisible();
+  await expect(sidebar.locator('text=Review Notes (2)')).toBeVisible();
 
   // Verify the scrollable list container for notes
   const notesContainer = sidebar.locator('.overflow-y-auto.custom-scrollbar').nth(1);
@@ -281,6 +435,32 @@ test('View the review route and ensure the right 30% sidebar renders a scrollabl
 });
 
 test('Verify the Review Mode uses proper lucide icons after refactoring', async ({ page }) => {
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ page: 1, perPage: 30, totalItems: 0, totalPages: 1, items: [] })
+      });
+    } else if (request.method() === 'POST') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'mock-new-note',
+          asset_id: 'test-asset-123',
+          author: 'Current User',
+          timestamp: 0,
+          note_text: 'A mock created note',
+          canvas_data: null,
+          created: new Date().toISOString()
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
   await page.goto('/review/test-asset-123');
   
   // Verify lucide-react icons are loaded in the DOM (usually they have lucide class or are SVGs)
@@ -300,6 +480,32 @@ test('Verify the Review Mode uses proper lucide icons after refactoring', async 
 });
 
 test('Verify the visual annotation tools render a drawing toolbar and overlay canvas in Review Mode', async ({ page }) => {
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ page: 1, perPage: 30, totalItems: 0, totalPages: 1, items: [] })
+      });
+    } else if (request.method() === 'POST') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'mock-new-note',
+          asset_id: 'test-asset-123',
+          author: 'Current User',
+          timestamp: 0,
+          note_text: 'A mock created note',
+          canvas_data: null,
+          created: new Date().toISOString()
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
   await page.goto('/review/test-asset-123');
   
   // Verify the drawing toolbar is present
