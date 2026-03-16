@@ -642,7 +642,7 @@ test('Upload a source_clip video via the React UI. Run extractor_agent.py. Verif
 
   // The previous tests heavily mock PocketBase. 
   // Let's create a real project and real asset using the UI, but wait - the previous test 'Verify that the React app loads and displays the main dashboard shell with navigation.' mocks the UI upload.
-  // The system uses a real PocketBase instance at http://127.0.0.1:8090.
+  // The system uses a real PocketBase instance at http://loom-cutsync-pocketbase:8090.
   
   const pbUrl = 'http://loom-cutsync-pocketbase:8090';
   

@@ -1,17 +1,23 @@
 import time
 import os
 import subprocess
-import requests
-from pocketbase import PocketBase
+import urllib.request
+import urllib.parse
+import json
 
 PB_URL = os.getenv("POCKETBASE_URL", "http://127.0.0.1:8090")
 
-def get_pb_client():
-    return PocketBase(PB_URL)
+def update_asset_status(asset_id, status):
+    url = f"{PB_URL}/api/collections/assets/records/{asset_id}"
+    data = json.dumps({"processing_status": status}).encode('utf-8')
+    req = urllib.request.Request(url, data=data, method="PATCH")
+    req.add_header('Content-Type', 'application/json')
+    with urllib.request.urlopen(req) as response:
+        return json.loads(response.read().decode())
 
-def process_asset(asset, pb):
-    asset_id = getattr(asset, "id", None)
-    file_name = getattr(asset, "file", None)
+def process_asset(asset):
+    asset_id = asset.get("id")
+    file_name = asset.get("file")
     
     if not asset_id or not file_name:
         print(f"[{asset_id}] Invalid asset record, missing ID or file name.")
@@ -19,7 +25,7 @@ def process_asset(asset, pb):
 
     print(f"[{asset_id}] Found pending asset. Changing status to extracting_audio...")
     try:
-        pb.collection("assets").update(asset_id, {"processing_status": "extracting_audio"})
+        update_asset_status(asset_id, "extracting_audio")
     except Exception as e:
         print(f"[{asset_id}] Failed to update status to extracting_audio: {e}")
         return
@@ -34,12 +40,14 @@ def process_asset(asset, pb):
         local_audio_path = os.path.join(temp_dir, f"{asset_id}_audio.mp3")
         
         print(f"[{asset_id}] Downloading {file_name} from {file_url}...")
-        response = requests.get(file_url, stream=True)
-        response.raise_for_status()
-        
-        with open(local_video_path, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                f.write(chunk)
+        req = urllib.request.Request(file_url)
+        with urllib.request.urlopen(req) as response:
+            with open(local_video_path, 'wb') as f:
+                while True:
+                    chunk = response.read(8192)
+                    if not chunk:
+                        break
+                    f.write(chunk)
                 
         print(f"[{asset_id}] Download complete. Extracting audio...")
         
@@ -50,31 +58,34 @@ def process_asset(asset, pb):
         ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
         print(f"[{asset_id}] Audio extraction complete. Updating status to analyzing...")
-        pb.collection("assets").update(asset_id, {"processing_status": "analyzing"})
+        update_asset_status(asset_id, "analyzing")
         
     except Exception as e:
         print(f"[{asset_id}] Error processing asset: {e}")
         try:
-            pb.collection("assets").update(asset_id, {"processing_status": "error"})
+            update_asset_status(asset_id, "error")
         except Exception as inner_e:
             print(f"[{asset_id}] Failed to set error status: {inner_e}")
 
+def get_pending_assets():
+    filter_expr = urllib.parse.quote("asset_type='source_clip' && processing_status='pending'")
+    url = f"{PB_URL}/api/collections/assets/records?filter={filter_expr}&perPage=500"
+    req = urllib.request.Request(url)
+    with urllib.request.urlopen(req) as response:
+        data = json.loads(response.read().decode())
+        return data.get("items", [])
+
 def main():
     print(f"Starting extractor daemon, polling {PB_URL}...")
-    pb = get_pb_client()
     
     oneshot = os.getenv("ONESHOT", "false").lower() == "true"
     
     while True:
         try:
-            records = pb.collection("assets").get_full_list(
-                query_params={
-                    "filter": "asset_type='source_clip' && processing_status='pending'"
-                }
-            )
+            records = get_pending_assets()
             
             for record in records:
-                process_asset(record, pb)
+                process_asset(record)
                 
         except Exception as e:
             print(f"Error during polling: {e}")
