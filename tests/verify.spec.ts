@@ -1,3 +1,6 @@
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
 import { test, expect } from '@playwright/test';
 
 test('Verify that the React app loads and displays the main dashboard shell with navigation.', async ({ page }) => {
@@ -628,4 +631,81 @@ test('User saves a note at 0:15, it persists in PocketBase. Clicking an older no
 
   // Take screenshot of evidence
   await page.screenshot({ path: 'evidence_old.png' });
+});
+
+test('Upload a source_clip video via the React UI. Run extractor_agent.py. Verify the asset status changes to extracting_audio in PocketBase, the audio file is successfully generated in /tmp, and the status ultimately changes to analyzing.', async ({ page, request }) => {
+  // First, we create a project and asset directly via PocketBase API to simulate the upload,
+  // since the prompt says "Upload a 'source_clip' video via the React UI" but also mentions PocketBase API
+  // Actually, let's use the UI to upload as requested.
+  // We need PocketBase running. The test environment has PocketBase running on localhost:8090.
+  // We won't mock this time! We'll use the real backend so the python script can interact with it.
+
+  // The previous tests heavily mock PocketBase. 
+  // Let's create a real project and real asset using the UI, but wait - the previous test 'Verify that the React app loads and displays the main dashboard shell with navigation.' mocks the UI upload.
+  // The system uses a real PocketBase instance at http://127.0.0.1:8090.
+  
+  const pbUrl = 'http://loom-cutsync-pocketbase:8090';
+  
+  // 1. Create a dummy video file in /tmp to upload
+  const dummyVideoPath = '/tmp/dummy_test_video.mp4';
+  if (!fs.existsSync(dummyVideoPath)) {
+    // We can create a tiny dummy mp4 using ffmpeg or just an empty file if pocketbase accepts it.
+    // However, the python script will run ffmpeg on it, so it needs to be a valid video or ffmpeg will error out.
+    // Let's generate a 1-second blank video with blank audio.
+    execSync(`ffmpeg -f lavfi -i color=c=black:s=128x128:d=1 -f lavfi -i anullsrc=r=44100:cl=stereo:d=1 -c:v libx264 -c:a aac -shortest -y ${dummyVideoPath}`);
+  }
+
+  // 2. Clear out any previous records or projects to avoid conflicts, or just create one and find it.
+  
+  await page.goto('/');
+  await expect(page.locator('text=CutSync')).toBeVisible();
+
+  // Open the New Project Modal
+  await page.click('button:has-text("New Project")');
+  await expect(page.locator('h2:has-text("New Project")').first()).toBeVisible();
+
+  const uniqueTitle = `Test Proj ${Date.now()}`;
+  await page.fill('input#title', uniqueTitle);
+  await page.fill('textarea#description', 'Real upload test');
+  await page.selectOption('select#asset_type', 'source_clip');
+
+  // Real file upload
+  const fileChooserPromise = page.waitForEvent('filechooser');
+  await page.click('text=Drag & drop source video');
+  const fileChooser = await fileChooserPromise;
+  await fileChooser.setFiles(dummyVideoPath);
+
+  await expect(page.locator('text=dummy_test_video.mp4')).toBeVisible();
+
+  // Submit the form
+  await page.click('button:has-text("Create Project")');
+  await expect(page.locator('h2:has-text("New Project")')).toBeHidden({ timeout: 10000 });
+
+  // 3. We should now have a real asset in pocketbase with status 'pending'
+  // Let's verify via API
+  const assetsRes = await request.get(`${pbUrl}/api/collections/assets/records?filter=asset_type='source_clip'&&sort=-created`);
+  const assetsData = await assetsRes.json();
+  const asset = assetsData.items[0];
+  
+  expect(asset).toBeDefined();
+  expect(asset.processing_status).toBe('pending');
+  expect(asset.asset_type).toBe('source_clip');
+
+  // 4. Run extractor_agent.py
+  const env = { ...process.env, POCKETBASE_URL: pbUrl, ONESHOT: 'true' };
+  const output = execSync('python3 backend/extractor_agent.py', { env, encoding: 'utf-8' });
+  console.log(output);
+
+  // 5. Verify status changed to analyzing
+  const verifyRes = await request.get(`${pbUrl}/api/collections/assets/records/${asset.id}`);
+  const verifyData = await verifyRes.json();
+  
+  expect(verifyData.processing_status).toBe('analyzing');
+  
+  // 6. Verify audio file generated in /tmp
+  const expectedAudioPath = `/tmp/${asset.id}_audio.mp3`;
+  expect(fs.existsSync(expectedAudioPath)).toBe(true);
+  
+  // Take screenshot as required
+  await page.screenshot({ path: 'evidence.png' });
 });

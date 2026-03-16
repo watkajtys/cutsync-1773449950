@@ -1,0 +1,5 @@
+<<<<<<< SEARCH
+  const pbUrl = process.env.TEST_ENV === 'local' ? 'http://127.0.0.1:8090' : 'http://loom-cutsync-pocketbase:8090';
+=======
+  const pbUrl = 'http://loom-cutsync-pocketbase:8090';
+>>>>>>> REPLACE
