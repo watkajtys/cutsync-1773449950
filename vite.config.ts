@@ -8,5 +8,8 @@ export default defineConfig({
       ignored: ['**/pb_data/**', '**/playwright-report/**']
     }
   },
+  optimizeDeps: {
+    exclude: ['pocketbase']
+  },
   plugins: [react()],
 })
