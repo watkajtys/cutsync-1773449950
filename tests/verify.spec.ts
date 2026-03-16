@@ -322,6 +322,9 @@ test('Verify the newly implemented Theater Mode structure and styling in Review 
   await page.waitForTimeout(500);
   await expect(page.locator('[data-testid="active-tab-panel-title"]')).toContainText('export', { ignoreCase: true });
 
+  // Verify UI fixes (play button, control bar, handle, text sizes)
+  await expect(page.locator('button:has(svg.lucide-play)').first()).toBeVisible();
+
   // Take screenshot of the new feature at the end
   await page.screenshot({ path: 'evidence_old.png' });
 });

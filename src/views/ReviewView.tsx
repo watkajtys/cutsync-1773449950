@@ -46,14 +46,14 @@ export const ReviewView: React.FC = () => {
           <img alt="Cinematic Content" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6C5kYDZtuJGpypOT0LOGUpiCxJ04IluVt0NtnMAYUS0KaSK5rKBHTwWoYhRpLCNOguVUdp4x8aElSCab-FeEK7zcRCeuHU09MwP0oiIT5O_vpnu-iQwo0k07ImqxZdPfYPfMFQKnaQwX-Wl0tvjk7lo0Pi7_cRyvPMARNGos_9HZqCOHcf0btx6Orh5Dhmwglxkvzm0IXdotBjZVGV4PDMpTrBRk3k76aJZybsz3wmBGGcOzodO_09Q9sDm26sZlRvo3MJm24asg" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
           <div className="absolute top-6 left-6 flex items-center gap-4">
-            <div className="flex flex-col drop-shadow-md">
-              <span className="text-[10px] text-white/60 font-bold tracking-widest uppercase text-shadow">Project</span>
-              <span className="text-xs text-white font-bold text-shadow">SILENT HORIZON_V03.mxf</span>
+            <div className="flex flex-col">
+              <span className="text-[10px] text-white/40 font-bold tracking-widest uppercase">Project</span>
+              <span className="text-xs text-white/80 font-medium">SILENT HORIZON_V03.mxf</span>
             </div>
           </div>
-          <div className="absolute bottom-6 right-6 text-right drop-shadow-md">
-            <span className="text-[10px] text-white/60 font-bold tracking-widest uppercase text-shadow">Ratio</span>
-            <p className="text-xs text-white font-bold tracking-tight text-shadow">2.39:1 Cinemascope</p>
+          <div className="absolute bottom-6 right-6 text-right">
+            <span className="text-[10px] text-white/40 font-bold tracking-widest uppercase">Ratio</span>
+            <p className="text-xs text-white/80 font-medium tracking-tight">2.39:1 Cinemascope</p>
           </div>
         </div>
 
