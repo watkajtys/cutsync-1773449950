@@ -202,7 +202,7 @@ test('View the review route and ensure the right 30% sidebar renders a scrollabl
   const sendButton = sidebar.locator('button:has(svg.lucide-send)').first();
   await expect(sendButton).toBeVisible();
 
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify the Review Mode uses proper lucide icons after refactoring', async ({ page }) => {
