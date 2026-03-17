@@ -24,7 +24,7 @@ export const ReviewHeader: React.FC = () => {
           <span className="text-slate-600 mx-1">/</span>
           <span data-testid="nav-review-pipeline" className="flex items-center gap-2 px-3 py-1.5 rounded-md text-white bg-white/10 transition-colors cursor-default">
             <Eye size={14} />
-            REVIEW PIPELINE
+            Review Pipeline
           </span>
         </nav>
       </div>

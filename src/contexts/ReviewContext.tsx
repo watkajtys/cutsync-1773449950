@@ -120,6 +120,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       if (assetId === ':id') {
         console.warn('Intercepted generic route parameter ":id". Aborting fetch.');
         setNotes([]);
+        setError('ASSET_NOT_FOUND');
         return;
       }
       const fetchedNotes = await fetchReviewNotes(assetId);
@@ -177,6 +178,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       if (assetId === ':id') {
         console.warn('Intercepted generic route parameter ":id". Aborting asset fetch.');
         setAssetUrl(null);
+        setError('ASSET_NOT_FOUND');
         return;
       }
       console.log(`[PocketBase Fetch] Fetching asset with ID: ${assetId} from url: ${pb.baseUrl}/api/collections/assets/records/${assetId}`);
