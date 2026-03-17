@@ -715,3 +715,139 @@ test('Verify the Prep Mode UI layout and connect it to PocketBase to display sou
   // Take screenshot
   await page.screenshot({ path: 'evidence_old.png' });
 });
+
+test('Verify Prep Mode video synchronization and click-to-scrub navigation', async ({ page }) => {
+  const assetId = 'test-asset-123';
+  
+  await page.route('**/api/collections/ai_transcripts/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          page: 1,
+          perPage: 30,
+          totalItems: 2,
+          totalPages: 1,
+          items: [
+            {
+              id: 'mock-transcript-1',
+              asset_id: assetId,
+              raw_text: "DIRECTOR: Welcome to the test.",
+              created: new Date().toISOString()
+            },
+            {
+              id: 'mock-transcript-2',
+              asset_id: assetId,
+              raw_text: "ACTOR: Thank you.",
+              created: new Date().toISOString()
+            }
+          ]
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.route('**/api/collections/ai_cut_suggestions/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          page: 1,
+          perPage: 30,
+          totalItems: 1,
+          totalPages: 1,
+          items: [
+            {
+              id: 'mock-cut-1',
+              asset_id: assetId,
+              start_timecode: 15, // 00:00:15
+              end_timecode: 20,
+              cut_reason: "Good transition.",
+              created: new Date().toISOString()
+            }
+          ]
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.goto(`/prep/${assetId}`);
+
+  // Wait for things to load
+  await expect(page.locator('text=Source Transcript')).toBeVisible();
+
+  // Test 1: Click on Cut Suggestion
+  // The start_timecode is 15. Clicking should set video currentTime to 15.
+  const cutSuggestion = page.locator('text=Good transition.');
+  await expect(cutSuggestion).toBeVisible();
+  await cutSuggestion.click();
+  
+  await page.waitForTimeout(500);
+
+  let currentTime = await page.evaluate(() => {
+    const video = document.querySelector('video');
+    return video ? video.currentTime : 0;
+  });
+  expect(currentTime).toBeCloseTo(15, 1);
+
+  // Test 2: Click on Transcript
+  // First transcript is at mockTime = 0*10 = 0
+  // Second transcript is at mockTime = 1*10 = 10
+  const secondTranscript = page.locator('text=Thank you.');
+  await expect(secondTranscript).toBeVisible();
+  await secondTranscript.click();
+
+  await page.waitForTimeout(500);
+
+  currentTime = await page.evaluate(() => {
+    const video = document.querySelector('video');
+    return video ? video.currentTime : 0;
+  });
+  expect(currentTime).toBeCloseTo(10, 1);
+
+  // Test 3: Click on Timeline Progress Bar
+  // The dummy.mp4 length is not deterministic before loading but let's mock the UI click.
+  // We can evaluate directly on the DOM or simulate click.
+  await page.evaluate(() => {
+    // Set duration to 100 for easy calculation
+    const video = document.querySelector('video');
+    if (video) {
+        // Since duration is readonly on HTMLVideoElement, we mock it by triggering context state updates or dispatching events if needed,
+        // but let's just use the click handler directly via evaluate if possible, or trigger a click on the progress bar.
+        // Easiest is to click the middle of the progress bar.
+    }
+  });
+
+  const progressBar = page.locator('.bg-white\\/20.rounded-full.mb-4.cursor-pointer');
+  await expect(progressBar).toBeVisible();
+  const box = await progressBar.boundingBox();
+  if (box) {
+      // Click at 25% of the progress bar
+      await page.mouse.click(box.x + box.width * 0.25, box.y + box.height / 2);
+  }
+
+  await page.waitForTimeout(500);
+
+  const duration = await page.evaluate(() => {
+    const video = document.querySelector('video');
+    return video ? video.duration : 0;
+  });
+
+  currentTime = await page.evaluate(() => {
+    const video = document.querySelector('video');
+    return video ? video.currentTime : 0;
+  });
+
+  // Since we clicked at 25%, current time should be roughly duration * 0.25
+  if (duration > 0 && !isNaN(duration)) {
+    expect(currentTime).toBeCloseTo(duration * 0.25, 1);
+  }
+
+  await page.screenshot({ path: 'evidence.png' });
+});

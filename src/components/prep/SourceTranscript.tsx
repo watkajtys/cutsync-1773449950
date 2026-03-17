@@ -4,7 +4,7 @@ import { usePrep } from '../../contexts/PrepContext';
 import { formatTimecode } from '../../utils/timeFormat';
 
 export const SourceTranscript: React.FC = () => {
-  const { transcripts, currentTime } = usePrep();
+  const { transcripts, currentTime, setCurrentTime } = usePrep();
 
   return (
     <div className="w-1/2 flex flex-col bg-surface-accent">
@@ -42,7 +42,11 @@ export const SourceTranscript: React.FC = () => {
               const isItalic = content.startsWith("[") && content.endsWith("]");
 
               return (
-              <div key={transcript.id} className={`transcript-line group flex gap-6 ${isActive ? 'bg-primary/5 -mx-6 px-6 py-2 border-l-2 border-primary' : ''}`}>
+              <div 
+                key={transcript.id} 
+                className={`transcript-line group flex gap-6 cursor-pointer ${isActive ? 'bg-primary/5 -mx-6 px-6 py-2 border-l-2 border-primary' : ''}`}
+                onClick={() => setCurrentTime(mockTime)}
+              >
                 <span className={`timestamp text-[10px] font-mono font-bold w-16 flex-shrink-0 ${isActive ? 'text-primary' : 'text-primary opacity-40 transition-opacity'}`}>
                   {formatTimecode(mockTime, false)}
                 </span>
