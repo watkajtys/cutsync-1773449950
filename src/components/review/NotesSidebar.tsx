@@ -43,7 +43,7 @@ export const NotesSidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-[30%] border-l border-white/5 bg-surface flex flex-col">
+    <aside data-testid="notes-sidebar" className="w-[30%] border-l border-white/5 bg-surface flex flex-col">
       <section className="flex-1 flex flex-col overflow-hidden">
         <ReviewNotesList notes={notes} error={error} />
         

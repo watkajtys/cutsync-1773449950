@@ -69,7 +69,7 @@ export const ReviewNotesList: React.FC<ReviewNotesListProps> = ({ notes, error }
         ))}
 
         {!error && notes.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full gap-4 text-center p-6 text-slate-400">
+          <div data-testid="empty-notes-state" className="flex flex-col items-center justify-center h-full gap-4 text-center p-6 text-slate-400">
             <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-2">
               <span className="material-symbols-outlined text-3xl opacity-50">edit_note</span>
             </div>

@@ -368,9 +368,11 @@ test('Verify the Review Mode shell and layout for a specific asset', async ({ pa
   // Navigate directly to the review mode for a mock asset
   await page.goto('/review/test-asset-123');
   
+  await page.waitForLoadState('networkidle');
+
   // Verify that the header navigation is present
-  await expect(page.locator('text=Active Workspace').first()).toBeVisible();
-  await expect(page.locator('text=Review Pipeline').first()).toBeVisible();
+  await expect(page.getByTestId('nav-workspace')).toBeVisible();
+  await expect(page.getByTestId('nav-review-pipeline')).toBeVisible();
   await expect(page.locator('text=Alex Rivers').first()).toBeVisible();
 
   // Verify the Theater Mode video player section
@@ -470,7 +472,7 @@ test('View the review route and ensure the right 30% sidebar renders a scrollabl
   await page.goto('/review/test-asset-123');
   
   // Verify the Sidebar container (should be ~30% equivalent width logic based on the design - e.g. w-80 or flex-basis)
-  const sidebar = page.locator('aside').nth(1);
+  const sidebar = page.getByTestId('notes-sidebar');
   await expect(sidebar).toBeVisible();
 
   // Verify the Technical Metadata section
@@ -480,7 +482,7 @@ test('View the review route and ensure the right 30% sidebar renders a scrollabl
   await expect(sidebar.locator('text=Review Notes (2)')).toBeVisible();
 
   // Verify the scrollable list container for notes
-  const notesContainer = sidebar.locator('.overflow-y-auto.custom-scrollbar').nth(1);
+  const notesContainer = sidebar.locator('.overflow-y-auto.custom-scrollbar').first();
   await expect(notesContainer).toBeVisible();
 
   // Verify a specific styled note with timestamp
@@ -1393,8 +1395,8 @@ test('Verify conflicting states in Review Notes panel are fixed', async ({ page 
   await expect(errorBannerText).toBeVisible();
 
   // Verify the empty state is NOT visible
-  const emptyStateText = page.locator('text=No notes added yet.');
-  await expect(emptyStateText).not.toBeVisible();
+  const emptyStateContainer = page.getByTestId('empty-notes-state');
+  await expect(emptyStateContainer).not.toBeVisible();
 
   // Click the retry button
   const retryButton = page.locator('button:has-text("Retry")');
@@ -1405,7 +1407,7 @@ test('Verify conflicting states in Review Notes panel are fixed', async ({ page 
   await expect(errorBannerText).not.toBeVisible();
 
   // Verify the empty state is now visible
-  await expect(emptyStateText).toBeVisible();
+  await expect(emptyStateContainer).toBeVisible();
 
   await page.screenshot({ path: 'evidence_old.png' });
 });
@@ -1547,7 +1549,7 @@ test('User pauses video, selects freehand, draws, switches to box, draws, clears
   
   // Make sure it becomes active (primary colored)
   await page.waitForTimeout(200);
-  await expect(gestureButton).toHaveClass(/text-\[#3b82f6\]/);
+  await expect(gestureButton).toHaveClass(/bg-blue-500/);
 
   // Wait a moment for state change
   await page.waitForTimeout(100);

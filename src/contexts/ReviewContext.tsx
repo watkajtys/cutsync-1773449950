@@ -119,6 +119,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setCurrentAssetId(assetId);
       if (assetId === ':id') {
         console.warn('Intercepted generic route parameter ":id". Aborting fetch.');
+        setNotes([]);
         return;
       }
       const fetchedNotes = await fetchReviewNotes(assetId);
