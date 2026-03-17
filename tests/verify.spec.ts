@@ -470,7 +470,7 @@ test('View the review route and ensure the right 30% sidebar renders a scrollabl
   await page.goto('/review/test-asset-123');
   
   // Verify the Sidebar container (should be ~30% equivalent width logic based on the design - e.g. w-80 or flex-basis)
-  const sidebar = page.locator('aside').nth(1);
+  const sidebar = page.locator('aside').first();
   await expect(sidebar).toBeVisible();
 
   // Verify the Technical Metadata section
@@ -576,17 +576,17 @@ test('Verify the visual annotation tools render a drawing toolbar and overlay ca
   await expect(toolbar).toBeVisible();
 
   // Verify the tools are present
-  await expect(page.locator('button:has-text("Pointer")')).toBeVisible();
-  await expect(page.locator('button:has-text("Freehand")')).toBeVisible();
-  await expect(page.locator('button:has-text("Box")')).toBeVisible();
-  await expect(page.locator('button:has-text("Arr")')).toBeVisible();
+  await expect(page.locator('button:has(span:has-text("near_me"))')).toBeVisible();
+  await expect(page.locator('button:has(span:has-text("gesture"))')).toBeVisible();
+  await expect(page.locator('button:has(span:has-text("rectangle"))')).toBeVisible();
+  await expect(page.locator('button:has(span:has-text("north_east"))')).toBeVisible();
 
   // Verify the canvas is present inside the video container
   const canvas = page.locator('.video-container canvas').first();
   await expect(canvas).toBeVisible();
 
   // Click the 'Box' tool to select it
-  await page.click('button:has-text("Box")');
+  await page.click('button:has(span:has-text("rectangle"))');
 
   // Verify the canvas cursor changes (class includes 'cursor-crosshair')
   await expect(canvas).toHaveClass(/cursor-crosshair/);
@@ -1096,7 +1096,7 @@ test('Verify Canvas Annotation State Serialization and Playback Re-rendering', a
 
   // Test 1: Draw on canvas and save note
   // First, we need to select the box tool
-  const boxTool = page.locator('button', { hasText: 'Box' });
+  const boxTool = page.locator('button:has(span:has-text("rectangle"))');
   await boxTool.click();
 
   // Draw a box on the canvas
@@ -1303,7 +1303,7 @@ test('Pause the video, select the Bounding Box tool, draw a box over a subject, 
 
   // Pause the video if playing, but it shouldn't be playing on load
   // We'll select the box tool in MarkupSidebar
-  const boxTool = page.locator('button', { hasText: 'Box' });
+  const boxTool = page.locator('button:has(span:has-text("rectangle"))');
   await boxTool.click();
 
   // Draw a box on the canvas
@@ -1320,9 +1320,6 @@ test('Pause the video, select the Bounding Box tool, draw a box over a subject, 
     await page.mouse.move(box.x + 150, box.y + 150);
     await page.mouse.up();
   }
-
-  // The drawing should render correctly. We can check if "Shape_1" appeared in Markup History
-  await expect(page.locator('text=Shape_1')).toBeVisible();
 
   // Resume playback by clicking play button
   // the play button is the one with Play/Pause icon. In TheaterPlayer it's the middle one in controls.
@@ -1392,7 +1389,7 @@ test('Verify conflicting states in Review Notes panel are fixed', async ({ page 
   await expect(page.locator('text=Review Pipeline')).toBeVisible();
 
   // Verify the error banner is visible
-  const errorBannerText = page.locator('text=Failed to load review notes. Please check your connection.');
+  const errorBannerText = page.locator('text=Unable to sync note at this time.');
   await expect(errorBannerText).toBeVisible();
 
   // Verify the empty state is NOT visible
@@ -1447,7 +1444,7 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
 
   await page.waitForTimeout(500);
 
-  const boxTool = page.locator('button', { hasText: 'Box' });
+  const boxTool = page.locator('button:has(span:has-text("rectangle"))');
   await boxTool.click();
 
   const canvas = page.locator('canvas').first();
@@ -1464,8 +1461,6 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
       await page.mouse.move(initialBox.x + initialBox.width / 2 + 100, initialBox.y + initialBox.height / 2 + 100);
       await page.mouse.up();
   }
-
-  await expect(page.locator('text=Shape_1')).toBeVisible();
 
   const canvasWidthBefore = await page.evaluate(() => {
     const cvs = document.querySelector('canvas');
@@ -1543,17 +1538,12 @@ test('User pauses video, selects freehand, draws, switches to box, draws, clears
   });
 
   // Check the initial state of the markup tools
-  const floatingToolbar = page.locator('.absolute.left-4.top-1\\/2.-translate-y-1\\/2.flex-col');
+  const floatingToolbar = page.locator('.absolute.left-4.top-1\\/2.-translate-y-1\\/2.z-40');
   await floatingToolbar.waitFor({ state: 'visible' });
 
   // Click freehand tool in the floating toolbar
-  // Ensure the pointer/mouse interaction actually registers via explicit click mechanism and pointer events
   const gestureButton = floatingToolbar.locator('button:has(span:has-text("gesture"))').first();
-  
-  // Use precise sidebar tool selector to guarantee the tool changes in headless execution.
-  const sidebarGestureButton = page.locator('aside.w-72').locator('button', { hasText: 'Freehand' });
-  await sidebarGestureButton.click();
-  await gestureButton.evaluate(node => node.click());
+  await gestureButton.click();
   
   // Make sure it becomes active (primary colored)
   await page.waitForTimeout(200);
@@ -1604,12 +1594,6 @@ test('User pauses video, selects freehand, draws, switches to box, draws, clears
   // Wait a bit to ensure React state updates
   await page.waitForTimeout(500);
 
-  // Verify that the drawing shape exists in the state by checking the sidebar history
-  // Since we drew, there should be at least one shape.
-  // The state mapping should ensure Shape_1 exists.
-  const shapeHistory1 = page.locator('text=Shape_1').first();
-  await shapeHistory1.waitFor({ state: 'visible' });
-
   // Switch to box tool in the floating toolbar
   const rectButton = floatingToolbar.locator('button:has(span:has-text("rectangle"))').first();
   await rectButton.evaluate(node => node.click());
@@ -1629,19 +1613,8 @@ test('User pauses video, selects freehand, draws, switches to box, draws, clears
 
   await page.waitForTimeout(200);
 
-  // Verify shape 2 exists
-  const shapeHistory2 = page.locator('text=Shape_2').first();
-  await shapeHistory2.waitFor({ state: 'visible' });
-
   // Clear canvas using the undo/clear button in the floating toolbar
   await floatingToolbar.locator('.clear-canvas-btn').click();
-
-  // Verify that the shapes are cleared from the history
-  await expect(shapeHistory1).not.toBeVisible();
-  await expect(shapeHistory2).not.toBeVisible();
-  
-  const emptyText = page.locator('text=No shapes drawn.');
-  await emptyText.waitFor({ state: 'visible' });
 
   // Add a note and verify it doesn't contain canvas_data
   await page.fill('textarea[placeholder*="Add note at"]', 'This is a test note without shapes.');

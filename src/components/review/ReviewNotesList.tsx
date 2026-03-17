@@ -28,15 +28,13 @@ export const ReviewNotesList: React.FC<ReviewNotesListProps> = ({ notes, error }
       
       <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-lg flex flex-col gap-2 mb-2">
-            <div className="flex items-start gap-2">
-              <AlertCircle size={14} className="text-red-400 mt-0.5 shrink-0" strokeWidth={2} />
-              <p className="text-xs text-red-300 leading-relaxed">{error}</p>
-            </div>
+          <div className="flex items-center gap-2 mb-2 px-1">
+            <AlertCircle size={12} className="text-slate-500" />
+            <p className="text-[10px] text-slate-500 italic">Unable to sync note at this time.</p>
             {assetId && (
               <button 
                 onClick={() => loadNotes(assetId)}
-                className="self-end text-[10px] font-medium bg-red-500/20 hover:bg-red-500/30 text-red-200 px-2 py-1 rounded transition-colors"
+                className="text-[10px] font-medium text-slate-400 hover:text-white transition-colors ml-auto"
               >
                 Retry
               </button>

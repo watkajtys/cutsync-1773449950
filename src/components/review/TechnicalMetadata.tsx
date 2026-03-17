@@ -8,7 +8,7 @@ export const TechnicalMetadata: React.FC = () => {
         <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Technical Metadata</h3>
         <Info className="text-slate-500" size={14} strokeWidth={1.5} />
       </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-5 space-y-4">
         <div>
           <span className="text-[9px] font-bold text-slate-500 uppercase block mb-1">File Info</span>
           <div className="space-y-1.5">
