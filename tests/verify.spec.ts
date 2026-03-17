@@ -881,3 +881,94 @@ test('Verify Prep Mode video synchronization and click-to-scrub navigation', asy
 
   await page.screenshot({ path: 'evidence_old.png' });
 });
+
+test('Verify Prep Mode export functionality for SRT and CSV formats', async ({ page }) => {
+  const assetId = 'test-asset-123';
+  
+  await page.route('**/api/collections/ai_transcripts/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          page: 1,
+          perPage: 30,
+          totalItems: 1,
+          totalPages: 1,
+          items: [
+            {
+              id: 'mock-transcript-1',
+              asset_id: assetId,
+              raw_text: "SPEAKER 1: Testing the export functionality.",
+              created: new Date().toISOString()
+            }
+          ]
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.route('**/api/collections/ai_cut_suggestions/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          page: 1,
+          perPage: 30,
+          totalItems: 1,
+          totalPages: 1,
+          items: [
+            {
+              id: 'mock-cut-1',
+              asset_id: assetId,
+              start_timecode: 10,
+              end_timecode: 15,
+              cut_reason: "Export test cut suggestion.",
+              created: new Date().toISOString()
+            }
+          ]
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: assetId,
+          file: 'dummy_file.mp4'
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.goto(`/prep/${assetId}`);
+
+  // Wait for things to load
+  await expect(page.locator('text=Export SRT')).toBeVisible();
+  await expect(page.locator('text=Export CSV')).toBeVisible();
+
+  // Test Export SRT
+  const downloadPromiseSRT = page.waitForEvent('download');
+  await page.click('button:has-text("Export SRT")');
+  const downloadSRT = await downloadPromiseSRT;
+  expect(downloadSRT.suggestedFilename()).toBe(`transcript_${assetId}.srt`);
+
+  // Test Export CSV
+  const downloadPromiseCSV = page.waitForEvent('download');
+  await page.click('button:has-text("Export CSV")');
+  const downloadCSV = await downloadPromiseCSV;
+  expect(downloadCSV.suggestedFilename()).toBe(`cut_suggestions_${assetId}.csv`);
+
+  await page.screenshot({ path: 'evidence.png' });
+});
