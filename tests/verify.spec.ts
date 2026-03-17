@@ -1192,5 +1192,5 @@ test('Verify Theater Player Interactive Scrubber', async ({ page }) => {
   // Current time should be around 75% of 60 seconds = 45
   expect(currentTime).toBeCloseTo(45, 0);
 
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });

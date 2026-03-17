@@ -9,6 +9,7 @@ export const TheaterPlayer: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [scrubTime, setScrubTime] = useState<number | null>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const lastScrubTime = useRef<number | null>(null);
 
@@ -61,16 +62,17 @@ export const TheaterPlayer: React.FC = () => {
     }
   };
 
-  const handleScrub = useCallback((clientX: number) => {
-    if (!timelineRef.current || duration <= 0) return;
+  const getScrubTime = useCallback((clientX: number) => {
+    if (!timelineRef.current || duration <= 0) return 0;
     const rect = timelineRef.current.getBoundingClientRect();
     const percent = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-    seekToTime(percent * duration);
-  }, [duration, seekToTime]);
+    return percent * duration;
+  }, [duration]);
 
   const handlePointerDownTimeline = (e: React.PointerEvent<HTMLDivElement>) => {
     setIsDragging(true);
-    handleScrub(e.clientX);
+    const newTime = getScrubTime(e.clientX);
+    setScrubTime(newTime);
     if (timelineRef.current) {
       timelineRef.current.setPointerCapture(e.pointerId);
     }
@@ -78,13 +80,18 @@ export const TheaterPlayer: React.FC = () => {
 
   const handlePointerMoveTimeline = (e: React.PointerEvent<HTMLDivElement>) => {
     if (isDragging) {
-      handleScrub(e.clientX);
+      const newTime = getScrubTime(e.clientX);
+      setScrubTime(newTime);
     }
   };
 
   const handlePointerUpTimeline = (e: React.PointerEvent<HTMLDivElement>) => {
     if (isDragging) {
       setIsDragging(false);
+      if (scrubTime !== null) {
+        seekToTime(scrubTime);
+      }
+      setScrubTime(null);
       if (timelineRef.current) {
         timelineRef.current.releasePointerCapture(e.pointerId);
       }
@@ -167,7 +174,7 @@ export const TheaterPlayer: React.FC = () => {
             onPointerUp={handlePointerUpTimeline}
             onPointerCancel={handlePointerUpTimeline}
           >
-            <div className="h-full bg-primary relative" style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}>
+            <div className="h-full bg-primary relative" style={{ width: `${duration > 0 ? ((scrubTime !== null ? scrubTime : currentTime) / duration) * 100 : 0}%` }}>
               <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full border-2 border-white shadow-lg translate-x-1/2"></div>
             </div>
           </div>
