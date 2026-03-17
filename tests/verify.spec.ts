@@ -970,5 +970,5 @@ test('Verify Prep Mode export functionality for SRT and CSV formats', async ({ p
   const downloadCSV = await downloadPromiseCSV;
   expect(downloadCSV.suggestedFilename()).toBe(`cut_suggestions_${assetId}.csv`);
 
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
