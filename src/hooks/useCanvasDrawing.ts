@@ -14,11 +14,9 @@ export const useCanvasDrawing = () => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
     return {
-      x: (e.clientX - rect.left) * scaleX,
-      y: (e.clientY - rect.top) * scaleY
+      x: (e.clientX - rect.left) / rect.width,
+      y: (e.clientY - rect.top) / rect.height
     };
   };
 
@@ -86,33 +84,36 @@ export const useCanvasDrawing = () => {
       
       if (shape.points.length === 0) return;
 
+      const toX = (x: number) => x * canvas.width;
+      const toY = (y: number) => y * canvas.height;
+
       if (shape.tool === 'freehand') {
-        ctx.moveTo(shape.points[0].x, shape.points[0].y);
+        ctx.moveTo(toX(shape.points[0].x), toY(shape.points[0].y));
         for (let i = 1; i < shape.points.length; i++) {
-          ctx.lineTo(shape.points[i].x, shape.points[i].y);
+          ctx.lineTo(toX(shape.points[i].x), toY(shape.points[i].y));
         }
         ctx.stroke();
       } else if (shape.tool === 'rect') {
         if (shape.points.length < 2) return;
         const p1 = shape.points[0];
         const p2 = shape.points[1];
-        ctx.strokeRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+        ctx.strokeRect(toX(p1.x), toY(p1.y), toX(p2.x) - toX(p1.x), toY(p2.y) - toY(p1.y));
       } else if (shape.tool === 'arrow') {
         if (shape.points.length < 2) return;
         const p1 = shape.points[0];
         const p2 = shape.points[1];
         
-        ctx.moveTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
+        ctx.moveTo(toX(p1.x), toY(p1.y));
+        ctx.lineTo(toX(p2.x), toY(p2.y));
         ctx.stroke();
 
-        const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+        const angle = Math.atan2(toY(p2.y) - toY(p1.y), toX(p2.x) - toX(p1.x));
         const headlen = 15;
         ctx.beginPath();
-        ctx.moveTo(p2.x, p2.y);
-        ctx.lineTo(p2.x - headlen * Math.cos(angle - Math.PI / 6), p2.y - headlen * Math.sin(angle - Math.PI / 6));
-        ctx.lineTo(p2.x - headlen * Math.cos(angle + Math.PI / 6), p2.y - headlen * Math.sin(angle + Math.PI / 6));
-        ctx.lineTo(p2.x, p2.y);
+        ctx.moveTo(toX(p2.x), toY(p2.y));
+        ctx.lineTo(toX(p2.x) - headlen * Math.cos(angle - Math.PI / 6), toY(p2.y) - headlen * Math.sin(angle - Math.PI / 6));
+        ctx.lineTo(toX(p2.x) - headlen * Math.cos(angle + Math.PI / 6), toY(p2.y) - headlen * Math.sin(angle + Math.PI / 6));
+        ctx.lineTo(toX(p2.x), toY(p2.y));
         ctx.fill();
       }
     });

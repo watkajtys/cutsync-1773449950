@@ -972,3 +972,138 @@ test('Verify Prep Mode export functionality for SRT and CSV formats', async ({ p
 
   await page.screenshot({ path: 'evidence_old.png' });
 });
+
+test('Verify Canvas Annotation State Serialization and Playback Re-rendering', async ({ page }) => {
+  const assetId = 'test-asset-123';
+  
+  // Track requests manually since the JS SDK cancels repeated requests
+  const savedNotes: any[] = [];
+  
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'POST') {
+      const postData = JSON.parse(request.postData() || '{}');
+      const newNote = {
+        id: `mock-note-${Date.now()}`,
+        asset_id: assetId,
+        author: postData.author || 'Current User',
+        timestamp: postData.timestamp || 0,
+        note_text: postData.note_text || '',
+        canvas_data: postData.canvas_data || null,
+        created: new Date().toISOString()
+      };
+      savedNotes.push(newNote);
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(newNote)
+      });
+    } else if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          page: 1,
+          perPage: 30,
+          totalItems: savedNotes.length,
+          totalPages: 1,
+          items: savedNotes
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: assetId,
+          file: 'dummy_file.mp4'
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.goto(`/review/${assetId}`);
+
+  // Wait for things to load
+  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+
+  // Test 1: Draw on canvas and save note
+  // First, we need to select the box tool
+  const boxTool = page.locator('button', { hasText: 'Box' });
+  await boxTool.click();
+
+  // Draw a box on the canvas
+  const canvas = page.locator('canvas').first();
+  const box = await canvas.boundingBox();
+  if (box) {
+    await page.mouse.move(box.x + 100, box.y + 100);
+    await page.mouse.down();
+    await page.mouse.move(box.x + 200, box.y + 200);
+    await page.mouse.up();
+  }
+
+  // Type a note
+  await page.fill('textarea[placeholder*="Add note at"]', 'Check this area');
+  
+  // Submit
+  await page.click('button:has(svg.lucide-send)');
+
+  // Note should appear in the list
+  await expect(page.locator('text=Check this area')).toBeVisible();
+
+  // Wait for the UI update
+  await page.waitForTimeout(500);
+
+  expect(savedNotes.length).toBe(1);
+  expect(savedNotes[0].canvas_data).not.toBeNull();
+  expect(savedNotes[0].canvas_data[0].tool).toBe('rect');
+  
+  // Now, Scrub away (simulate timeupdate to trigger clear)
+  // This manual scrub (change of time > 0.5s) should clear the canvas since no note matches this new time.
+  await page.evaluate(() => {
+    const video = document.querySelector('video');
+    if (video) {
+        video.currentTime = video.currentTime + 5;
+        video.dispatchEvent(new Event('timeupdate'));
+    }
+  });
+
+  await page.waitForTimeout(500);
+
+  // Now click the note in the sidebar, this will seek back and instantly re-render
+  const noteElement = page.locator('text=Check this area');
+  await noteElement.click();
+
+  await page.waitForTimeout(500);
+
+  // Now scrub away again to ensure the note is cleared after being viewed
+  await page.evaluate(() => {
+    const video = document.querySelector('video');
+    if (video) {
+        video.currentTime = video.currentTime + 5;
+        video.dispatchEvent(new Event('timeupdate'));
+    }
+  });
+  
+  await page.waitForTimeout(500);
+  
+  // Finally, scrub TO the note's timestamp. It should automatically re-draw the shapes without clicking the note.
+  await page.evaluate((noteTime) => {
+    const video = document.querySelector('video');
+    if (video) {
+        video.currentTime = noteTime;
+        video.dispatchEvent(new Event('timeupdate'));
+    }
+  }, savedNotes[0].timestamp);
+  
+  await page.waitForTimeout(500);
+
+  await page.screenshot({ path: 'evidence.png' });
+});

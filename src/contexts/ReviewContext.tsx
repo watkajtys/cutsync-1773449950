@@ -16,8 +16,11 @@ interface ReviewContextType {
   inputRef: React.RefObject<HTMLTextAreaElement>;
   videoRef: React.RefObject<HTMLVideoElement>;
   seekToTime: (time: number) => void;
+  seekToNote: (note: ReviewNote) => void;
   currentTime: number;
   setCurrentTime: React.Dispatch<React.SetStateAction<number>>;
+  viewingNoteTime: number | null;
+  setViewingNoteTime: React.Dispatch<React.SetStateAction<number | null>>;
   notes: ReviewNote[];
   loadNotes: (assetId: string) => Promise<void>;
   error: string | null;
@@ -34,6 +37,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [currentTime, setCurrentTime] = useState<number>(0);
+  const [viewingNoteTime, setViewingNoteTime] = useState<number | null>(null);
   const [notes, setNotes] = useState<ReviewNote[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [assetUrl, setAssetUrl] = useState<string | null>(null);
@@ -50,6 +54,17 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (videoRef.current) {
       videoRef.current.currentTime = time;
       setCurrentTime(time);
+      videoRef.current.dispatchEvent(new Event('timeupdate'));
+    }
+  };
+
+  const seekToNote = (note: ReviewNote) => {
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = note.timestamp;
+      setCurrentTime(note.timestamp);
+      setViewingNoteTime(note.timestamp);
+      setShapes(note.canvas_data || []);
       videoRef.current.dispatchEvent(new Event('timeupdate'));
     }
   };
@@ -86,8 +101,11 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       inputRef,
       videoRef,
       seekToTime,
+      seekToNote,
       currentTime,
       setCurrentTime,
+      viewingNoteTime,
+      setViewingNoteTime,
       notes,
       loadNotes,
       error,

@@ -11,7 +11,7 @@ interface ReviewNotesListProps {
 }
 
 export const ReviewNotesList: React.FC<ReviewNotesListProps> = ({ notes, error }) => {
-  const { seekToTime } = useReview();
+  const { seekToNote } = useReview();
 
   return (
     <>
@@ -35,7 +35,7 @@ export const ReviewNotesList: React.FC<ReviewNotesListProps> = ({ notes, error }
         {notes.map(note => (
           <div 
             key={note.id}
-            onClick={() => seekToTime(note.timestamp)} 
+            onClick={() => seekToNote(note)} 
             className="group relative bg-white/5 p-3 rounded-lg border border-white/5 hover:border-primary/50 transition-colors cursor-pointer"
           >
             <div className="flex items-center justify-between mb-2">

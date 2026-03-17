@@ -5,8 +5,9 @@ import { DrawingToolbar } from './DrawingToolbar';
 import { useReview } from '../../contexts/ReviewContext';
 
 export const TheaterPlayer: React.FC = () => {
-  const { videoRef, inputRef, setCurrentTime, assetUrl } = useReview();
+  const { videoRef, inputRef, setCurrentTime, assetUrl, clearDrawing, viewingNoteTime, setViewingNoteTime, notes, setShapes, currentShape } = useReview();
   const [isPlaying, setIsPlaying] = useState(false);
+  const lastScrubTime = React.useRef<number | null>(null);
 
   const {
     canvasRef,
@@ -32,6 +33,7 @@ export const TheaterPlayer: React.FC = () => {
           } else {
             videoRef.current.play();
             setIsPlaying(true);
+            clearDrawing();
           }
         }
         if (inputRef.current) {
@@ -50,6 +52,7 @@ export const TheaterPlayer: React.FC = () => {
         videoRef.current.pause();
       } else {
         videoRef.current.play();
+        clearDrawing();
       }
       setIsPlaying(!isPlaying);
     }
@@ -57,7 +60,31 @@ export const TheaterPlayer: React.FC = () => {
 
   const handleTimeUpdate = () => {
     if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
+      const t = videoRef.current.currentTime;
+      setCurrentTime(t);
+      
+      const prevTime = lastScrubTime.current ?? t;
+      const isManualScrub = Math.abs(t - prevTime) > 0.5;
+      lastScrubTime.current = t;
+
+      if (!isPlaying) {
+        // Find if there's a note at this exact timestamp (within 0.2s)
+        const matchedNote = notes.find(n => Math.abs(t - n.timestamp) < 0.2 && n.canvas_data && n.canvas_data.length > 0);
+        
+        if (matchedNote) {
+          if (viewingNoteTime !== matchedNote.timestamp) {
+            setViewingNoteTime(matchedNote.timestamp);
+            setShapes(matchedNote.canvas_data!);
+          }
+        } else {
+          // No matched note. If we were viewing one, or if user manually scrubbed, clear it.
+          // Don't clear if they are actively drawing (currentShape).
+          if ((viewingNoteTime !== null || isManualScrub) && !currentShape) {
+            clearDrawing();
+            setViewingNoteTime(null);
+          }
+        }
+      }
     }
   };
 
@@ -70,7 +97,10 @@ export const TheaterPlayer: React.FC = () => {
             src={assetUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"}
             className="w-full h-full object-cover opacity-80"
             onTimeUpdate={handleTimeUpdate}
-            onPlay={() => setIsPlaying(true)}
+            onPlay={() => {
+              setIsPlaying(true);
+              clearDrawing();
+            }}
             onPause={() => setIsPlaying(false)}
             crossOrigin="anonymous"
           />
