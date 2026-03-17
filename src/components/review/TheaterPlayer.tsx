@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Play, Pause, FastForward, Rewind, SkipBack, SkipForward, Volume2, Subtitles, Settings, Maximize } from 'lucide-react';
 import { useCanvasDrawing } from '../../hooks/useCanvasDrawing';
 import { DrawingToolbar } from './DrawingToolbar';
 import { useReview } from '../../contexts/ReviewContext';
 
 export const TheaterPlayer: React.FC = () => {
-  const { videoRef, inputRef, setCurrentTime, assetUrl, clearDrawing, viewingNoteTime, setViewingNoteTime, notes, setShapes, currentShape } = useReview();
+  const { videoRef, inputRef, currentTime, setCurrentTime, seekToTime, assetUrl, clearDrawing, viewingNoteTime, setViewingNoteTime, notes, setShapes, currentShape } = useReview();
   const [isPlaying, setIsPlaying] = useState(false);
-  const lastScrubTime = React.useRef<number | null>(null);
+  const [duration, setDuration] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const lastScrubTime = useRef<number | null>(null);
 
   const {
     canvasRef,
@@ -58,6 +61,36 @@ export const TheaterPlayer: React.FC = () => {
     }
   };
 
+  const handleScrub = useCallback((clientX: number) => {
+    if (!timelineRef.current || duration <= 0) return;
+    const rect = timelineRef.current.getBoundingClientRect();
+    const percent = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    seekToTime(percent * duration);
+  }, [duration, seekToTime]);
+
+  const handlePointerDownTimeline = (e: React.PointerEvent<HTMLDivElement>) => {
+    setIsDragging(true);
+    handleScrub(e.clientX);
+    if (timelineRef.current) {
+      timelineRef.current.setPointerCapture(e.pointerId);
+    }
+  };
+
+  const handlePointerMoveTimeline = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (isDragging) {
+      handleScrub(e.clientX);
+    }
+  };
+
+  const handlePointerUpTimeline = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (isDragging) {
+      setIsDragging(false);
+      if (timelineRef.current) {
+        timelineRef.current.releasePointerCapture(e.pointerId);
+      }
+    }
+  };
+
   const handleTimeUpdate = () => {
     if (videoRef.current) {
       const t = videoRef.current.currentTime;
@@ -97,6 +130,8 @@ export const TheaterPlayer: React.FC = () => {
             src={assetUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"}
             className="w-full h-full object-cover opacity-80"
             onTimeUpdate={handleTimeUpdate}
+            onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+            onDurationChange={(e) => setDuration(e.currentTarget.duration)}
             onPlay={() => {
               setIsPlaying(true);
               clearDrawing();
@@ -124,9 +159,16 @@ export const TheaterPlayer: React.FC = () => {
             <p className="text-[10px] font-bold text-white/40 tracking-widest uppercase">Resolution</p>
             <p className="text-xs font-bold text-white/80">4K DCI (4096 x 1716)</p>
           </div>
-          <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/10 z-20">
-            <div className="h-full bg-primary w-[34%] relative">
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full border-2 border-white shadow-lg"></div>
+          <div 
+            ref={timelineRef}
+            className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/10 z-20 cursor-pointer touch-none"
+            onPointerDown={handlePointerDownTimeline}
+            onPointerMove={handlePointerMoveTimeline}
+            onPointerUp={handlePointerUpTimeline}
+            onPointerCancel={handlePointerUpTimeline}
+          >
+            <div className="h-full bg-primary relative" style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}>
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full border-2 border-white shadow-lg translate-x-1/2"></div>
             </div>
           </div>
         </div>

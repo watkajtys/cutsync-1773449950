@@ -1107,3 +1107,90 @@ test('Verify Canvas Annotation State Serialization and Playback Re-rendering', a
 
   await page.screenshot({ path: 'evidence_old.png' });
 });
+
+test('Verify Theater Player Interactive Scrubber', async ({ page }) => {
+  const assetId = 'test-asset-123';
+
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: assetId,
+          file: 'dummy_file.mp4'
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.goto(`/review/${assetId}`);
+
+  // Wait for the Review Pipeline text or a basic element to confirm the page has loaded
+  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+
+  // Find the video element
+  const video = page.locator('video');
+  await expect(video).toBeVisible();
+
+  // Force some metadata to load or let the browser load dummy.mp4
+  await page.waitForTimeout(1000);
+
+  // We explicitly evaluate setting duration so the UI knows how to calculate the width
+  await page.evaluate(() => {
+    const vid = document.querySelector('video');
+    if (vid) {
+      // Mocking duration
+      Object.defineProperty(vid, 'duration', { value: 60, writable: true });
+      vid.dispatchEvent(new Event('loadedmetadata'));
+      vid.dispatchEvent(new Event('durationchange'));
+    }
+  });
+  
+  await page.waitForTimeout(500);
+
+  // Find the interactive scrubber container
+  // It has a specific class mix: "absolute bottom-0 left-0 right-0 h-1.5 bg-white/10 z-20 cursor-pointer touch-none"
+  const scrubberContainer = page.locator('.cursor-pointer.touch-none').last();
+  await expect(scrubberContainer).toBeVisible();
+
+  const box = await scrubberContainer.boundingBox();
+  if (box) {
+    // Click at 50% of the timeline
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.up();
+  }
+
+  await page.waitForTimeout(500);
+
+  let currentTime = await page.evaluate(() => {
+    const vid = document.querySelector('video');
+    return vid ? vid.currentTime : 0;
+  });
+
+  // Current time should be around 50% of 60 seconds = 30
+  expect(currentTime).toBeCloseTo(30, 0);
+
+  if (box) {
+    // Drag test: Click at 50%, drag to 75%
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * 0.75, box.y + box.height / 2);
+    await page.mouse.up();
+  }
+
+  await page.waitForTimeout(500);
+
+  currentTime = await page.evaluate(() => {
+    const vid = document.querySelector('video');
+    return vid ? vid.currentTime : 0;
+  });
+
+  // Current time should be around 75% of 60 seconds = 45
+  expect(currentTime).toBeCloseTo(45, 0);
+
+  await page.screenshot({ path: 'evidence.png' });
+});
