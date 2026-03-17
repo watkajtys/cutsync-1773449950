@@ -1659,7 +1659,8 @@ test('Verify the Asset Not Found empty state renders when a literal :id is reque
 
   await page.goto('/review/:id');
   
-  await expect(page.locator('text=ERROR 404: ASSET NOT FOUND')).toBeVisible();
+  await expect(page.locator('text=System Error 404')).toBeVisible();
+  await expect(page.locator('text=Asset Not Found').first()).toBeVisible();
   await expect(page.locator('text=The requested asset ID could not be located in the database.')).toBeVisible();
 
   expect(apiCalled).toBe(false);

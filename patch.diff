@@ -1,0 +1,33 @@
+<<<<<<< SEARCH
+          {error === 'ASSET_NOT_FOUND' ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-50">
+              <div className="text-white font-mono text-sm border border-white/10 bg-black p-4 rounded-md flex flex-col items-center gap-2">
+                <span className="text-red-400">ERROR 404: ASSET NOT FOUND</span>
+                <span className="text-slate-400">The requested asset ID could not be located in the database.</span>
+              </div>
+            </div>
+          ) : (
+=======
+          {error === 'ASSET_NOT_FOUND' ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0c0e14] z-50 overflow-hidden">
+              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at center, #1e293b 0%, transparent 70%)' }} />
+              <div className="text-white font-mono text-sm border border-red-500/20 bg-red-500/5 p-6 rounded-none flex flex-col items-center gap-4 relative z-10 w-96 max-w-full shadow-2xl backdrop-blur-sm">
+                <div className="w-12 h-12 rounded-full border border-red-500/30 flex items-center justify-center bg-red-500/10 mb-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                </div>
+                <div className="flex flex-col items-center gap-1 text-center">
+                  <span className="text-red-400 text-xs tracking-[0.2em] font-bold uppercase">System Error 404</span>
+                  <span className="text-slate-300 text-sm font-light">Asset Not Found</span>
+                </div>
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-red-500/20 to-transparent my-2" />
+                <span className="text-slate-500 text-[10px] uppercase tracking-widest text-center leading-relaxed">
+                  The requested asset ID could not be located in the database.
+                </span>
+              </div>
+              <div className="absolute bottom-4 left-4 flex flex-col gap-1 pointer-events-none">
+                <span className="text-[9px] font-mono text-red-500/40 tracking-widest uppercase">Status: OFFLINE</span>
+                <span className="text-[9px] font-mono text-slate-600 tracking-widest uppercase">Connect: FAILED</span>
+              </div>
+            </div>
+          ) : (
+>>>>>>> REPLACE
