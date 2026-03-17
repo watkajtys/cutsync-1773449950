@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import PocketBase from 'pocketbase';
+import { pb } from '../lib/pocketbase';
 
 export interface PrepContextType {
   assetId: string;
@@ -11,10 +12,8 @@ export interface PrepContextType {
   videoRef: React.RefObject<HTMLVideoElement | null>;
   transcripts: any[];
   cutSuggestions: any[];
+  assetUrl: string | null;
 }
-
-const pbUrl = import.meta.env.VITE_POCKETBASE_URL || 'http://127.0.0.1:8090';
-const pb = new PocketBase(pbUrl);
 
 const PrepContext = createContext<PrepContextType | undefined>(undefined);
 
@@ -24,6 +23,7 @@ export const PrepProvider: React.FC<{ assetId: string; children: React.ReactNode
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [transcripts, setTranscripts] = useState<any[]>([]);
   const [cutSuggestions, setCutSuggestions] = useState<any[]>([]);
+  const [assetUrl, setAssetUrl] = useState<string | null>(null);
 
   const setCurrentTime = (time: number, programmatic: boolean = true) => {
     setCurrentTimeState(time);
@@ -39,6 +39,15 @@ export const PrepProvider: React.FC<{ assetId: string; children: React.ReactNode
   useEffect(() => {
     const fetchPrepData = async () => {
         try {
+            try {
+                const assetRecord = await pb.collection('assets').getOne(assetId, { requestKey: null });
+                if (assetRecord && assetRecord.file) {
+                    setAssetUrl(pb.files.getUrl(assetRecord, assetRecord.file));
+                }
+            } catch (err) {
+                console.error('Failed to fetch asset record:', err);
+            }
+            
             const transcriptRes = await pb.collection('ai_transcripts').getFullList({
                 filter: `asset_id = "${assetId}"`,
                 sort: '+created',
@@ -70,7 +79,8 @@ export const PrepProvider: React.FC<{ assetId: string; children: React.ReactNode
         setDuration,
         videoRef,
         transcripts,
-        cutSuggestions
+        cutSuggestions,
+        assetUrl
       }}
     >
       {children}

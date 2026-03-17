@@ -1,0 +1,69 @@
+import React from 'react';
+import { ListFilter, AlertCircle } from 'lucide-react';
+import { ReviewNote } from '../../types/review';
+import { formatTimecode } from '../../utils/timeFormat';
+import { formatTimeAgo } from '../../utils/dateUtils';
+import { useReview } from '../../contexts/ReviewContext';
+
+interface ReviewNotesListProps {
+  notes: ReviewNote[];
+  error: string | null;
+}
+
+export const ReviewNotesList: React.FC<ReviewNotesListProps> = ({ notes, error }) => {
+  const { seekToTime } = useReview();
+
+  return (
+    <>
+      <div className="p-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Review Notes ({notes.length})</h3>
+        <div className="flex gap-2">
+          <button className="text-slate-500 hover:text-white transition-colors">
+            <ListFilter size={14} strokeWidth={1.5} />
+          </button>
+        </div>
+      </div>
+      
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-lg flex items-start gap-2 mb-2">
+            <AlertCircle size={14} className="text-red-400 mt-0.5 shrink-0" strokeWidth={2} />
+            <p className="text-xs text-red-300 leading-relaxed">{error}</p>
+          </div>
+        )}
+
+        {notes.map(note => (
+          <div 
+            key={note.id}
+            onClick={() => seekToTime(note.timestamp)} 
+            className="group relative bg-white/5 p-3 rounded-lg border border-white/5 hover:border-primary/50 transition-colors cursor-pointer"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-mono text-primary font-bold px-1.5 py-0.5 rounded bg-primary/10">{formatTimecode(note.timestamp)}</span>
+              <span className="text-[9px] text-slate-500 font-bold">{note.created ? formatTimeAgo(note.created) : ''}</span>
+            </div>
+            <p className={`text-xs text-slate-300 leading-relaxed ${note.canvas_data ? 'italic border-l-2 border-primary/30 pl-2' : ''}`}>
+              {note.canvas_data ? `"${note.note_text}"` : note.note_text}
+            </p>
+            <div className="mt-2 flex items-center gap-2">
+              <div className="h-4 w-4 rounded-full bg-slate-800 flex items-center justify-center overflow-hidden">
+                {note.author === 'Sarah J.' ? (
+                  <img alt="Sarah" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzKhWLSKnAzAauvIwjImoVPnPTt7-K2rcU455fWERDrWZcF8nPI2Q1G38CznoSOoZuwvZ6I01Vb789wHd_c9J01e6L5whT2ItHyaUQaMfx-izq9DyBNaPO5FPxnuh2UxkNcbRMVhQNRdKzrctpCwYbMvGqlOPrugw6B3N9Ot-OyWU131KF-43uxXfwexisEdIJhSoaUz9_ZY9Tw-5_EEBjWATiYcJlclLkKh40HR07xEi22LuZ4wJfpALdgSAPFdU2e0sOIHeZgbM"/>
+                ) : (
+                  <span className="text-[8px] text-white">{note.author.substring(0,2).toUpperCase()}</span>
+                )}
+              </div>
+              <span className="text-[10px] font-medium text-slate-400">{note.author}</span>
+            </div>
+          </div>
+        ))}
+
+        {notes.length === 0 && (
+          <div className="text-center p-4">
+            <p className="text-xs text-slate-500">No notes added yet.</p>
+          </div>
+        )}
+      </div>
+    </>
+  );
+};

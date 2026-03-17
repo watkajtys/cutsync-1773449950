@@ -690,6 +690,21 @@ test('Verify the Prep Mode UI layout and connect it to PocketBase to display sou
     }
   });
 
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: assetId,
+          file: 'dummy_file.mp4'
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
   // Navigate directly to the prep mode for this asset
   await page.goto(`/prep/${assetId}`);
 
@@ -770,6 +785,21 @@ test('Verify Prep Mode video synchronization and click-to-scrub navigation', asy
               created: new Date().toISOString()
             }
           ]
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: assetId,
+          file: 'dummy_file.mp4'
         })
       });
     } else {

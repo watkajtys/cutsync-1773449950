@@ -5,7 +5,7 @@ import { DrawingToolbar } from './DrawingToolbar';
 import { useReview } from '../../contexts/ReviewContext';
 
 export const TheaterPlayer: React.FC = () => {
-  const { videoRef, inputRef, setCurrentTime } = useReview();
+  const { videoRef, inputRef, setCurrentTime, assetUrl } = useReview();
   const [isPlaying, setIsPlaying] = useState(false);
 
   const {
@@ -67,7 +67,7 @@ export const TheaterPlayer: React.FC = () => {
         <div className="video-container w-full max-w-6xl relative bg-slate-900 rounded-lg overflow-hidden shadow-2xl border border-white/5" style={{ aspectRatio: '21 / 9' }}>
           <video 
             ref={videoRef}
-            src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+            src={assetUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"}
             className="w-full h-full object-cover opacity-80"
             onTimeUpdate={handleTimeUpdate}
             onPlay={() => setIsPlaying(true)}

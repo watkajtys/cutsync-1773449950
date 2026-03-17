@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { fetchReviewNotes } from '../api/reviews';
 import { ReviewNote, Shape, Tool } from '../types/review';
+import { pb } from '../lib/pocketbase';
 
 interface ReviewContextType {
   activeTool: Tool;
@@ -21,6 +22,8 @@ interface ReviewContextType {
   loadNotes: (assetId: string) => Promise<void>;
   error: string | null;
   setError: React.Dispatch<React.SetStateAction<string | null>>;
+  assetUrl: string | null;
+  loadAsset: (assetId: string) => Promise<void>;
 }
 
 const ReviewContext = createContext<ReviewContextType | undefined>(undefined);
@@ -33,6 +36,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [notes, setNotes] = useState<ReviewNote[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [assetUrl, setAssetUrl] = useState<string | null>(null);
 
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
@@ -61,6 +65,17 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, []);
 
+  const loadAsset = useCallback(async (assetId: string) => {
+    try {
+      const assetRecord = await pb.collection('assets').getOne(assetId, { requestKey: null });
+      if (assetRecord && assetRecord.file) {
+        setAssetUrl(pb.files.getUrl(assetRecord, assetRecord.file));
+      }
+    } catch (err) {
+      console.error("Failed to fetch asset for review:", err);
+    }
+  }, []);
+
   return (
     <ReviewContext.Provider value={{
       activeTool, setActiveTool,
@@ -76,7 +91,9 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       notes,
       loadNotes,
       error,
-      setError
+      setError,
+      assetUrl,
+      loadAsset
     }}>
       {children}
     </ReviewContext.Provider>

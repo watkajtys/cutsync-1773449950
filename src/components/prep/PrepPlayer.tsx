@@ -4,7 +4,7 @@ import { usePrep } from '../../contexts/PrepContext';
 import { formatTimecode } from '../../utils/timeFormat';
 
 export const PrepPlayer: React.FC = () => {
-  const { videoRef, setCurrentTime, setDuration, currentTime, duration } = usePrep();
+  const { videoRef, setCurrentTime, setDuration, currentTime, duration, assetUrl } = usePrep();
 
   const handleTimeUpdate = () => {
     if (videoRef.current) {
@@ -37,7 +37,7 @@ export const PrepPlayer: React.FC = () => {
         <div className="aspect-video h-full relative bg-neutral-900 shadow-2xl ring-1 ring-white/10 overflow-hidden group">
           <video
             ref={videoRef}
-            src="/dummy.mp4"
+            src={assetUrl || "/dummy.mp4"}
             className="w-full h-full object-cover"
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
