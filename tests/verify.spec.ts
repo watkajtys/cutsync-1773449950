@@ -183,7 +183,7 @@ test('Verify the Chronological River displays structural elements like tick mark
   const waveformContainer = riverSection.locator('.opacity-30').first();
   await expect(waveformContainer).toBeVisible();
 
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify center play button overlay is removed', async ({ page }) => {
