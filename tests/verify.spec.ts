@@ -1633,3 +1633,34 @@ test('User pauses video, selects freehand, draws, switches to box, draws, clears
   // Take screenshot of evidence
   await page.screenshot({ path: 'evidence_old.png' });
 });
+
+test('Verify the Asset Not Found empty state renders when a literal :id is requested', async ({ page }) => {
+  let apiCalled = false;
+  
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      apiCalled = true;
+      await route.continue();
+    } else {
+      await route.continue();
+    }
+  });
+  
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      apiCalled = true;
+      await route.continue();
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.goto('/review/:id');
+  
+  await expect(page.locator('text=ERROR 404: ASSET NOT FOUND')).toBeVisible();
+  await expect(page.locator('text=The requested asset ID could not be located in the database.')).toBeVisible();
+
+  expect(apiCalled).toBe(false);
+
+  await page.screenshot({ path: 'evidence_old.png' });
+});

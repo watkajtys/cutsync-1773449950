@@ -16,11 +16,11 @@ export const TheaterPlayer: React.FC = () => {
 
   const {
     canvasRef,
-    activeTool,
     handlePointerDown,
     handlePointerMove,
     handlePointerUp
   } = useCanvasDrawing();
+  const { activeTool } = useReview();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
