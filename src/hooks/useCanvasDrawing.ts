@@ -10,7 +10,7 @@ export const useCanvasDrawing = () => {
 
   const {
     activeTool, activeColor, shapes, currentShape,
-    setShapes, setCurrentShape, videoRef
+    setShapes, setCurrentShape, videoRef, saveShapesToBackend
   } = useReview();
 
   useEffect(() => {
@@ -45,11 +45,11 @@ export const useCanvasDrawing = () => {
     };
   };
 
-  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>) => {
     if (activeTool === 'pointer') return;
     
     isDrawing.current = true;
-    const { x, y } = getCoordinates(e);
+    const { x, y } = getCoordinates(e as React.PointerEvent<HTMLCanvasElement>);
     setCurrentShape({
       tool: activeTool,
       color: activeColor,
@@ -57,10 +57,10 @@ export const useCanvasDrawing = () => {
     });
   };
 
-  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawing.current || activeTool === 'pointer' || !currentShape) return;
     
-    const { x, y } = getCoordinates(e);
+    const { x, y } = getCoordinates(e as React.PointerEvent<HTMLCanvasElement>);
     
     if (activeTool === 'freehand') {
       setCurrentShape({
@@ -75,11 +75,13 @@ export const useCanvasDrawing = () => {
     }
   };
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (e?: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawing.current || activeTool === 'pointer' || !currentShape) return;
     isDrawing.current = false;
-    setShapes([...shapes, currentShape]);
+    const newShapes = [...shapes, currentShape];
+    setShapes(newShapes);
     setCurrentShape(null);
+    saveShapesToBackend(newShapes);
   };
 
   // Dedicated effect just for the ResizeObserver to draw whenever the window size changes

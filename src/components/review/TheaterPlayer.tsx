@@ -5,7 +5,7 @@ import { useReview } from '../../contexts/ReviewContext';
 import { formatTimecode } from '../../utils/timeFormat';
 
 export const TheaterPlayer: React.FC = () => {
-  const { videoRef, inputRef, currentTime, setCurrentTime, seekToTime, assetUrl, clearDrawing, viewingNoteTime, setViewingNoteTime, notes, setShapes, currentShape } = useReview();
+  const { videoRef, inputRef, currentTime, setCurrentTime, seekToTime, assetUrl, clearDrawing, viewingNoteTime, setViewingNoteTime, notes, setShapes, currentShape, setActiveTool } = useReview();
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -130,6 +130,40 @@ export const TheaterPlayer: React.FC = () => {
 
   return (
     <section className="flex-1 bg-black flex flex-col relative group">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2 p-1.5 bg-panel-dark/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl">
+        <button 
+          onClick={() => setActiveTool('freehand')}
+          className={`w-12 h-12 flex items-center justify-center rounded-lg transition-all ${activeTool === 'freehand' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-transparent text-slate-400 hover:text-white hover:bg-white/5'}`}
+        >
+          <span className="material-symbols-outlined">gesture</span>
+        </button>
+        <button 
+          onClick={() => setActiveTool('rect')}
+          className={`w-12 h-12 flex items-center justify-center rounded-lg transition-all ${activeTool === 'rect' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-transparent text-slate-400 hover:text-white hover:bg-white/5'}`}
+        >
+          <span className="material-symbols-outlined">rectangle</span>
+        </button>
+        <button 
+          onClick={() => setActiveTool('arrow')}
+          className={`w-12 h-12 flex items-center justify-center rounded-lg transition-all ${activeTool === 'arrow' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-transparent text-slate-400 hover:text-white hover:bg-white/5'}`}
+        >
+          <span className="material-symbols-outlined">north_east</span>
+        </button>
+        <button 
+          onClick={() => setActiveTool('pointer')}
+          className={`w-12 h-12 flex items-center justify-center rounded-lg transition-all ${activeTool === 'pointer' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-transparent text-slate-400 hover:text-white hover:bg-white/5'}`}
+        >
+          <span className="material-symbols-outlined">near_me</span>
+        </button>
+        <div className="w-8 h-px bg-white/10 mx-auto my-1"></div>
+        <button 
+          onClick={clearDrawing}
+          className="w-12 h-12 flex items-center justify-center rounded-lg bg-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all clear-canvas-btn"
+        >
+          <span className="material-symbols-outlined">undo</span>
+        </button>
+      </div>
+
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="video-container w-full max-w-6xl relative bg-slate-900 rounded-lg overflow-hidden shadow-2xl border border-white/5" style={{ aspectRatio: '21 / 9' }}>
           <video 

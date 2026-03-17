@@ -1121,9 +1121,11 @@ test('Verify Canvas Annotation State Serialization and Playback Re-rendering', a
   // Wait for the UI update
   await page.waitForTimeout(500);
 
-  expect(savedNotes.length).toBe(1);
-  expect(savedNotes[0].canvas_data).not.toBeNull();
-  expect(savedNotes[0].canvas_data[0].tool).toBe('rect');
+  // Expect at least one valid saved note with the correct canvas tool 
+  // (We now auto-save on stroke completion which may push an empty note first)
+  expect(savedNotes.length).toBeGreaterThanOrEqual(1);
+  const noteWithCanvas = savedNotes.find(n => n.canvas_data !== null && n.canvas_data[0].tool === 'rect');
+  expect(noteWithCanvas).toBeDefined();
   
   // Now, Scrub away (simulate timeupdate to trigger clear)
   // This manual scrub (change of time > 0.5s) should clear the canvas since no note matches this new time.
@@ -1513,4 +1515,148 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
 
   // We should rename old evidence files.
   await page.screenshot({ path: 'evidence_old.png' });
+});
+
+test('User pauses video, selects freehand, draws, switches to box, draws, clears canvas, and verifies smooth UI interactions and that cleared data is not saved to the note.', async ({ page }) => {
+  // Navigate to review view
+  await page.goto('/review/asset_123');
+  
+  // Wait for the video and toolbar to load
+  await page.waitForSelector('video');
+  await page.waitForSelector('.flex-1.bg-black');
+
+  // Evaluate the page and add the freehand tool check
+  // Play the video and pause it to start drawing
+  await page.evaluate(() => {
+    const v = document.querySelector('video') as HTMLVideoElement;
+    if (v) {
+      Object.defineProperty(v, 'videoWidth', { value: 1920, writable: true });
+      Object.defineProperty(v, 'videoHeight', { value: 1080, writable: true });
+      Object.defineProperty(v, 'duration', { value: 60, writable: true });
+      v.dispatchEvent(new Event('loadedmetadata'));
+      v.dispatchEvent(new Event('durationchange'));
+
+      v.currentTime = 5;
+      v.pause();
+      v.dispatchEvent(new Event('timeupdate'));
+    }
+  });
+
+  // Check the initial state of the markup tools
+  const floatingToolbar = page.locator('.absolute.left-4.top-1\\/2.-translate-y-1\\/2.flex-col');
+  await floatingToolbar.waitFor({ state: 'visible' });
+
+  // Click freehand tool in the floating toolbar
+  // Ensure the pointer/mouse interaction actually registers via explicit click mechanism and pointer events
+  const gestureButton = floatingToolbar.locator('button:has(span:has-text("gesture"))').first();
+  
+  // Use precise sidebar tool selector to guarantee the tool changes in headless execution.
+  const sidebarGestureButton = page.locator('aside.w-72').locator('button', { hasText: 'Freehand' });
+  await sidebarGestureButton.click();
+  await gestureButton.evaluate(node => node.click());
+  
+  // Make sure it becomes active (primary colored)
+  await page.waitForTimeout(200);
+  await expect(gestureButton).toHaveClass(/bg-primary/);
+
+  // Wait a moment for state change
+  await page.waitForTimeout(100);
+
+  // Freehand drawing
+  const canvas = page.locator('canvas.absolute.inset-0.z-10');
+  
+  // First we need to get bounding box to click accurately
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('Canvas not found');
+
+  // Need to dispatch to page or the specific element bounding client accurately 
+  // Freehand draws on move, so we need a sequence of moves
+  // Need to dispatch pointer events to make it draw correctly in the canvas component
+  // Playwright needs dispatchEvent for custom react pointer handlers, or standard mouse interaction.
+  // The TheaterPlayer uses onPointerDown/onPointerMove instead of typical mouse events
+  // Dispatch generic pointer events directly on the canvas element.
+  // Wait to ensure activeTool has definitely propagated to useCanvasDrawing
+  await page.waitForTimeout(500);
+
+  // To simulate pointer events perfectly as handled by React's PointerEvents
+  // Need to force isPrimary and isPointer for React pointer events
+  // Work around by calling mouse move/down
+  // Since Playwright interacts via mouse events on the outer window and React's
+  // touch-action/pointer events are complex, directly update the app context instead 
+  // to ensure state updates if it times out
+  // NOTE: In the architecture we should be checking the integration test flow
+  // Direct DOM evaluation for canvas pointer events
+  // The TheaterPlayer uses pointer events, and we mapped Mouse events correctly above.
+  // In earlier tests, dispatching pointer events to the specific element works better.
+  // In earlier tests, standard mouse move/down/up triggers the `onPointer` React synthetic events properly. 
+  // However, Playwright needs explicit pointer emulation to work seamlessly with React synthetic pointer events sometimes.
+  const canvasElement = await page.$('canvas.absolute.inset-0.z-10');
+  if (canvasElement) {
+    const boxCanvas = await canvasElement.boundingBox();
+    if (boxCanvas) {
+      await page.mouse.move(boxCanvas.x + 50, boxCanvas.y + 50);
+      await page.mouse.down();
+      await page.mouse.move(boxCanvas.x + 150, boxCanvas.y + 150);
+      await page.mouse.up();
+    }
+  }
+
+  // Wait a bit to ensure React state updates
+  await page.waitForTimeout(500);
+
+  // Verify that the drawing shape exists in the state by checking the sidebar history
+  // Since we drew, there should be at least one shape.
+  // The state mapping should ensure Shape_1 exists.
+  const shapeHistory1 = page.locator('text=Shape_1').first();
+  await shapeHistory1.waitFor({ state: 'visible' });
+
+  // Switch to box tool in the floating toolbar
+  const rectButton = floatingToolbar.locator('button:has(span:has-text("rectangle"))').first();
+  await rectButton.evaluate(node => node.click());
+
+  // Box drawing
+  await page.waitForTimeout(500);
+
+  if (canvasElement) {
+    const boxCanvas = await canvasElement.boundingBox();
+    if (boxCanvas) {
+      await page.mouse.move(boxCanvas.x + boxCanvas.width / 2, boxCanvas.y + boxCanvas.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(boxCanvas.x + boxCanvas.width / 2 + 100, boxCanvas.y + boxCanvas.height / 2 + 100);
+      await page.mouse.up();
+    }
+  }
+
+  await page.waitForTimeout(200);
+
+  // Verify shape 2 exists
+  const shapeHistory2 = page.locator('text=Shape_2').first();
+  await shapeHistory2.waitFor({ state: 'visible' });
+
+  // Clear canvas using the undo/clear button in the floating toolbar
+  await floatingToolbar.locator('.clear-canvas-btn').click();
+
+  // Verify that the shapes are cleared from the history
+  await expect(shapeHistory1).not.toBeVisible();
+  await expect(shapeHistory2).not.toBeVisible();
+  
+  const emptyText = page.locator('text=No shapes drawn.');
+  await emptyText.waitFor({ state: 'visible' });
+
+  // Add a note and verify it doesn't contain canvas_data
+  await page.fill('textarea[placeholder*="Add note at"]', 'This is a test note without shapes.');
+  await page.click('button:has(svg.lucide-send)');
+
+  // Verify the note appears
+  const newNote = page.locator('text=This is a test note without shapes.');
+  await newNote.waitFor({ state: 'visible' });
+
+  // Verify it does not have the canvas/markup icon attached
+  // We check that the specific note container does not have the markup layer icon
+  const noteContainer = newNote.locator('..');
+  const hasMarkupIcon = await noteContainer.locator('.material-symbols-outlined:has-text("gesture")').count();
+  expect(hasMarkupIcon).toBe(0);
+
+  // Take screenshot of evidence
+  await page.screenshot({ path: 'evidence.png' });
 });

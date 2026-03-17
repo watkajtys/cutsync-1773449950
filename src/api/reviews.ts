@@ -15,6 +15,31 @@ export const fetchReviewNotes = async (assetId: string): Promise<ReviewNote[]> =
   }
 };
 
+export const updateReviewNote = async (
+  noteId: string,
+  canvasData: Shape[] | null
+): Promise<ReviewNote> => {
+  try {
+    const record = await pb.collection('review_notes').update<ReviewNote>(noteId, {
+      canvas_data: canvasData
+    }, { requestKey: null });
+    return record;
+  } catch (error) {
+    console.error("Error updating review note:", error);
+    throw error;
+  }
+};
+
+export const deleteReviewNote = async (noteId: string): Promise<boolean> => {
+  try {
+    await pb.collection('review_notes').delete(noteId, { requestKey: null });
+    return true;
+  } catch (error) {
+    console.error("Error deleting review note:", error);
+    return false;
+  }
+};
+
 export const createReviewNote = async (
   assetId: string, 
   author: string, 

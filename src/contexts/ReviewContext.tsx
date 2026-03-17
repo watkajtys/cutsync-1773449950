@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import { fetchReviewNotes } from '../api/reviews';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { fetchReviewNotes, createReviewNote, updateReviewNote, deleteReviewNote } from '../api/reviews';
 import { ReviewNote, Shape, Tool } from '../types/review';
 import { pb } from '../lib/pocketbase';
 
@@ -27,13 +28,28 @@ interface ReviewContextType {
   setError: React.Dispatch<React.SetStateAction<string | null>>;
   assetUrl: string | null;
   loadAsset: (assetId: string) => Promise<void>;
+  saveShapesToBackend: (newShapes: Shape[]) => Promise<void>;
 }
 
 const ReviewContext = createContext<ReviewContextType | undefined>(undefined);
 
 export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [activeTool, setActiveTool] = useState<Tool>('pointer');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlTool = searchParams.get('tool') as Tool | null;
+  const initialTool = urlTool && ['pointer', 'freehand', 'rect', 'arrow'].includes(urlTool) ? urlTool : 'pointer';
+
+  const [activeTool, setActiveTool] = useState<Tool>(initialTool);
   const [activeColor, setActiveColor] = useState<string>('#ef4444');
+
+  // Sync tool change back to URL query parameters
+  useEffect(() => {
+    const currentTool = searchParams.get('tool');
+    if (activeTool === 'pointer' && currentTool !== null) {
+      setSearchParams({}, { replace: true });
+    } else if (activeTool !== 'pointer' && currentTool !== activeTool) {
+      setSearchParams({ tool: activeTool }, { replace: true });
+    }
+  }, [activeTool, searchParams, setSearchParams]);
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [currentTime, setCurrentTime] = useState<number>(0);
@@ -41,13 +57,34 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [notes, setNotes] = useState<ReviewNote[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [assetUrl, setAssetUrl] = useState<string | null>(null);
+  const [currentAssetId, setCurrentAssetId] = useState<string | null>(null);
 
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
 
-  const clearDrawing = () => {
+  const clearDrawing = async () => {
+    // If we're viewing a note with canvas data, clearing the canvas should clear the note's data too.
+    if (viewingNoteTime !== null) {
+      const noteToUpdate = notes.find(n => n.timestamp === viewingNoteTime);
+      if (noteToUpdate && noteToUpdate.canvas_data) {
+        if (noteToUpdate.note_text.trim() === '') {
+          await deleteReviewNote(noteToUpdate.id);
+        } else {
+          await updateReviewNote(noteToUpdate.id, null);
+        }
+        if (currentAssetId) await loadNotes(currentAssetId);
+      }
+    } else {
+      // Look for a blank "draft" note at the exact same timestamp to clear
+      const noteToUpdate = notes.find(n => Math.abs(currentTime - n.timestamp) < 0.2 && n.note_text.trim() === '');
+      if (noteToUpdate) {
+        await deleteReviewNote(noteToUpdate.id);
+        if (currentAssetId) await loadNotes(currentAssetId);
+      }
+    }
     setShapes([]);
     setCurrentShape(null);
+    setViewingNoteTime(null);
   };
 
   const seekToTime = (time: number) => {
@@ -72,6 +109,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const loadNotes = useCallback(async (assetId: string) => {
     try {
       setError(null);
+      setCurrentAssetId(assetId);
       const fetchedNotes = await fetchReviewNotes(assetId);
       setNotes(fetchedNotes);
     } catch (err) {
@@ -79,6 +117,24 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setError("Failed to load review notes. Please check your connection.");
     }
   }, []);
+
+  const saveShapesToBackend = useCallback(async (newShapes: Shape[]) => {
+    if (!currentAssetId) return;
+    
+    // Auto-save: either update the current note or create a blank "draft" note holding the drawing
+    let matchedNote = notes.find(n => n.timestamp === viewingNoteTime);
+    if (!matchedNote) {
+      matchedNote = notes.find(n => Math.abs(currentTime - n.timestamp) < 0.2);
+    }
+    
+    if (matchedNote) {
+      await updateReviewNote(matchedNote.id, newShapes.length > 0 ? newShapes : null);
+    } else if (newShapes.length > 0) {
+      await createReviewNote(currentAssetId, 'Current User', currentTime, '', newShapes);
+    }
+    await loadNotes(currentAssetId);
+  }, [currentAssetId, notes, viewingNoteTime, currentTime, loadNotes]);
+
 
   const loadAsset = useCallback(async (assetId: string) => {
     try {
@@ -111,7 +167,8 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       error,
       setError,
       assetUrl,
-      loadAsset
+      loadAsset,
+      saveShapesToBackend
     }}>
       {children}
     </ReviewContext.Provider>
