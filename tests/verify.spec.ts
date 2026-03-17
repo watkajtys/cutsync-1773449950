@@ -1658,5 +1658,5 @@ test('User pauses video, selects freehand, draws, switches to box, draws, clears
   expect(hasMarkupIcon).toBe(0);
 
   // Take screenshot of evidence
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
