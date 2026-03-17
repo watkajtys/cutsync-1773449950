@@ -6,7 +6,7 @@ import { useReview } from '../../contexts/ReviewContext';
 import { formatTimecode } from '../../utils/timeFormat';
 
 export const TheaterPlayer: React.FC = () => {
-  const { videoRef, inputRef, currentTime, setCurrentTime, seekToTime, assetUrl, clearDrawing, viewingNoteTime, setViewingNoteTime, notes, setShapes, currentShape, setActiveTool, activeColor, setActiveColor } = useReview();
+  const { videoRef, inputRef, currentTime, setCurrentTime, seekToTime, assetUrl, currentAssetId, clearDrawing, viewingNoteTime, setViewingNoteTime, notes, setShapes, currentShape } = useReview();
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -133,6 +133,14 @@ export const TheaterPlayer: React.FC = () => {
     <section className="flex-1 bg-black flex flex-col relative group">
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="video-container w-full max-w-6xl relative bg-slate-900 rounded-lg overflow-hidden shadow-2xl border border-white/5" style={{ aspectRatio: '21 / 9' }}>
+          {!assetUrl && currentAssetId === ':id' ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-50">
+              <div className="text-white font-mono text-sm border border-white/10 bg-black p-4 rounded-md flex flex-col items-center gap-2">
+                <span className="text-red-400">ERROR 404: ASSET NOT FOUND</span>
+                <span className="text-slate-400">The requested asset ID could not be located in the database.</span>
+              </div>
+            </div>
+          ) : null}
           <video 
             ref={videoRef}
             src={assetUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"}

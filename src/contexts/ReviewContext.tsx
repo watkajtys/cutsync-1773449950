@@ -27,6 +27,7 @@ interface ReviewContextType {
   error: string | null;
   setError: React.Dispatch<React.SetStateAction<string | null>>;
   assetUrl: string | null;
+  currentAssetId: string | null;
   loadAsset: (assetId: string) => Promise<void>;
   saveShapesToBackend: (newShapes: Shape[]) => Promise<void>;
 }
@@ -116,6 +117,10 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       setError(null);
       setCurrentAssetId(assetId);
+      if (assetId === ':id') {
+        console.warn('Intercepted generic route parameter ":id". Aborting fetch.');
+        return;
+      }
       const fetchedNotes = await fetchReviewNotes(assetId);
       setNotes(fetchedNotes);
       
@@ -167,6 +172,11 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const loadAsset = useCallback(async (assetId: string) => {
     try {
+      if (assetId === ':id') {
+        console.warn('Intercepted generic route parameter ":id". Aborting asset fetch.');
+        setAssetUrl(null);
+        return;
+      }
       console.log(`[PocketBase Fetch] Fetching asset with ID: ${assetId} from url: ${pb.baseUrl}/api/collections/assets/records/${assetId}`);
       const assetRecord = await pb.collection('assets').getOne(assetId, { requestKey: null });
       if (assetRecord && assetRecord.file) {
@@ -199,6 +209,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       error,
       setError,
       assetUrl,
+      currentAssetId,
       loadAsset,
       saveShapesToBackend
     }}>
