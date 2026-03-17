@@ -44,9 +44,7 @@ export const NotesSidebar: React.FC = () => {
 
   return (
     <aside className="w-[30%] border-l border-white/5 bg-surface flex flex-col">
-      <TechnicalMetadata />
-
-      <section className="h-[55%] flex flex-col">
+      <section className="flex-1 flex flex-col overflow-hidden">
         <ReviewNotesList notes={notes} error={error} />
         
         <div className="p-4 bg-black/40 border-t border-white/5">
@@ -75,6 +73,10 @@ export const NotesSidebar: React.FC = () => {
           </div>
         </div>
       </section>
+      
+      <div className="h-[25%] border-t border-white/5 bg-black/20 overflow-y-auto">
+        <TechnicalMetadata />
+      </div>
     </aside>
   );
 };

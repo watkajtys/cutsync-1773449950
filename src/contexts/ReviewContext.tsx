@@ -172,6 +172,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const loadAsset = useCallback(async (assetId: string) => {
     try {
+      setCurrentAssetId(assetId);
       if (assetId === ':id') {
         console.warn('Intercepted generic route parameter ":id". Aborting asset fetch.');
         setAssetUrl(null);

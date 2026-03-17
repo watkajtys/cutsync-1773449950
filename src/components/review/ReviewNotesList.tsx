@@ -69,8 +69,14 @@ export const ReviewNotesList: React.FC<ReviewNotesListProps> = ({ notes, error }
         ))}
 
         {!error && notes.length === 0 && (
-          <div className="text-center p-4">
-            <p className="text-xs text-slate-500">No notes added yet.</p>
+          <div className="flex flex-col items-center justify-center h-full gap-4 text-center p-6 text-slate-400">
+            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-2">
+              <span className="material-symbols-outlined text-3xl opacity-50">edit_note</span>
+            </div>
+            <div>
+              <p className="text-sm font-bold text-white mb-1">No notes added yet</p>
+              <p className="text-xs text-slate-500">Play the video and start typing below to add a timestamped note, or use the drawing tools to annotate a specific frame.</p>
+            </div>
           </div>
         )}
       </div>
