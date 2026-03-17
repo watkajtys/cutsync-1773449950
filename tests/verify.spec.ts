@@ -713,5 +713,5 @@ test('Verify the Prep Mode UI layout and connect it to PocketBase to display sou
   await expect(page.locator("text=We've been tracking these signatures for three weeks.")).toBeVisible();
 
   // Take screenshot
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
