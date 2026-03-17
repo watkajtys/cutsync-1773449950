@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { fetchReviewNotes, createReviewNote, updateReviewNote, deleteReviewNote } from '../api/reviews';
 import { ReviewNote, Shape, Tool } from '../types/review';
@@ -50,6 +50,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setSearchParams({ tool: activeTool }, { replace: true });
     }
   }, [activeTool, searchParams, setSearchParams]);
+
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [currentTime, setCurrentTime] = useState<number>(0);
@@ -58,6 +59,9 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [error, setError] = useState<string | null>(null);
   const [assetUrl, setAssetUrl] = useState<string | null>(null);
   const [currentAssetId, setCurrentAssetId] = useState<string | null>(null);
+  
+  const pendingNoteIdRef = useRef<string | null>(null);
+  const isSavingRef = useRef<boolean>(false);
 
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
@@ -69,6 +73,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       if (noteToUpdate && noteToUpdate.canvas_data) {
         if (noteToUpdate.note_text.trim() === '') {
           await deleteReviewNote(noteToUpdate.id);
+          pendingNoteIdRef.current = null;
         } else {
           await updateReviewNote(noteToUpdate.id, null);
         }
@@ -79,6 +84,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const noteToUpdate = notes.find(n => Math.abs(currentTime - n.timestamp) < 0.2 && n.note_text.trim() === '');
       if (noteToUpdate) {
         await deleteReviewNote(noteToUpdate.id);
+        pendingNoteIdRef.current = null;
         if (currentAssetId) await loadNotes(currentAssetId);
       }
     }
@@ -112,29 +118,45 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setCurrentAssetId(assetId);
       const fetchedNotes = await fetchReviewNotes(assetId);
       setNotes(fetchedNotes);
+      
+      // If we seek to a new time or load notes, make sure we clear our pending ID tracking
+      // unless we specifically need it, but normally on load we reset it.
     } catch (err) {
       console.error("Failed to fetch notes in context", err);
-      setError("Failed to load review notes. Please check your connection.");
+      setError("Unable to sync note at this time.");
     }
   }, []);
 
   const saveShapesToBackend = useCallback(async (newShapes: Shape[]) => {
     if (!currentAssetId) return;
-    
-    // Auto-save: either update the current note or create a blank "draft" note holding the drawing
-    let matchedNote = notes.find(n => n.timestamp === viewingNoteTime);
-    if (!matchedNote) {
-      matchedNote = notes.find(n => Math.abs(currentTime - n.timestamp) < 0.2);
+    if (isSavingRef.current) {
+        // Simple debounce/lock to prevent rapid duplicate creation
+        setTimeout(() => saveShapesToBackend(newShapes), 300);
+        return;
     }
     
-    if (matchedNote) {
-      await updateReviewNote(matchedNote.id, newShapes.length > 0 ? newShapes : null);
-    } else if (newShapes.length > 0) {
-      await createReviewNote(currentAssetId, 'Current User', currentTime, '', newShapes);
+    isSavingRef.current = true;
+    try {
+        // Auto-save: either update the current note or create a blank "draft" note holding the drawing
+        let matchedNote = notes.find(n => n.timestamp === viewingNoteTime);
+        if (!matchedNote) {
+            matchedNote = notes.find(n => Math.abs(currentTime - n.timestamp) < 0.2);
+        }
+        
+        // If we have a pending ID that we just created, prioritize that to avoid race conditions
+        const targetId = matchedNote?.id || pendingNoteIdRef.current;
+        
+        if (targetId) {
+            await updateReviewNote(targetId, newShapes.length > 0 ? newShapes : null);
+        } else if (newShapes.length > 0) {
+            const newNote = await createReviewNote(currentAssetId, 'Current User', currentTime, '', newShapes);
+            pendingNoteIdRef.current = newNote.id;
+        }
+        await loadNotes(currentAssetId);
+    } finally {
+        isSavingRef.current = false;
     }
-    await loadNotes(currentAssetId);
   }, [currentAssetId, notes, viewingNoteTime, currentTime, loadNotes]);
-
 
   const loadAsset = useCallback(async (assetId: string) => {
     try {
