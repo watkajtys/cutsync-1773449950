@@ -1211,10 +1211,13 @@ test('Verify Theater Player Interactive Scrubber', async ({ page }) => {
   
   await page.waitForTimeout(500);
 
-  // Find the interactive scrubber container
-  // It has a specific class mix: "absolute bottom-0 left-0 right-0 h-1.5 bg-white/10 z-20 cursor-pointer touch-none"
-  const scrubberContainer = page.locator('.cursor-pointer.touch-none').last();
+  // Find the interactive scrubber container by data-testid
+  const scrubberContainer = page.locator('[data-testid="timeline-container"]');
   await expect(scrubberContainer).toBeVisible();
+
+  // Verify that there are tick marks (the foundational UI structure part)
+  const tickMarks = scrubberContainer.locator('.w-px.bg-white\\/10');
+  expect(await tickMarks.count()).toBeGreaterThan(0);
 
   const box = await scrubberContainer.boundingBox();
   if (box) {
