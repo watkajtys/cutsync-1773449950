@@ -12,27 +12,72 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 PB_URL = os.getenv("POCKETBASE_URL", "http://127.0.0.1:8090")
 
-def update_asset_status(asset_id, status):
+
+def get_auth_token():
+    admin_email = os.environ.get("PB_ADMIN_EMAIL")
+    admin_password = os.environ.get("PB_ADMIN_PASSWORD")
+    if not admin_email or not admin_password:
+        return None
+    
+    payload = json.dumps({"identity": admin_email, "password": admin_password}).encode('utf-8')
+    try:
+        url = f"{PB_URL}/api/collections/_superusers/auth-with-password"
+        req = urllib.request.Request(url, data=payload, method="POST")
+        req.add_header('Content-Type', 'application/json')
+        with urllib.request.urlopen(req) as response:
+            data = json.loads(response.read().decode())
+            return data.get("token")
+    except urllib.error.HTTPError as e:
+        try:
+            url = f"{PB_URL}/api/admins/auth-with-password"
+            req = urllib.request.Request(url, data=payload, method="POST")
+            req.add_header('Content-Type', 'application/json')
+            with urllib.request.urlopen(req) as response:
+                data = json.loads(response.read().decode())
+                return data.get("token")
+        except Exception as inner_e:
+            logging.error(f"Failed admin authentication fallback: {inner_e}")
+            return None
+    except Exception as e:
+        logging.error(f"Failed superuser authentication: {e}")
+        return None
+
+def update_asset_status(asset_id, status, token=None):
     url = f"{PB_URL}/api/collections/assets/records/{asset_id}"
     data = json.dumps({"processing_status": status}).encode('utf-8')
     req = urllib.request.Request(url, data=data, method="PATCH")
     req.add_header('Content-Type', 'application/json')
+    if token:
+        req.add_header('Authorization', token)
     logging.info(f"[{asset_id}] Requesting status update to '{status}' at {url}")
-    with urllib.request.urlopen(req) as response:
-        result = json.loads(response.read().decode())
-        logging.info(f"[{asset_id}] Successfully updated status to '{status}'")
-        return result
+    try:
+        with urllib.request.urlopen(req) as response:
+            result = json.loads(response.read().decode())
+            logging.info(f"[{asset_id}] Successfully updated status to '{status}'")
+            return result
+    except urllib.error.HTTPError as e:
+        err_msg = e.read().decode()
+        logging.error(f"[{asset_id}] HTTPError {e.code} updating status at {url}. Payload: {data.decode()}. Response: {err_msg}")
+        raise e
 
-def create_pocketbase_record(collection, data):
+def create_pocketbase_record(collection, data, token=None):
     url = f"{PB_URL}/api/collections/{collection}/records"
     payload = json.dumps(data).encode('utf-8')
     req = urllib.request.Request(url, data=payload, method="POST")
     req.add_header('Content-Type', 'application/json')
-    logging.info(f"Creating record in {collection}: {data}")
-    with urllib.request.urlopen(req) as response:
-        return json.loads(response.read().decode())
+    if token:
+        req.add_header('Authorization', token)
+    logging.info(f"Creating record in {collection}: {data} at {url}")
+    try:
+        with urllib.request.urlopen(req) as response:
+            return json.loads(response.read().decode())
+    except urllib.error.HTTPError as e:
+        err_msg = e.read().decode()
+        logging.error(f"HTTPError {e.code} creating record in {collection} at {url}. Payload: {payload.decode()}. Response: {err_msg}")
+        raise e
 
-def process_asset(asset):
+def process_asset(asset, token=None):
+
     asset_id = asset.get("id")
     file_name = asset.get("file")
     
@@ -42,7 +87,7 @@ def process_asset(asset):
 
     logging.info(f"[{asset_id}] Found pending asset. Transitioning status: pending -> extracting_audio")
     try:
-        update_asset_status(asset_id, "extracting_audio")
+        update_asset_status(asset_id, "extracting_audio", token)
     except Exception as e:
         logging.error(f"[{asset_id}] Failed to update status to extracting_audio: {e}")
         return
@@ -75,7 +120,7 @@ def process_asset(asset):
         ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
         logging.info(f"[{asset_id}] Audio extraction complete. Transitioning status: extracting_audio -> analyzing")
-        update_asset_status(asset_id, "analyzing")
+        update_asset_status(asset_id, "analyzing", token)
 
         # Now do the Gemini analysis
         api_key = os.environ.get("GEMINI_API_KEY")
@@ -126,26 +171,26 @@ def process_asset(asset):
         # Save transcript
         create_pocketbase_record("ai_transcripts", {
             "asset_id": asset_id,
-            "raw_text": transcript_data.get("raw_text", ""),
-            "srt_payload": transcript_data.get("srt_payload", "")
-        })
+            "raw_text": str(transcript_data.get("raw_text", "")),
+            "srt_payload": str(transcript_data.get("srt_payload", ""))
+        }, token)
         
         # Save cut suggestions
         for cut in cuts:
             create_pocketbase_record("ai_cut_suggestions", {
                 "asset_id": asset_id,
-                "start_timecode": float(cut.get("start_timecode", 0)),
-                "end_timecode": float(cut.get("end_timecode", 0)),
-                "cut_reason": cut.get("cut_reason", "")
-            })
+                "start_timecode": float(cut.get("start_timecode", 0.0)),
+                "end_timecode": float(cut.get("end_timecode", 0.0)),
+                "cut_reason": str(cut.get("cut_reason", ""))
+            }, token)
             
         logging.info(f"[{asset_id}] Analysis complete. Transitioning status: analyzing -> ready")
-        update_asset_status(asset_id, "ready")
+        update_asset_status(asset_id, "ready", token)
         
     except Exception as e:
         logging.error(f"[{asset_id}] Error processing asset: {e}")
         try:
-            update_asset_status(asset_id, "error")
+            update_asset_status(asset_id, "error", token)
         except Exception as inner_e:
             logging.error(f"[{asset_id}] Failed to set error status fallback: {inner_e}")
     finally:
@@ -156,29 +201,41 @@ def process_asset(asset):
         if os.path.exists(local_audio_path):
             os.remove(local_audio_path)
 
-def get_pending_assets():
+def get_pending_assets(token=None):
     filter_expr = urllib.parse.quote("asset_type='source_clip' && processing_status='pending'")
     url = f"{PB_URL}/api/collections/assets/records?filter={filter_expr}&perPage=500"
     logging.debug(f"Polling {url}")
     req = urllib.request.Request(url)
-    with urllib.request.urlopen(req) as response:
-        data = json.loads(response.read().decode())
-        items = data.get("items", [])
-        if items:
-            logging.info(f"Found {len(items)} pending assets matching criteria.")
-        return items
+    if token:
+        req.add_header('Authorization', token)
+    try:
+        with urllib.request.urlopen(req) as response:
+            data = json.loads(response.read().decode())
+            items = data.get("items", [])
+            if items:
+                logging.info(f"Found {len(items)} pending assets matching criteria.")
+            return items
+    except urllib.error.HTTPError as e:
+        err_msg = e.read().decode()
+        logging.error(f"HTTPError {e.code} polling assets at {url}. Response: {err_msg}")
+        return []
 
 def main():
     logging.info(f"Starting extractor daemon, polling {PB_URL} for pending assets...")
     
     oneshot = os.getenv("ONESHOT", "false").lower() == "true"
+    token = get_auth_token()
+    if token:
+        logging.info("Successfully acquired PocketBase admin token.")
+    else:
+        logging.warning("No PocketBase admin token acquired. API requests may fail if admin privileges are required.")
     
     while True:
         try:
-            records = get_pending_assets()
+            records = get_pending_assets(token)
             
             for record in records:
-                process_asset(record)
+                process_asset(record, token)
                 
         except Exception as e:
             logging.error(f"Error during polling PocketBase: {e}")

@@ -140,7 +140,7 @@ test('Verify that the React app loads and displays the main dashboard shell with
   await expect(page.locator('h3:has-text("Integration Test Project")').first()).toBeVisible();
 
   // Take screenshot at the end
-  await page.screenshot({ path: 'evidence_old.png.old' });
+  await page.screenshot({ path: 'evidence_old_old.png' });
 });
 
 test('Verify center play button overlay is removed', async ({ page }) => {
@@ -192,7 +192,7 @@ test('Verify center play button overlay is removed', async ({ page }) => {
   await expect(largePlayButton).toHaveCount(0);
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence_old.png.old' });
+  await page.screenshot({ path: 'evidence_old_old.png' });
 });
 
 test('User hits spacebar during playback; video pauses and new note input is focused.', async ({ page }) => {
@@ -267,7 +267,7 @@ test('User hits spacebar during playback; video pauses and new note input is foc
   await expect(textarea).toBeFocused();
 
   // Take screenshot of the evidence
-  await page.screenshot({ path: 'evidence_old.png.old' });
+  await page.screenshot({ path: 'evidence_old_old.png' });
 });
 
 test('Verify the Review Mode shell and layout for a specific asset', async ({ page }) => {
@@ -352,7 +352,7 @@ test('Verify the Review Mode shell and layout for a specific asset', async ({ pa
   await expect(page.locator('text=CURRENT: 0').first()).toBeVisible(); // Evaluates to 0 frames initially
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence_old.png.old' });
+  await page.screenshot({ path: 'evidence_old_old.png' });
 });
 
 test('View the review route and ensure the right 30% sidebar renders a scrollable list of styled mock notes with timestamps, alongside an input field at the bottom.', async ({ page }) => {
@@ -434,7 +434,7 @@ test('View the review route and ensure the right 30% sidebar renders a scrollabl
   const sendButton = sidebar.locator('button:has(svg.lucide-send)').first();
   await expect(sendButton).toBeVisible();
 
-  await page.screenshot({ path: 'evidence_old.png.old' });
+  await page.screenshot({ path: 'evidence_old_old.png' });
 });
 
 test('Verify the Review Mode uses proper lucide icons after refactoring', async ({ page }) => {
@@ -479,7 +479,7 @@ test('Verify the Review Mode uses proper lucide icons after refactoring', async 
   const cloudCogIcon = page.locator('footer svg').first();
   await expect(cloudCogIcon).toBeVisible();
 
-  await page.screenshot({ path: 'evidence_old.png.old' });
+  await page.screenshot({ path: 'evidence_old_old.png' });
 });
 
 test('Verify the visual annotation tools render a drawing toolbar and overlay canvas in Review Mode', async ({ page }) => {
@@ -532,7 +532,7 @@ test('Verify the visual annotation tools render a drawing toolbar and overlay ca
   await expect(canvas).toHaveClass(/cursor-crosshair/);
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence_old.png.old' });
+  await page.screenshot({ path: 'evidence_old_old.png' });
 });
 
 test('User saves a note at 0:15, it persists in PocketBase. Clicking an older note at 0:05 scrubs the video directly to 0:05.', async ({ page }) => {
@@ -630,7 +630,7 @@ test('User saves a note at 0:15, it persists in PocketBase. Clicking an older no
   await expect(page.locator('text=New note at 0:15')).toBeVisible();
 
   // Take screenshot of evidence
-  await page.screenshot({ path: 'evidence_old.png.old' });
+  await page.screenshot({ path: 'evidence_old_old.png' });
 });
 
 
