@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlignLeft, Search } from 'lucide-react';
 import { usePrep } from '../../contexts/PrepContext';
+import { formatTimecode } from '../../utils/timeFormat';
 
 export const SourceTranscript: React.FC = () => {
   const { transcripts, currentTime } = usePrep();
@@ -29,15 +30,33 @@ export const SourceTranscript: React.FC = () => {
               const mockTime = index * 10;
               const isActive = currentTime >= mockTime && currentTime < mockTime + 10;
               
+              // Parse speaker dynamically safely
+              let speaker = "";
+              let content = transcript.raw_text || "";
+              const speakerMatch = content.match(/^([A-Z\s]+):(.*)/);
+              if (speakerMatch) {
+                speaker = speakerMatch[1].trim();
+                content = speakerMatch[2].trim();
+              }
+              
+              const isItalic = content.startsWith("[") && content.endsWith("]");
+
               return (
               <div key={transcript.id} className={`transcript-line group flex gap-6 ${isActive ? 'bg-primary/5 -mx-6 px-6 py-2 border-l-2 border-primary' : ''}`}>
                 <span className={`timestamp text-[10px] font-mono font-bold w-16 flex-shrink-0 ${isActive ? 'text-primary' : 'text-primary opacity-40 transition-opacity'}`}>
-                  {Math.floor(mockTime / 60).toString().padStart(2, '0')}:{Math.floor(mockTime % 60).toString().padStart(2, '0')}
+                  {formatTimecode(mockTime, false)}
                 </span>
                 <div className="flex-1">
-                  <p className={`text-[13px] leading-relaxed ${isActive ? 'text-white' : 'text-slate-400'}`}>
-                    <span className={`${isActive ? 'text-primary' : 'text-white'} font-semibold`}>AI:</span> {transcript.raw_text}
+                  <p className={`text-[13px] leading-relaxed ${isActive ? 'text-white' : 'text-slate-400'} ${isItalic ? 'italic' : ''}`}>
+                    {speaker && <span className={`${isActive ? 'text-primary font-bold' : 'text-white font-semibold'}`}>{speaker}: </span>}
+                    {content}
                   </p>
+                  {isActive && (
+                    <div className="mt-2 flex gap-1.5">
+                      <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-[9px] font-bold text-emerald-500 uppercase tracking-tighter">Key Dialogue</span>
+                      <span className="px-1.5 py-0.5 rounded bg-white/5 text-[9px] font-bold text-slate-500 uppercase tracking-tighter">High Confidence</span>
+                    </div>
+                  )}
                 </div>
               </div>
             )})

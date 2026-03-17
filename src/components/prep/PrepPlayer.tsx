@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Play, SkipForward, Volume2 } from 'lucide-react';
 import { usePrep } from '../../contexts/PrepContext';
+import { formatTimecode } from '../../utils/timeFormat';
 
 export const PrepPlayer: React.FC = () => {
   const { videoRef, setCurrentTime, setDuration, currentTime, duration } = usePrep();
@@ -20,17 +21,10 @@ export const PrepPlayer: React.FC = () => {
     }
   };
 
-  const formatTime = (time: number) => {
-    const min = Math.floor(time / 60);
-    const sec = Math.floor(time % 60);
-    const frames = Math.floor((time - Math.floor(time)) * 24); // Assuming 24fps
-    return `00:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}:${frames.toString().padStart(2, '0')}`;
-  };
-
   return (
     <section className="h-[50%] min-h-[400px] flex flex-col bg-black relative border-b border-white/5">
       <div className="flex-1 flex items-center justify-center p-6 h-full">
-        <div className="aspect-video h-full relative bg-neutral-900 shadow-2xl ring-1 ring-white/10 overflow-hidden group w-full flex items-center justify-center">
+        <div className="aspect-video h-full relative bg-neutral-900 shadow-2xl ring-1 ring-white/10 overflow-hidden group">
           <video
             ref={videoRef}
             src="/dummy.mp4"
@@ -50,10 +44,10 @@ export const PrepPlayer: React.FC = () => {
               <div className="flex items-center gap-6">
                 <Play className="text-white cursor-pointer" size={24} fill="currentColor" onClick={() => videoRef.current?.play()} />
                 <SkipForward className="text-white/70 cursor-pointer" size={24} />
-                <Volume2 className="text-white/70 cursor-pointer" size={24} />
+                <Volume2 className="text-white/70 cursor-pointer" size={20} />
               </div>
               <div className="text-[11px] font-mono text-white/80 tracking-widest">
-                {formatTime(currentTime)} / {formatTime(duration)}
+                {formatTimecode(currentTime)} / {formatTimecode(duration)}
               </div>
             </div>
           </div>

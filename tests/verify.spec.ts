@@ -652,7 +652,7 @@ test('Verify the Prep Mode UI layout and connect it to PocketBase to display sou
             {
               id: 'mock-transcript-1',
               asset_id: assetId,
-              raw_text: "We've been tracking these signatures for three weeks.",
+              raw_text: "DIRECTOR: We've been tracking these signatures for three weeks.",
               created: new Date().toISOString()
             }
           ]
@@ -677,9 +677,9 @@ test('Verify the Prep Mode UI layout and connect it to PocketBase to display sou
             {
               id: 'mock-cut-1',
               asset_id: assetId,
-              start_timecode: 10,
-              end_timecode: 20,
-              cut_reason: "Dead air",
+              start_timecode: 252,
+              end_timecode: 258,
+              cut_reason: "High focus on facial expressions. Ideal for transition.",
               created: new Date().toISOString()
             }
           ]
@@ -701,14 +701,17 @@ test('Verify the Prep Mode UI layout and connect it to PocketBase to display sou
   const video = page.locator('video').first();
   await expect(video).toBeVisible();
 
-  // Verify Cut Suggestions
+  // Verify Cut Suggestions rendering correctly with dynamic title logic
   await expect(page.locator('text=AI Cut Suggestions')).toBeVisible();
-  await expect(page.locator('text=Dead air')).toBeVisible();
+  await expect(page.locator('text=High focus on facial expressions. Ideal for transition.')).toBeVisible();
+  await expect(page.locator('text=00:04:12 - 00:04:18')).toBeVisible();
+  await expect(page.locator('h4:has-text("High focus on facial expressions")')).toBeVisible();
 
-  // Verify Transcript
+  // Verify Transcript rendering correctly with dynamic speaker parsing
   await expect(page.locator('text=Source Transcript')).toBeVisible();
+  await expect(page.locator('text=DIRECTOR:')).toBeVisible();
   await expect(page.locator("text=We've been tracking these signatures for three weeks.")).toBeVisible();
 
   // Take screenshot
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });

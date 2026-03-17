@@ -1,6 +1,7 @@
 import React from 'react';
 import { Wand2, PlayCircle, ImageOff } from 'lucide-react';
 import { usePrep } from '../../contexts/PrepContext';
+import { formatTimecode } from '../../utils/timeFormat';
 
 export const CutSuggestions: React.FC = () => {
   const { cutSuggestions, setCurrentTime } = usePrep();
@@ -33,13 +34,16 @@ export const CutSuggestions: React.FC = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] font-bold text-primary uppercase tracking-tight">Emotional Peak</span>
+                    <span className={`text-[10px] font-bold uppercase tracking-tight ${suggestion.cut_reason?.toLowerCase().includes('technical') || suggestion.cut_reason?.toLowerCase().includes('stable') || suggestion.cut_reason?.toLowerCase().includes('wide') ? 'text-emerald-500' : 'text-primary'}`}>
+                      {suggestion.cut_reason?.toLowerCase().includes('technical') || suggestion.cut_reason?.toLowerCase().includes('stable') || suggestion.cut_reason?.toLowerCase().includes('wide') ? 'Technical' : 'Emotional Peak'}
+                    </span>
                     <span className="text-[9px] font-mono text-slate-500">
-                      {Math.floor(suggestion.start_timecode / 60)}:{Math.floor(suggestion.start_timecode % 60).toString().padStart(2, '0')} - 
-                      {Math.floor(suggestion.end_timecode / 60)}:{Math.floor(suggestion.end_timecode % 60).toString().padStart(2, '0')}
+                      {formatTimecode(suggestion.start_timecode, false)} - {formatTimecode(suggestion.end_timecode, false)}
                     </span>
                   </div>
-                  <h4 className="text-xs font-semibold text-white truncate mb-1">Close-up: Protagonist realization</h4>
+                  <h4 className="text-xs font-semibold text-white truncate mb-1">
+                    {suggestion.cut_reason?.split('.')[0] || 'Cut Suggestion'}
+                  </h4>
                   <p className="text-[10px] text-slate-400 line-clamp-2">{suggestion.cut_reason}</p>
                 </div>
               </div>
