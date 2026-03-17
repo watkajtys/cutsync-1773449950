@@ -140,7 +140,7 @@ test('Verify that the React app loads and displays the main dashboard shell with
   await expect(page.locator('h3:has-text("Integration Test Project")').first()).toBeVisible();
 
   // Take screenshot at the end
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence_old.png.old' });
 });
 
 test('Verify center play button overlay is removed', async ({ page }) => {
@@ -192,7 +192,7 @@ test('Verify center play button overlay is removed', async ({ page }) => {
   await expect(largePlayButton).toHaveCount(0);
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence_old.png.old' });
 });
 
 test('User hits spacebar during playback; video pauses and new note input is focused.', async ({ page }) => {
@@ -267,7 +267,7 @@ test('User hits spacebar during playback; video pauses and new note input is foc
   await expect(textarea).toBeFocused();
 
   // Take screenshot of the evidence
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence_old.png.old' });
 });
 
 test('Verify the Review Mode shell and layout for a specific asset', async ({ page }) => {
@@ -352,7 +352,7 @@ test('Verify the Review Mode shell and layout for a specific asset', async ({ pa
   await expect(page.locator('text=CURRENT: 0').first()).toBeVisible(); // Evaluates to 0 frames initially
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence_old.png.old' });
 });
 
 test('View the review route and ensure the right 30% sidebar renders a scrollable list of styled mock notes with timestamps, alongside an input field at the bottom.', async ({ page }) => {
@@ -434,7 +434,7 @@ test('View the review route and ensure the right 30% sidebar renders a scrollabl
   const sendButton = sidebar.locator('button:has(svg.lucide-send)').first();
   await expect(sendButton).toBeVisible();
 
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence_old.png.old' });
 });
 
 test('Verify the Review Mode uses proper lucide icons after refactoring', async ({ page }) => {
@@ -479,7 +479,7 @@ test('Verify the Review Mode uses proper lucide icons after refactoring', async 
   const cloudCogIcon = page.locator('footer svg').first();
   await expect(cloudCogIcon).toBeVisible();
 
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence_old.png.old' });
 });
 
 test('Verify the visual annotation tools render a drawing toolbar and overlay canvas in Review Mode', async ({ page }) => {
@@ -532,7 +532,7 @@ test('Verify the visual annotation tools render a drawing toolbar and overlay ca
   await expect(canvas).toHaveClass(/cursor-crosshair/);
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence_old.png.old' });
 });
 
 test('User saves a note at 0:15, it persists in PocketBase. Clicking an older note at 0:05 scrubs the video directly to 0:05.', async ({ page }) => {
@@ -630,6 +630,135 @@ test('User saves a note at 0:15, it persists in PocketBase. Clicking an older no
   await expect(page.locator('text=New note at 0:15')).toBeVisible();
 
   // Take screenshot of evidence
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence_old.png.old' });
 });
 
+
+test('Run the daemon. Verify it picks up an asset in "analyzing", sends the audio to Gemini, populates "ai_transcripts" and "ai_cut_suggestions" collections in PocketBase, sets asset status to "ready", and deletes local temp files.', async ({ request, page }) => {
+  // Use http://loom-cutsync-pocketbase:8090 directly as per diagnostician override
+  const pbUrl = 'http://loom-cutsync-pocketbase:8090';
+
+  // We mock Gemini using a mock python server or we just mock the python script directly.
+  // Actually, we can run the python daemon with a mock GEMINI_API_KEY and stub the google.genai client
+  // But wait, the python daemon is run via execSync in the test, so we can mock the module or inject a mock script.
+  // Let's create a wrapper script that mocks `genai.Client` and runs `extractor_agent.main()`.
+  
+  // Create a wrapper script to run the daemon in a mock environment
+  const mockScriptPath = path.join('/tmp', 'mock_extractor.py');
+  fs.writeFileSync(mockScriptPath, `
+import sys
+import os
+import json
+from unittest.mock import MagicMock
+sys.path.insert(0, os.path.abspath('backend'))
+import extractor_agent
+
+# Mock the google.genai module inside extractor_agent
+mock_client_instance = MagicMock()
+mock_generate_content = MagicMock()
+mock_generate_content.text = json.dumps({
+    "transcript": {
+        "raw_text": "Mock transcript",
+        "srt_payload": "1\\\n00:00:00,000 --> 00:00:05,000\\\nMock transcript"
+    },
+    "cut_suggestions": [
+        {
+            "start_timecode": 1.0,
+            "end_timecode": 2.0,
+            "cut_reason": "Mock silence"
+        }
+    ]
+})
+mock_client_instance.models.generate_content.return_value = mock_generate_content
+extractor_agent.genai.Client = MagicMock(return_value=mock_client_instance)
+
+# Ensure one-shot execution
+os.environ["ONESHOT"] = "true"
+os.environ["GEMINI_API_KEY"] = "mock_key"
+
+extractor_agent.main()
+`);
+
+  // Setup mock asset in PocketBase via API request
+  // We need to create an asset with status 'pending'
+  const createAssetRes = await request.post(`${pbUrl}/api/collections/assets/records`, {
+    data: {
+      project_id: 'dummy_project_id_123',
+      file: 'dummy.mp4',
+      asset_type: 'source_clip',
+      processing_status: 'pending'
+    }
+  });
+  expect(createAssetRes.ok()).toBeTruthy();
+  const assetData = await createAssetRes.json();
+  const assetId = assetData.id;
+
+  // Make sure a dummy file exists so the download doesn't fail
+  const formData = new FormData();
+  const dummyFile = new Blob(['dummy content'], { type: 'video/mp4' });
+  formData.append('file', dummyFile, 'dummy.mp4');
+
+  const uploadRes = await request.patch(`${pbUrl}/api/collections/assets/records/${assetId}`, {
+    multipart: {
+      file: {
+        name: 'dummy.mp4',
+        mimeType: 'video/mp4',
+        buffer: Buffer.from('fake video content')
+      }
+    }
+  });
+  expect(uploadRes.ok()).toBeTruthy();
+  const uploadedAssetData = await uploadRes.json();
+
+  // Also we need dummy.mp4 to be valid for ffmpeg. Let's create a real dummy mp4 and upload it.
+  const realDummyPath = '/tmp/dummy.mp4';
+  execSync('ffmpeg -f lavfi -i testsrc=duration=1:size=1280x720:rate=30 -c:v libx264 -t 1 -y /tmp/dummy.mp4');
+  const fileBuffer = fs.readFileSync('/tmp/dummy.mp4');
+  
+  const uploadRealRes = await request.patch(`${pbUrl}/api/collections/assets/records/${assetId}`, {
+    multipart: {
+      file: {
+        name: 'dummy.mp4',
+        mimeType: 'video/mp4',
+        buffer: fileBuffer
+      }
+    }
+  });
+  expect(uploadRealRes.ok()).toBeTruthy();
+  const realUploadedAssetData = await uploadRealRes.json();
+  const finalFilename = realUploadedAssetData.file;
+
+  // Run the mock script
+  console.log('Running mock extractor agent...');
+  execSync(`python3 ${mockScriptPath}`, { env: { ...process.env, POCKETBASE_URL: pbUrl } });
+
+  // Verify asset status is 'ready'
+  const checkAssetRes = await request.get(`${pbUrl}/api/collections/assets/records/${assetId}`);
+  expect(checkAssetRes.ok()).toBeTruthy();
+  const finalAssetData = await checkAssetRes.json();
+  expect(finalAssetData.processing_status).toBe('ready');
+
+  // Verify ai_transcripts were created
+  const transcriptsRes = await request.get(`${pbUrl}/api/collections/ai_transcripts/records?filter=(asset_id='${assetId}')`);
+  expect(transcriptsRes.ok()).toBeTruthy();
+  const transcriptsData = await transcriptsRes.json();
+  expect(transcriptsData.items.length).toBeGreaterThan(0);
+  expect(transcriptsData.items[0].raw_text).toBe('Mock transcript');
+
+  // Verify ai_cut_suggestions were created
+  const cutsRes = await request.get(`${pbUrl}/api/collections/ai_cut_suggestions/records?filter=(asset_id='${assetId}')`);
+  expect(cutsRes.ok()).toBeTruthy();
+  const cutsData = await cutsRes.json();
+  expect(cutsData.items.length).toBeGreaterThan(0);
+  expect(cutsData.items[0].cut_reason).toBe('Mock silence');
+
+  // Verify temporary files are deleted
+  const tempVideoPath = `/tmp/${assetId}_${finalFilename}`;
+  const tempAudioPath = `/tmp/${assetId}_audio.mp3`;
+  expect(fs.existsSync(tempVideoPath)).toBe(false);
+  expect(fs.existsSync(tempAudioPath)).toBe(false);
+
+  // Take screenshot (even though this test mainly verifies backend logic, we load the root and take a screenshot)
+  await page.goto('/');
+  await page.screenshot({ path: 'evidence.png' });
+});

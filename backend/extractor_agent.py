@@ -5,6 +5,8 @@ import urllib.request
 import urllib.parse
 import json
 import logging
+from google import genai
+from google.genai import types
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -21,6 +23,15 @@ def update_asset_status(asset_id, status):
         logging.info(f"[{asset_id}] Successfully updated status to '{status}'")
         return result
 
+def create_pocketbase_record(collection, data):
+    url = f"{PB_URL}/api/collections/{collection}/records"
+    payload = json.dumps(data).encode('utf-8')
+    req = urllib.request.Request(url, data=payload, method="POST")
+    req.add_header('Content-Type', 'application/json')
+    logging.info(f"Creating record in {collection}: {data}")
+    with urllib.request.urlopen(req) as response:
+        return json.loads(response.read().decode())
+
 def process_asset(asset):
     asset_id = asset.get("id")
     file_name = asset.get("file")
@@ -36,14 +47,14 @@ def process_asset(asset):
         logging.error(f"[{asset_id}] Failed to update status to extracting_audio: {e}")
         return
         
+    temp_dir = "/tmp"
+    os.makedirs(temp_dir, exist_ok=True)
+    local_video_path = os.path.join(temp_dir, f"{asset_id}_{file_name}")
+    local_audio_path = os.path.join(temp_dir, f"{asset_id}_audio.mp3")
+
     try:
         # Download the file
         file_url = f"{PB_URL}/api/files/assets/{asset_id}/{file_name}"
-        
-        temp_dir = "/tmp"
-        os.makedirs(temp_dir, exist_ok=True)
-        local_video_path = os.path.join(temp_dir, f"{asset_id}_{file_name}")
-        local_audio_path = os.path.join(temp_dir, f"{asset_id}_audio.mp3")
         
         logging.info(f"[{asset_id}] Downloading {file_name} from {file_url}...")
         req = urllib.request.Request(file_url)
@@ -65,13 +76,85 @@ def process_asset(asset):
         
         logging.info(f"[{asset_id}] Audio extraction complete. Transitioning status: extracting_audio -> analyzing")
         update_asset_status(asset_id, "analyzing")
+
+        # Now do the Gemini analysis
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            logging.error(f"[{asset_id}] GEMINI_API_KEY not found in environment, falling back to mock or failing.")
+            raise ValueError("Missing GEMINI_API_KEY")
+            
+        logging.info(f"[{asset_id}] Calling Gemini API for audio analysis...")
+        client = genai.Client(api_key=api_key)
+        
+        # We upload the audio file using the new genai client
+        audio_file = client.files.upload(file=local_audio_path)
+        
+        prompt = """
+        Analyze this audio track. Provide a transcript and suggest cuts to improve pacing or remove silent/dead areas.
+        Respond ONLY with a valid JSON object following this exact structure:
+        {
+          "transcript": {
+            "raw_text": "Full text here",
+            "srt_payload": "1\\n00:00:00,000 --> 00:00:05,000\\nFull text here"
+          },
+          "cut_suggestions": [
+            {
+              "start_timecode": 0.5,
+              "end_timecode": 2.5,
+              "cut_reason": "Long silence"
+            }
+          ]
+        }
+        """
+        
+        response = client.models.generate_content(
+            model='gemini-1.5-pro',
+            contents=[audio_file, prompt],
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+            ),
+        )
+        
+        payload_text = response.text
+        logging.info(f"[{asset_id}] Received response from Gemini: {payload_text}")
+        
+        data = json.loads(payload_text)
+        
+        transcript_data = data.get("transcript", {})
+        cuts = data.get("cut_suggestions", [])
+        
+        # Save transcript
+        create_pocketbase_record("ai_transcripts", {
+            "asset_id": asset_id,
+            "raw_text": transcript_data.get("raw_text", ""),
+            "srt_payload": transcript_data.get("srt_payload", "")
+        })
+        
+        # Save cut suggestions
+        for cut in cuts:
+            create_pocketbase_record("ai_cut_suggestions", {
+                "asset_id": asset_id,
+                "start_timecode": float(cut.get("start_timecode", 0)),
+                "end_timecode": float(cut.get("end_timecode", 0)),
+                "cut_reason": cut.get("cut_reason", "")
+            })
+            
+        logging.info(f"[{asset_id}] Analysis complete. Transitioning status: analyzing -> ready")
+        update_asset_status(asset_id, "ready")
         
     except Exception as e:
-        logging.error(f"[{asset_id}] Error processing asset during download or ffmpeg extraction: {e}")
+        logging.error(f"[{asset_id}] Error processing asset: {e}")
         try:
             update_asset_status(asset_id, "error")
         except Exception as inner_e:
             logging.error(f"[{asset_id}] Failed to set error status fallback: {inner_e}")
+    finally:
+        # Cleanup temp files
+        logging.info(f"[{asset_id}] Cleaning up temporary files...")
+        if os.path.exists(local_video_path):
+            os.remove(local_video_path)
+        if os.path.exists(local_audio_path):
+            os.remove(local_audio_path)
 
 def get_pending_assets():
     filter_expr = urllib.parse.quote("asset_type='source_clip' && processing_status='pending'")
