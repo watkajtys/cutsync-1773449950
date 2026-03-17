@@ -760,5 +760,5 @@ extractor_agent.main()
 
   // Take screenshot (even though this test mainly verifies backend logic, we load the root and take a screenshot)
   await page.goto('/');
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
