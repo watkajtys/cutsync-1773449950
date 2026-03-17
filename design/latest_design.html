@@ -2,7 +2,7 @@
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>CutSync Professional Review Suite</title>
+<title>CutSync Professional Review Suite - Contextual Variant</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -54,6 +54,9 @@
         .theater-player {
             box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
         }
+        .tool-strip-active {
+            @apply ring-1 ring-primary shadow-[0_0_15px_rgba(13,127,242,0.3)];
+        }
     </style>
 </head>
 <body class="bg-background-dark text-slate-100 antialiased overflow-hidden h-screen flex flex-col">
@@ -95,44 +98,26 @@
 </div>
 </header>
 <main class="flex-1 flex overflow-hidden">
-<aside class="w-72 flex flex-col border-r border-white/5 bg-panel-dark">
+<aside class="w-64 flex flex-col border-r border-white/5 bg-panel-dark">
 <div class="p-5 border-b border-white/5">
-<h3 class="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500 mb-5">Markup Toolkit</h3>
-<div class="grid grid-cols-2 gap-2 mb-6">
-<button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-primary text-white ring-1 ring-primary/50 shadow-lg shadow-primary/20 transition-all">
-<span class="material-symbols-outlined">gesture</span>
-<span class="text-[9px] font-bold uppercase">Freehand</span>
-</button>
-<button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-slate-800/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-all border border-white/5">
-<span class="material-symbols-outlined">rectangle</span>
-<span class="text-[9px] font-bold uppercase">Box</span>
-</button>
-<button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-slate-800/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-all border border-white/5">
-<span class="material-symbols-outlined">text_fields</span>
-<span class="text-[9px] font-bold uppercase">Text</span>
-</button>
-<button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-slate-800/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-all border border-white/5">
-<span class="material-symbols-outlined">near_me</span>
-<span class="text-[9px] font-bold uppercase">Pointer</span>
-</button>
-</div>
+<h3 class="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500 mb-5">Tool Properties</h3>
 <div class="space-y-6">
 <div class="space-y-3">
 <div class="flex justify-between items-center">
-<label class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Color Palette</label>
+<label class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Color</label>
 <span class="text-[9px] font-mono text-markup-green">#39FF14</span>
 </div>
 <div class="flex flex-wrap gap-2">
-<button class="size-6 rounded-full bg-markup-green ring-2 ring-white ring-offset-2 ring-offset-panel-dark"></button>
-<button class="size-6 rounded-full bg-red-500 hover:scale-110 transition-transform"></button>
-<button class="size-6 rounded-full bg-blue-500 hover:scale-110 transition-transform"></button>
-<button class="size-6 rounded-full bg-yellow-400 hover:scale-110 transition-transform"></button>
-<button class="size-6 rounded-full bg-white hover:scale-110 transition-transform"></button>
+<button class="size-5 rounded-full bg-markup-green ring-2 ring-white ring-offset-2 ring-offset-panel-dark"></button>
+<button class="size-5 rounded-full bg-red-500 hover:scale-110 transition-transform"></button>
+<button class="size-5 rounded-full bg-blue-500 hover:scale-110 transition-transform"></button>
+<button class="size-5 rounded-full bg-yellow-400 hover:scale-110 transition-transform"></button>
+<button class="size-5 rounded-full bg-white hover:scale-110 transition-transform"></button>
 </div>
 </div>
 <div class="space-y-3">
 <div class="flex justify-between items-center">
-<label class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Stroke Weight</label>
+<label class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Stroke</label>
 <span class="text-[10px] font-mono text-slate-100">2PX</span>
 </div>
 <div class="px-1">
@@ -144,8 +129,8 @@
 </div>
 <div class="flex items-center justify-between pt-2">
 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Snap to Grid</span>
-<button class="w-8 h-4 bg-primary rounded-full relative">
-<div class="absolute right-0.5 top-0.5 size-3 bg-white rounded-full"></div>
+<button class="w-7 h-3.5 bg-primary rounded-full relative">
+<div class="absolute right-0.5 top-0.5 size-2.5 bg-white rounded-full"></div>
 </button>
 </div>
 </div>
@@ -177,6 +162,24 @@
 </div>
 </aside>
 <section class="flex-1 relative flex flex-col bg-black overflow-hidden">
+<div class="absolute left-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2 p-1.5 bg-panel-dark/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl">
+<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-primary text-white shadow-lg shadow-primary/20 transition-all">
+<span class="material-symbols-outlined">gesture</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined">rectangle</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined">text_fields</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined">near_me</span>
+</button>
+<div class="w-8 h-px bg-white/10 mx-auto my-1"></div>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined">undo</span>
+</button>
+</div>
 <div class="flex-1 relative theater-player group cursor-crosshair">
 <div class="absolute inset-0 bg-cover bg-center grayscale-[0.3] brightness-[0.6]" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD2AZ_NMPDe4Kos-nYVqsRmUb3TXmsfEQ6AZ1Cp-BQZXIF_NySXN66WQDBpvpAxvWHg_bTX3-jdFipaJxvR1YTzd3TnhDB6tUizEZIMM5FVSwzz3Gx-lav-Nn6pd6qY43UE_frcoAm4u_Pu3ILQqeMvlWpnd2fu2IvGUqoXRF_nMgeweVTbrkDhAuJ80hZ_Z5uI_oQOlDaIGc-rxWNfsqEqwRSA2b8l4GHo6PJ1aS9EsXzZ13uJAgVpRjnrtxja1qEGXz45gIaXTSal");'></div>
 <div class="absolute inset-0 vfx-grid pointer-events-none opacity-20"></div>
@@ -194,10 +197,10 @@
 <div class="absolute -bottom-1 -right-1 size-3 border-b-2 border-r-2 border-white"></div>
 </div>
 </div>
-<div class="absolute left-8 top-8 font-mono text-slate-500 text-[10px] space-y-1">
-<div class="flex items-center gap-2"><span class="w-12">REC</span> <span class="text-red-500">â</span></div>
-<div class="flex items-center gap-2"><span class="w-12">GAMMA</span> <span>2.4</span></div>
-<div class="flex items-center gap-2"><span class="w-12">ISO</span> <span>800</span></div>
+<div class="absolute left-20 top-8 font-mono text-slate-500 text-[10px] space-y-1 bg-black/40 backdrop-blur p-2 rounded border border-white/5">
+<div class="flex items-center gap-2"><span class="w-12 text-slate-400">REC</span> <span class="text-red-500">â</span></div>
+<div class="flex items-center gap-2"><span class="w-12 text-slate-400">GAMMA</span> <span>2.4</span></div>
+<div class="flex items-center gap-2"><span class="w-12 text-slate-400">ISO</span> <span>800</span></div>
 </div>
 <div class="absolute right-8 bottom-8 flex flex-col gap-2 z-30">
 <div class="px-3 py-1.5 bg-black/80 border border-white/10 backdrop-blur-md rounded flex items-center gap-4">
