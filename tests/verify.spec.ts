@@ -1488,5 +1488,5 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
   
   expect(canvasWidthBefore).not.toBe(canvasWidthAfter);
 
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
