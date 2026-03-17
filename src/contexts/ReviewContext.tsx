@@ -61,7 +61,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [currentAssetId, setCurrentAssetId] = useState<string | null>(null);
   
   const pendingNoteIdRef = useRef<string | null>(null);
-  const isSavingRef = useRef<boolean>(false);
+  const activeSavePromiseRef = useRef<Promise<void> | null>(null);
 
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
@@ -127,35 +127,42 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, []);
 
-  const saveShapesToBackend = useCallback(async (newShapes: Shape[]) => {
-    if (!currentAssetId) return;
-    if (isSavingRef.current) {
-        // Simple debounce/lock to prevent rapid duplicate creation
-        setTimeout(() => saveShapesToBackend(newShapes), 300);
-        return;
-    }
-    
-    isSavingRef.current = true;
-    try {
+  const saveShapesToBackend = useCallback((newShapes: Shape[]): Promise<void> => {
+    if (!currentAssetId) return Promise.resolve();
+
+    const task = async () => {
+      try {
         // Auto-save: either update the current note or create a blank "draft" note holding the drawing
         let matchedNote = notes.find(n => n.timestamp === viewingNoteTime);
         if (!matchedNote) {
-            matchedNote = notes.find(n => Math.abs(currentTime - n.timestamp) < 0.2);
+          matchedNote = notes.find(n => Math.abs(currentTime - n.timestamp) < 0.2);
         }
         
         // If we have a pending ID that we just created, prioritize that to avoid race conditions
         const targetId = matchedNote?.id || pendingNoteIdRef.current;
         
         if (targetId) {
-            await updateReviewNote(targetId, newShapes.length > 0 ? newShapes : null);
+          await updateReviewNote(targetId, newShapes.length > 0 ? newShapes : null);
         } else if (newShapes.length > 0) {
-            const newNote = await createReviewNote(currentAssetId, 'Current User', currentTime, '', newShapes);
-            pendingNoteIdRef.current = newNote.id;
+          const newNote = await createReviewNote(currentAssetId, 'Current User', currentTime, '', newShapes);
+          pendingNoteIdRef.current = newNote.id;
         }
         await loadNotes(currentAssetId);
-    } finally {
-        isSavingRef.current = false;
-    }
+      } catch (err) {
+        console.error("Failed to save shapes:", err);
+      }
+    };
+
+    const newPromise = (activeSavePromiseRef.current || Promise.resolve())
+      .then(task)
+      .finally(() => {
+        if (activeSavePromiseRef.current === newPromise) {
+          activeSavePromiseRef.current = null;
+        }
+      });
+    
+    activeSavePromiseRef.current = newPromise;
+    return activeSavePromiseRef.current;
   }, [currentAssetId, notes, viewingNoteTime, currentTime, loadNotes]);
 
   const loadAsset = useCallback(async (assetId: string) => {

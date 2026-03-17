@@ -132,7 +132,7 @@ export const MarkupSidebar: React.FC = () => {
       <div className="p-4 border-t border-white/5">
         <button
           onClick={clearDrawing}
-          className="w-full py-2 flex items-center justify-center gap-2 rounded bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 transition-all font-bold text-[10px] uppercase tracking-widest"
+          className="w-full py-2 flex items-center justify-center gap-2 rounded bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 transition-all font-bold text-[10px] uppercase tracking-widest clear-canvas-btn"
         >
           <span className="material-symbols-outlined text-sm">delete_sweep</span>
           Clear Canvas

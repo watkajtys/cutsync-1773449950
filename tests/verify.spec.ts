@@ -470,7 +470,7 @@ test('View the review route and ensure the right 30% sidebar renders a scrollabl
   await page.goto('/review/test-asset-123');
   
   // Verify the Sidebar container (should be ~30% equivalent width logic based on the design - e.g. w-80 or flex-basis)
-  const sidebar = page.locator('aside').first();
+  const sidebar = page.locator('aside').nth(1);
   await expect(sidebar).toBeVisible();
 
   // Verify the Technical Metadata section
@@ -576,17 +576,17 @@ test('Verify the visual annotation tools render a drawing toolbar and overlay ca
   await expect(toolbar).toBeVisible();
 
   // Verify the tools are present
-  await expect(page.locator('button:has(span:has-text("near_me"))')).toBeVisible();
-  await expect(page.locator('button:has(span:has-text("gesture"))')).toBeVisible();
-  await expect(page.locator('button:has(span:has-text("rectangle"))')).toBeVisible();
-  await expect(page.locator('button:has(span:has-text("north_east"))')).toBeVisible();
+  await expect(page.locator('aside').first().locator('button:has(span:has-text("near_me"))')).toBeVisible();
+  await expect(page.locator('aside').first().locator('button:has(span:has-text("gesture"))')).toBeVisible();
+  await expect(page.locator('aside').first().locator('button:has(span:has-text("rectangle"))')).toBeVisible();
+  await expect(page.locator('aside').first().locator('button:has(span:has-text("north_east"))')).toBeVisible();
 
   // Verify the canvas is present inside the video container
   const canvas = page.locator('.video-container canvas').first();
   await expect(canvas).toBeVisible();
 
   // Click the 'Box' tool to select it
-  await page.click('button:has(span:has-text("rectangle"))');
+  await page.locator('aside').first().locator('button:has(span:has-text("rectangle"))').click();
 
   // Verify the canvas cursor changes (class includes 'cursor-crosshair')
   await expect(canvas).toHaveClass(/cursor-crosshair/);
@@ -1096,7 +1096,7 @@ test('Verify Canvas Annotation State Serialization and Playback Re-rendering', a
 
   // Test 1: Draw on canvas and save note
   // First, we need to select the box tool
-  const boxTool = page.locator('button:has(span:has-text("rectangle"))');
+  const boxTool = page.locator('aside').first().locator('button:has(span:has-text("rectangle"))');
   await boxTool.click();
 
   // Draw a box on the canvas
@@ -1303,7 +1303,7 @@ test('Pause the video, select the Bounding Box tool, draw a box over a subject, 
 
   // Pause the video if playing, but it shouldn't be playing on load
   // We'll select the box tool in MarkupSidebar
-  const boxTool = page.locator('button:has(span:has-text("rectangle"))');
+  const boxTool = page.locator('aside').first().locator('button:has(span:has-text("rectangle"))');
   await boxTool.click();
 
   // Draw a box on the canvas
@@ -1444,7 +1444,7 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
 
   await page.waitForTimeout(500);
 
-  const boxTool = page.locator('button:has(span:has-text("rectangle"))');
+  const boxTool = page.locator('aside').first().locator('button:has(span:has-text("rectangle"))');
   await boxTool.click();
 
   const canvas = page.locator('canvas').first();
@@ -1538,7 +1538,7 @@ test('User pauses video, selects freehand, draws, switches to box, draws, clears
   });
 
   // Check the initial state of the markup tools
-  const floatingToolbar = page.locator('.absolute.left-4.top-1\\/2.-translate-y-1\\/2.z-40');
+  const floatingToolbar = page.locator('aside').first();
   await floatingToolbar.waitFor({ state: 'visible' });
 
   // Click freehand tool in the floating toolbar
