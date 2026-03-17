@@ -140,7 +140,7 @@ test('Verify that the React app loads and displays the main dashboard shell with
   await expect(page.locator('h3:has-text("Integration Test Project")').first()).toBeVisible();
 
   // Take screenshot at the end
-  await page.screenshot({ path: 'evidence_old_old.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify center play button overlay is removed', async ({ page }) => {
@@ -192,7 +192,7 @@ test('Verify center play button overlay is removed', async ({ page }) => {
   await expect(largePlayButton).toHaveCount(0);
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence_old_old.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('User hits spacebar during playback; video pauses and new note input is focused.', async ({ page }) => {
@@ -267,7 +267,7 @@ test('User hits spacebar during playback; video pauses and new note input is foc
   await expect(textarea).toBeFocused();
 
   // Take screenshot of the evidence
-  await page.screenshot({ path: 'evidence_old_old.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify the Review Mode shell and layout for a specific asset', async ({ page }) => {
@@ -352,7 +352,7 @@ test('Verify the Review Mode shell and layout for a specific asset', async ({ pa
   await expect(page.locator('text=CURRENT: 0').first()).toBeVisible(); // Evaluates to 0 frames initially
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence_old_old.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('View the review route and ensure the right 30% sidebar renders a scrollable list of styled mock notes with timestamps, alongside an input field at the bottom.', async ({ page }) => {
@@ -410,7 +410,7 @@ test('View the review route and ensure the right 30% sidebar renders a scrollabl
   await page.goto('/review/test-asset-123');
   
   // Verify the Sidebar container (should be ~30% equivalent width logic based on the design - e.g. w-80 or flex-basis)
-  const sidebar = page.locator('aside').first();
+  const sidebar = page.locator('aside').nth(1);
   await expect(sidebar).toBeVisible();
 
   // Verify the Technical Metadata section
@@ -434,7 +434,7 @@ test('View the review route and ensure the right 30% sidebar renders a scrollabl
   const sendButton = sidebar.locator('button:has(svg.lucide-send)').first();
   await expect(sendButton).toBeVisible();
 
-  await page.screenshot({ path: 'evidence_old_old.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify the Review Mode uses proper lucide icons after refactoring', async ({ page }) => {
@@ -479,7 +479,7 @@ test('Verify the Review Mode uses proper lucide icons after refactoring', async 
   const cloudCogIcon = page.locator('footer svg').first();
   await expect(cloudCogIcon).toBeVisible();
 
-  await page.screenshot({ path: 'evidence_old_old.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify the visual annotation tools render a drawing toolbar and overlay canvas in Review Mode', async ({ page }) => {
@@ -512,12 +512,12 @@ test('Verify the visual annotation tools render a drawing toolbar and overlay ca
   await page.goto('/review/test-asset-123');
   
   // Verify the drawing toolbar is present
-  const toolbar = page.locator('div').filter({ hasText: 'Ptr' }).first();
+  const toolbar = page.locator('aside').first();
   await expect(toolbar).toBeVisible();
 
   // Verify the tools are present
-  await expect(page.locator('button:has-text("Ptr")')).toBeVisible();
-  await expect(page.locator('button:has-text("Pen")')).toBeVisible();
+  await expect(page.locator('button:has-text("Pointer")')).toBeVisible();
+  await expect(page.locator('button:has-text("Freehand")')).toBeVisible();
   await expect(page.locator('button:has-text("Box")')).toBeVisible();
   await expect(page.locator('button:has-text("Arr")')).toBeVisible();
 
@@ -532,7 +532,7 @@ test('Verify the visual annotation tools render a drawing toolbar and overlay ca
   await expect(canvas).toHaveClass(/cursor-crosshair/);
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence_old_old.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('User saves a note at 0:15, it persists in PocketBase. Clicking an older note at 0:05 scrubs the video directly to 0:05.', async ({ page }) => {
@@ -630,7 +630,7 @@ test('User saves a note at 0:15, it persists in PocketBase. Clicking an older no
   await expect(page.locator('text=New note at 0:15')).toBeVisible();
 
   // Take screenshot of evidence
-  await page.screenshot({ path: 'evidence_old_old.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 
@@ -1193,4 +1193,80 @@ test('Verify Theater Player Interactive Scrubber', async ({ page }) => {
   expect(currentTime).toBeCloseTo(45, 0);
 
   await page.screenshot({ path: 'evidence_old.png' });
+});
+
+test('Pause the video, select the Bounding Box tool, draw a box over a subject, and verify the drawing renders correctly. Resume playback and ensure the canvas hides.', async ({ page }) => {
+  const assetId = 'test-asset-123';
+
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: assetId,
+          file: 'dummy_file.mp4'
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.goto(`/review/${assetId}`);
+
+  // Wait for the Review Pipeline text or a basic element to confirm the page has loaded
+  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+
+  // Find the video element
+  const video = page.locator('video');
+  await expect(video).toBeVisible();
+
+  // Force video metadata to be loaded so we can interact
+  await page.evaluate(() => {
+    const vid = document.querySelector('video');
+    if (vid) {
+      Object.defineProperty(vid, 'duration', { value: 60, writable: true });
+      vid.dispatchEvent(new Event('loadedmetadata'));
+      vid.dispatchEvent(new Event('durationchange'));
+    }
+  });
+  
+  await page.waitForTimeout(500);
+
+  // Pause the video if playing, but it shouldn't be playing on load
+  // We'll select the box tool in MarkupSidebar
+  const boxTool = page.locator('button', { hasText: 'Box' });
+  await boxTool.click();
+
+  // Draw a box on the canvas
+  const canvas = page.locator('canvas').first();
+  await expect(canvas).toBeVisible();
+  
+  // Make sure canvas does not have hidden class initially
+  await expect(canvas).not.toHaveClass(/hidden/);
+
+  const box = await canvas.boundingBox();
+  if (box) {
+    await page.mouse.move(box.x + 50, box.y + 50);
+    await page.mouse.down();
+    await page.mouse.move(box.x + 150, box.y + 150);
+    await page.mouse.up();
+  }
+
+  // The drawing should render correctly. We can check if "Shape_1" appeared in Markup History
+  await expect(page.locator('text=Shape_1')).toBeVisible();
+
+  // Resume playback by clicking play button
+  // the play button is the one with Play/Pause icon. In TheaterPlayer it's the middle one in controls.
+  const playButton = page.locator('button.w-10.h-10.rounded-full.bg-white.text-black');
+  await playButton.click();
+  
+  // Wait for a short duration
+  await page.waitForTimeout(500);
+
+  // Ensure the canvas hides
+  await expect(canvas).toHaveClass(/hidden/);
+
+  await page.screenshot({ path: 'evidence.png' });
 });

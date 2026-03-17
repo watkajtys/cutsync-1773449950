@@ -12,6 +12,10 @@ export default {
         "surface": "#0c0e14",
         "surface-accent": "#161922",
         "border-subtle": "#242936",
+        "markup-green": "#39ff14",
+        "background-light": "#f5f7f8",
+        "background-dark": "#060a0d",
+        "panel-dark": "#0d1217",
       },
       fontFamily: {
         "display": ["Inter", "sans-serif"],

@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Play, Pause, FastForward, Rewind, SkipBack, SkipForward, Volume2, Subtitles, Settings, Maximize } from 'lucide-react';
 import { useCanvasDrawing } from '../../hooks/useCanvasDrawing';
-import { DrawingToolbar } from './DrawingToolbar';
 import { useReview } from '../../contexts/ReviewContext';
 
 export const TheaterPlayer: React.FC = () => {
@@ -129,7 +128,7 @@ export const TheaterPlayer: React.FC = () => {
   };
 
   return (
-    <section className="w-[70%] bg-black flex flex-col relative group">
+    <section className="flex-1 bg-black flex flex-col relative group">
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="video-container w-full max-w-6xl relative bg-slate-900 rounded-lg overflow-hidden shadow-2xl border border-white/5" style={{ aspectRatio: '21 / 9' }}>
           <video 
@@ -148,14 +147,13 @@ export const TheaterPlayer: React.FC = () => {
           />
           <canvas
             ref={canvasRef}
-            className={`absolute inset-0 w-full h-full z-10 touch-none ${activeTool !== 'pointer' ? 'cursor-crosshair' : 'cursor-default'}`}
+            className={`absolute inset-0 w-full h-full z-10 touch-none ${activeTool !== 'pointer' ? 'cursor-crosshair' : 'cursor-default'} ${isPlaying ? 'hidden' : ''}`}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerUp}
             onPointerOut={handlePointerUp}
           />
-          <DrawingToolbar />
           <div className="absolute top-4 left-4 pointer-events-none z-20">
             <div className="flex items-center gap-3">
               <span className="text-xs bg-red-600 text-white px-2 py-0.5 rounded-sm font-bold animate-pulse">REC</span>
