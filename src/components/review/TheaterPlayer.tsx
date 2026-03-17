@@ -139,11 +139,12 @@ export const TheaterPlayer: React.FC = () => {
                 <span className="text-slate-400">The requested asset ID could not be located in the database.</span>
               </div>
             </div>
-          ) : null}
-          <video 
-            ref={videoRef}
-            src={assetUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"}
-            className="w-full h-full object-contain opacity-80"
+          ) : (
+            <>
+              <video 
+                ref={videoRef}
+                src={assetUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"}
+                className="w-full h-full object-contain opacity-80"
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
             onDurationChange={(e) => setDuration(e.currentTarget.duration)}
@@ -188,6 +189,8 @@ export const TheaterPlayer: React.FC = () => {
               <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full border-2 border-white shadow-lg translate-x-1/2"></div>
             </div>
           </div>
+            </>
+          )}
         </div>
       </div>
       <div className="flex flex-col bg-surface-accent border-t border-border-subtle">
