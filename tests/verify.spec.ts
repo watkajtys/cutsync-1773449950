@@ -1289,6 +1289,8 @@ test('Pause the video, select the Bounding Box tool, draw a box over a subject, 
   await page.evaluate(() => {
     const vid = document.querySelector('video');
     if (vid) {
+      Object.defineProperty(vid, 'videoWidth', { value: 1920, writable: true });
+      Object.defineProperty(vid, 'videoHeight', { value: 1080, writable: true });
       Object.defineProperty(vid, 'duration', { value: 60, writable: true });
       vid.dispatchEvent(new Event('loadedmetadata'));
       vid.dispatchEvent(new Event('durationchange'));
@@ -1449,11 +1451,17 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
   const canvas = page.locator('canvas').first();
   await expect(canvas).toBeVisible();
 
-  // Draw on the canvas
-  await page.mouse.move(300, 300);
-  await page.mouse.down();
-  await page.mouse.move(500, 500);
-  await page.mouse.up();
+  // Get initial canvas rect
+  const initialBox = await canvas.boundingBox();
+  expect(initialBox).toBeTruthy();
+
+  // Draw on the canvas (relative to canvas position so it hits the video frame reliably)
+  if (initialBox) {
+      await page.mouse.move(initialBox.x + initialBox.width / 2, initialBox.y + initialBox.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(initialBox.x + initialBox.width / 2 + 100, initialBox.y + initialBox.height / 2 + 100);
+      await page.mouse.up();
+  }
 
   await expect(page.locator('text=Shape_1')).toBeVisible();
 
@@ -1464,10 +1472,6 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
 
   console.log("Canvas width before resize:", canvasWidthBefore);
   
-  // It turns out Playwright's layout engine can sometimes hold flex-1 components
-  // at original size if the sidebar (which is w-72 or 288px) doesn't allow wrapping.
-  // We'll dispatch a manual resize event and check if our observer triggers correctly.
-  
   // Change the styling of the container to force it to be smaller
   await page.evaluate(() => {
     const container = document.querySelector('.video-container') as HTMLElement;
@@ -1477,6 +1481,7 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
     }
   });
   
+  // Wait for the ResizeObserver to trigger and react to redraw.
   await page.waitForTimeout(2000);
 
   const canvasWidthAfter = await page.evaluate(() => {
@@ -1487,6 +1492,25 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
   console.log("Canvas width after resize:", canvasWidthAfter);
   
   expect(canvasWidthBefore).not.toBe(canvasWidthAfter);
+  
+  // Now verify that the scale of the drawn rect correctly adjusted on the newly scaled canvas.
+  // We do this by checking if the canvas has drawn pixels where we expect them in the new coordinate space.
+  const hasPixels = await page.evaluate(() => {
+      const cvs = document.querySelector('canvas');
+      if (!cvs) return false;
+      const ctx = cvs.getContext('2d');
+      if (!ctx) return false;
+      // Just check if any pixels exist in the bottom right quadrant of the new canvas
+      // which is where the box was roughly drawn.
+      const imageData = ctx.getImageData(cvs.width/2, cvs.height/2, cvs.width/2, cvs.height/2);
+      for (let i = 0; i < imageData.data.length; i += 4) {
+          if (imageData.data[i+3] > 0) return true; // check for alpha > 0
+      }
+      return false;
+  });
+  
+  expect(hasPixels).toBe(true);
 
-  await page.screenshot({ path: 'evidence_old.png' });
+  // We should rename old evidence files.
+  await page.screenshot({ path: 'evidence.png' });
 });

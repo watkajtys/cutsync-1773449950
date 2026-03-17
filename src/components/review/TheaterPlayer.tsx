@@ -135,7 +135,7 @@ export const TheaterPlayer: React.FC = () => {
           <video 
             ref={videoRef}
             src={assetUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"}
-            className="w-full h-full object-cover opacity-80"
+            className="w-full h-full object-contain opacity-80"
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
             onDurationChange={(e) => setDuration(e.currentTarget.duration)}

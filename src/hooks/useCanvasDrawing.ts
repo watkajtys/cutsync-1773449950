@@ -10,7 +10,7 @@ export const useCanvasDrawing = () => {
 
   const {
     activeTool, activeColor, shapes, currentShape,
-    setShapes, setCurrentShape
+    setShapes, setCurrentShape, videoRef
   } = useReview();
 
   useEffect(() => {
@@ -21,7 +21,24 @@ export const useCanvasDrawing = () => {
   const getCoordinates = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
+    
     const rect = canvas.getBoundingClientRect();
+    
+    const video = videoRef.current;
+    if (video && video.videoWidth && video.videoHeight) {
+      const scale = Math.min(rect.width / video.videoWidth, rect.height / video.videoHeight);
+      const renderedWidth = video.videoWidth * scale;
+      const renderedHeight = video.videoHeight * scale;
+      
+      const offsetX = (rect.width - renderedWidth) / 2;
+      const offsetY = (rect.height - renderedHeight) / 2;
+      
+      return {
+        x: (e.clientX - rect.left - offsetX) / renderedWidth,
+        y: (e.clientY - rect.top - offsetY) / renderedHeight
+      };
+    }
+    
     return {
       x: (e.clientX - rect.left) / rect.width,
       y: (e.clientY - rect.top) / rect.height
@@ -98,8 +115,20 @@ export const useCanvasDrawing = () => {
         
         if (shape.points.length === 0) return;
 
-        const toX = (x: number) => x * canvas.width;
-        const toY = (y: number) => y * canvas.height;
+        let toX = (x: number) => x * canvas.width;
+        let toY = (y: number) => y * canvas.height;
+
+        const video = videoRef.current;
+        if (video && video.videoWidth && video.videoHeight) {
+          const scale = Math.min(canvas.width / video.videoWidth, canvas.height / video.videoHeight);
+          const renderedWidth = video.videoWidth * scale;
+          const renderedHeight = video.videoHeight * scale;
+          const offsetX = (canvas.width - renderedWidth) / 2;
+          const offsetY = (canvas.height - renderedHeight) / 2;
+          
+          toX = (x: number) => (x * renderedWidth) + offsetX;
+          toY = (y: number) => (y * renderedHeight) + offsetY;
+        }
 
         if (shape.tool === 'freehand') {
           ctx.moveTo(toX(shape.points[0].x), toY(shape.points[0].y));
@@ -175,8 +204,20 @@ export const useCanvasDrawing = () => {
         
         if (shape.points.length === 0) return;
 
-        const toX = (x: number) => x * canvas.width;
-        const toY = (y: number) => y * canvas.height;
+        let toX = (x: number) => x * canvas.width;
+        let toY = (y: number) => y * canvas.height;
+
+        const video = videoRef.current;
+        if (video && video.videoWidth && video.videoHeight) {
+          const scale = Math.min(canvas.width / video.videoWidth, canvas.height / video.videoHeight);
+          const renderedWidth = video.videoWidth * scale;
+          const renderedHeight = video.videoHeight * scale;
+          const offsetX = (canvas.width - renderedWidth) / 2;
+          const offsetY = (canvas.height - renderedHeight) / 2;
+          
+          toX = (x: number) => (x * renderedWidth) + offsetX;
+          toY = (y: number) => (y * renderedHeight) + offsetY;
+        }
 
         if (shape.tool === 'freehand') {
           ctx.moveTo(toX(shape.points[0].x), toY(shape.points[0].y));
