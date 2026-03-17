@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Play, Pause, FastForward, Rewind, SkipBack, SkipForward, Volume2, Subtitles, Settings, Maximize } from 'lucide-react';
+import { CanvasHUD } from './CanvasHUD';
 import { useCanvasDrawing } from '../../hooks/useCanvasDrawing';
 import { useReview } from '../../contexts/ReviewContext';
 import { formatTimecode } from '../../utils/timeFormat';
 
 export const TheaterPlayer: React.FC = () => {
-  const { videoRef, inputRef, currentTime, setCurrentTime, seekToTime, assetUrl, clearDrawing, viewingNoteTime, setViewingNoteTime, notes, setShapes, currentShape } = useReview();
+  const { videoRef, inputRef, currentTime, setCurrentTime, seekToTime, assetUrl, clearDrawing, viewingNoteTime, setViewingNoteTime, notes, setShapes, currentShape, setActiveTool, activeColor, setActiveColor } = useReview();
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -165,6 +166,9 @@ export const TheaterPlayer: React.FC = () => {
             <p className="text-[10px] font-bold text-white/40 tracking-widest uppercase">Resolution</p>
             <p className="text-xs font-bold text-white/80">4K DCI (4096 x 1716)</p>
           </div>
+
+          <CanvasHUD />
+
           <div 
             ref={timelineRef}
             className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/10 z-20 cursor-pointer touch-none"

@@ -12,7 +12,7 @@ interface ReviewNotesListProps {
 }
 
 export const ReviewNotesList: React.FC<ReviewNotesListProps> = ({ notes, error }) => {
-  const { assetId } = useParams<{ assetId: string }>();
+  const { id } = useParams<{ id: string }>();
   const { seekToNote, loadNotes } = useReview();
 
   return (
@@ -31,9 +31,9 @@ export const ReviewNotesList: React.FC<ReviewNotesListProps> = ({ notes, error }
           <div className="flex items-center gap-2 mb-2 px-1">
             <AlertCircle size={12} className="text-slate-500" />
             <p className="text-[10px] text-slate-500 italic">Unable to sync note at this time.</p>
-            {assetId && (
+            {id && (
               <button 
-                onClick={() => loadNotes(assetId)}
+                onClick={() => loadNotes(id)}
                 className="text-[10px] font-medium text-slate-400 hover:text-white transition-colors ml-auto"
               >
                 Retry

@@ -572,21 +572,21 @@ test('Verify the visual annotation tools render a drawing toolbar and overlay ca
   await page.goto('/review/test-asset-123');
   
   // Verify the drawing toolbar is present
-  const toolbar = page.locator('aside').first();
+  const toolbar = page.getByTestId('canvas-hud');
   await expect(toolbar).toBeVisible();
 
   // Verify the tools are present
-  await expect(page.locator('aside').first().locator('button:has(span:has-text("near_me"))')).toBeVisible();
-  await expect(page.locator('aside').first().locator('button:has(span:has-text("gesture"))')).toBeVisible();
-  await expect(page.locator('aside').first().locator('button:has(span:has-text("rectangle"))')).toBeVisible();
-  await expect(page.locator('aside').first().locator('button:has(span:has-text("north_east"))')).toBeVisible();
+  await expect(toolbar.locator('button[title="Pointer"]')).toBeVisible();
+  await expect(toolbar.locator('button[title="Freehand"]')).toBeVisible();
+  await expect(toolbar.locator('button[title="Box"]')).toBeVisible();
+  await expect(toolbar.locator('button[title="Arrow"]')).toBeVisible();
 
   // Verify the canvas is present inside the video container
   const canvas = page.locator('.video-container canvas').first();
   await expect(canvas).toBeVisible();
 
   // Click the 'Box' tool to select it
-  await page.locator('aside').first().locator('button:has(span:has-text("rectangle"))').click();
+  await toolbar.locator('button[title="Box"]').click();
 
   // Verify the canvas cursor changes (class includes 'cursor-crosshair')
   await expect(canvas).toHaveClass(/cursor-crosshair/);
@@ -1096,7 +1096,7 @@ test('Verify Canvas Annotation State Serialization and Playback Re-rendering', a
 
   // Test 1: Draw on canvas and save note
   // First, we need to select the box tool
-  const boxTool = page.locator('aside').first().locator('button:has(span:has-text("rectangle"))');
+  const boxTool = page.getByTestId('canvas-hud').locator('button[title="Box"]');
   await boxTool.click();
 
   // Draw a box on the canvas
@@ -1302,8 +1302,8 @@ test('Pause the video, select the Bounding Box tool, draw a box over a subject, 
   await page.waitForTimeout(500);
 
   // Pause the video if playing, but it shouldn't be playing on load
-  // We'll select the box tool in MarkupSidebar
-  const boxTool = page.locator('aside').first().locator('button:has(span:has-text("rectangle"))');
+  // We'll select the box tool
+  const boxTool = page.getByTestId('canvas-hud').locator('button[title="Box"]');
   await boxTool.click();
 
   // Draw a box on the canvas
@@ -1444,7 +1444,7 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
 
   await page.waitForTimeout(500);
 
-  const boxTool = page.locator('aside').first().locator('button:has(span:has-text("rectangle"))');
+  const boxTool = page.getByTestId('canvas-hud').locator('button[title="Box"]');
   await boxTool.click();
 
   const canvas = page.locator('canvas').first();
@@ -1538,16 +1538,16 @@ test('User pauses video, selects freehand, draws, switches to box, draws, clears
   });
 
   // Check the initial state of the markup tools
-  const floatingToolbar = page.locator('aside').first();
+  const floatingToolbar = page.getByTestId('canvas-hud');
   await floatingToolbar.waitFor({ state: 'visible' });
 
   // Click freehand tool in the floating toolbar
-  const gestureButton = floatingToolbar.locator('button:has(span:has-text("gesture"))').first();
+  const gestureButton = floatingToolbar.locator('button[title="Freehand"]').first();
   await gestureButton.click();
   
   // Make sure it becomes active (primary colored)
   await page.waitForTimeout(200);
-  await expect(gestureButton).toHaveClass(/bg-primary/);
+  await expect(gestureButton).toHaveClass(/text-\[#3b82f6\]/);
 
   // Wait a moment for state change
   await page.waitForTimeout(100);
@@ -1595,7 +1595,7 @@ test('User pauses video, selects freehand, draws, switches to box, draws, clears
   await page.waitForTimeout(500);
 
   // Switch to box tool in the floating toolbar
-  const rectButton = floatingToolbar.locator('button:has(span:has-text("rectangle"))').first();
+  const rectButton = floatingToolbar.locator('button[title="Box"]').first();
   await rectButton.evaluate(node => node.click());
 
   // Box drawing

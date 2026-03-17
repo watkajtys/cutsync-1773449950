@@ -167,12 +167,15 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const loadAsset = useCallback(async (assetId: string) => {
     try {
+      console.log(`[PocketBase Fetch] Fetching asset with ID: ${assetId} from url: ${pb.baseUrl}/api/collections/assets/records/${assetId}`);
       const assetRecord = await pb.collection('assets').getOne(assetId, { requestKey: null });
       if (assetRecord && assetRecord.file) {
-        setAssetUrl(pb.files.getUrl(assetRecord, assetRecord.file));
+        const fileUrl = pb.files.getUrl(assetRecord, assetRecord.file);
+        console.log(`[PocketBase Fetch] Asset resolved. Media URL: ${fileUrl}`);
+        setAssetUrl(fileUrl);
       }
     } catch (err) {
-      console.error("Failed to fetch asset for review:", err);
+      console.error(`[PocketBase Fetch] Failed to fetch asset ${assetId} for review:`, err);
     }
   }, []);
 

@@ -8,24 +8,24 @@ import { ReviewNotesList } from './ReviewNotesList';
 import { formatTimecode } from '../../utils/timeFormat';
 
 export const NotesSidebar: React.FC = () => {
-  const { assetId } = useParams<{ assetId: string }>();
+  const { id } = useParams<{ id: string }>();
   const { clearDrawing, setActiveTool, inputRef, notes, loadNotes, currentTime, shapes, error, setError, loadAsset } = useReview();
   const [noteText, setNoteText] = useState('');
 
   useEffect(() => {
-    if (assetId) {
-      loadNotes(assetId);
-      loadAsset(assetId);
+    if (id) {
+      loadNotes(id);
+      loadAsset(id);
     }
-  }, [assetId, loadNotes, loadAsset]);
+  }, [id, loadNotes, loadAsset]);
 
   const handleSubmitNote = async () => {
-    if (!noteText.trim() || !assetId) return;
+    if (!noteText.trim() || !id) return;
     
     try {
       setError(null);
       await createReviewNote(
-        assetId,
+        id,
         'Current User', // Mock author for MVP
         currentTime,
         noteText,
@@ -35,7 +35,7 @@ export const NotesSidebar: React.FC = () => {
       setNoteText('');
       clearDrawing();
       setActiveTool('pointer');
-      await loadNotes(assetId); // Refresh list
+      await loadNotes(id); // Refresh list
     } catch (err) {
       console.error("Failed to save note:", err);
       setError("Failed to save review note. Please try again.");

@@ -16,7 +16,7 @@ export default function App() {
           <Route path="recent" element={<RecentView />} />
           <Route path="settings" element={<SettingsView />} />
         </Route>
-        <Route path="/review/:assetId" element={<ReviewView />} />
+        <Route path="/review/:id" element={<ReviewView />} />
         <Route path="/prep/:assetId" element={<PrepView />} />
       </Routes>
     </Router>
