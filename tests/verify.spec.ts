@@ -143,6 +143,49 @@ test('Verify that the React app loads and displays the main dashboard shell with
   await page.screenshot({ path: 'evidence_old.png' });
 });
 
+test('Verify the Chronological River displays structural elements like tick marks and waveforms in Review Mode.', async ({ page }) => {
+  const assetId = 'test-asset-123';
+
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: assetId,
+          file: 'dummy_file.mp4'
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.goto(`/review/${assetId}`);
+
+  // Wait for the UI to load
+  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+
+  // Verify the Chronological River timeline section at the bottom
+  const riverSection = page.locator('section').filter({ hasText: 'Chronological River • Frame-by-Frame Navigation' });
+  await expect(riverSection).toBeVisible();
+
+  // Verify the center-line exists
+  // It has a specific height and bg-color
+  const centerLine = riverSection.locator('.bg-white\\/5').first();
+  await expect(centerLine).toBeVisible();
+
+  // Verify tick marks container exists
+  const tickMarksContainer = riverSection.locator('.border-white\\/5').first();
+  await expect(tickMarksContainer).toBeVisible();
+
+  // Verify waveform container exists
+  const waveformContainer = riverSection.locator('.opacity-30').first();
+  await expect(waveformContainer).toBeVisible();
+
+  await page.screenshot({ path: 'evidence.png' });
+});
+
 test('Verify center play button overlay is removed', async ({ page }) => {
   await page.route('**/api/collections/review_notes/records*', async (route, request) => {
     if (request.method() === 'GET') {
