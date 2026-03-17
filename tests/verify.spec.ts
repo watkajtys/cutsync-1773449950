@@ -1105,5 +1105,5 @@ test('Verify Canvas Annotation State Serialization and Playback Re-rendering', a
   
   await page.waitForTimeout(500);
 
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
