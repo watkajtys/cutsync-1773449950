@@ -636,7 +636,7 @@ test('User saves a note at 0:15, it persists in PocketBase. Clicking an older no
 
 test('Run the daemon. Verify it picks up an asset in "analyzing", sends the audio to Gemini, populates "ai_transcripts" and "ai_cut_suggestions" collections in PocketBase, sets asset status to "ready", and deletes local temp files.', async ({ request, page }) => {
   // Use http://loom-cutsync-pocketbase:8090 directly as per diagnostician override
-  const pbUrl = 'http://loom-cutsync-pocketbase:8090';
+  const pbUrl = 'http://loom-cutsync-pocketbase:8090'; 
 
   // We mock Gemini using a mock python server or we just mock the python script directly.
   // Actually, we can run the python daemon with a mock GEMINI_API_KEY and stub the google.genai client
@@ -679,44 +679,27 @@ os.environ["GEMINI_API_KEY"] = "mock_key"
 extractor_agent.main()
 `);
 
-  // Setup mock asset in PocketBase via API request
-  // We need to create an asset with status 'pending'
-  const createAssetRes = await request.post(`${pbUrl}/api/collections/assets/records`, {
+  // We need to create a project first to get a valid 15-character project_id
+  const createProjRes = await request.post(`${pbUrl}/api/collections/projects/records`, {
     data: {
-      project_id: 'dummy_project_id_123',
-      file: 'dummy.mp4',
-      asset_type: 'source_clip',
-      processing_status: 'pending'
+      name: 'Dummy Project for Extractor'
     }
   });
-  expect(createAssetRes.ok()).toBeTruthy();
-  const assetData = await createAssetRes.json();
-  const assetId = assetData.id;
+  expect(createProjRes.ok()).toBeTruthy();
+  const projData = await createProjRes.json();
+  const validProjectId = projData.id;
 
-  // Make sure a dummy file exists so the download doesn't fail
-  const formData = new FormData();
-  const dummyFile = new Blob(['dummy content'], { type: 'video/mp4' });
-  formData.append('file', dummyFile, 'dummy.mp4');
-
-  const uploadRes = await request.patch(`${pbUrl}/api/collections/assets/records/${assetId}`, {
-    multipart: {
-      file: {
-        name: 'dummy.mp4',
-        mimeType: 'video/mp4',
-        buffer: Buffer.from('fake video content')
-      }
-    }
-  });
-  expect(uploadRes.ok()).toBeTruthy();
-  const uploadedAssetData = await uploadRes.json();
-
-  // Also we need dummy.mp4 to be valid for ffmpeg. Let's create a real dummy mp4 and upload it.
+  // Make sure a real dummy mp4 exists so ffmpeg doesn't fail
   const realDummyPath = '/tmp/dummy.mp4';
   execSync('ffmpeg -f lavfi -i testsrc=duration=1:size=1280x720:rate=30 -c:v libx264 -t 1 -y /tmp/dummy.mp4');
   const fileBuffer = fs.readFileSync('/tmp/dummy.mp4');
-  
-  const uploadRealRes = await request.patch(`${pbUrl}/api/collections/assets/records/${assetId}`, {
+
+  // Setup mock asset in PocketBase via API request using multipart/form-data for the initial POST
+  const createAssetRes = await request.post(`${pbUrl}/api/collections/assets/records`, {
     multipart: {
+      project_id: validProjectId,
+      asset_type: 'source_clip',
+      processing_status: 'pending',
       file: {
         name: 'dummy.mp4',
         mimeType: 'video/mp4',
@@ -724,9 +707,10 @@ extractor_agent.main()
       }
     }
   });
-  expect(uploadRealRes.ok()).toBeTruthy();
-  const realUploadedAssetData = await uploadRealRes.json();
-  const finalFilename = realUploadedAssetData.file;
+  expect(createAssetRes.ok()).toBeTruthy();
+  const assetData = await createAssetRes.json();
+  const assetId = assetData.id;
+  const finalFilename = assetData.file;
 
   // Run the mock script
   console.log('Running mock extractor agent...');
