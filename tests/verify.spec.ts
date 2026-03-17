@@ -849,5 +849,5 @@ test('Verify Prep Mode video synchronization and click-to-scrub navigation', asy
     expect(currentTime).toBeCloseTo(duration * 0.25, 1);
   }
 
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
