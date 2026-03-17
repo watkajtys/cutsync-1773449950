@@ -2,7 +2,7 @@
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>CutSync Review: Split Utility Sidebar</title>
+<title>CutSync Prep: Vertical Stack View</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -44,191 +44,211 @@
             background: #2d3446;
             border-radius: 10px;
         }
+        .transcript-line:hover .timestamp {
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="text-slate-300 h-screen overflow-hidden flex flex-col">
 <header class="h-14 flex items-center justify-between px-6 border-b border-white/5 bg-black/40 backdrop-blur-2xl z-50">
-<div class="flex items-center gap-6">
+<div class="flex items-center gap-8">
 <div class="flex items-center gap-2.5">
 <div class="bg-primary p-1 rounded-md flex items-center justify-center">
 <span class="material-symbols-outlined text-white text-lg leading-none">database</span>
 </div>
 <h2 class="text-white text-lg font-black tracking-tight">CutSync</h2>
 </div>
-<nav class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.15em]">
-<span class="text-slate-600">/</span>
+<nav class="flex items-center gap-6">
+<div class="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.15em]">
 <a class="text-slate-400 hover:text-white transition-colors" href="#">Projects</a>
 <span class="text-slate-600">/</span>
 <a class="text-slate-400 hover:text-white transition-colors" href="#">Silent Horizon</a>
-<span class="text-slate-600">/</span>
-<span class="text-primary">Review V03</span>
+</div>
+<div class="h-4 w-px bg-white/10"></div>
+<div class="flex items-center gap-1 p-1 bg-white/5 rounded-lg">
+<a class="px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors" href="#">Review</a>
+<a class="px-3 py-1 text-[10px] font-bold uppercase tracking-widest bg-primary text-white rounded-md" href="#">Prep Mode</a>
+</div>
 </nav>
 </div>
 <div class="flex items-center gap-6">
-<div class="flex items-center gap-4 bg-white/5 border border-white/10 rounded-lg px-4 py-1.5">
-<div class="flex flex-col items-center">
-<span class="text-[9px] text-slate-500 font-bold leading-none mb-1 uppercase">Current Timecode</span>
-<span class="text-sm font-mono text-white font-medium tracking-widest">00:14:02:11</span>
-</div>
+<div class="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-1">
+<span class="material-symbols-outlined text-sm text-emerald-500">auto_awesome</span>
+<span class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">AI Analysis Active</span>
 </div>
 <div class="h-8 w-8 rounded-full border border-white/10 overflow-hidden">
 <img alt="User" class="w-full h-full object-cover grayscale opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKrR0gaqFvnHYP_Yysmi98tV5mR20XmbS1FPtbP9ShGhx_ybqp2HLKkM8XkPy7oHPd7Qm5DIfdw7akfyiXxhKvXBLulA7ZXN4j3O2qv_52kC5RK6hkcL61b5w6_Qmz8fKTA-uy-S3Y6VeXWXiUZus3orcutLGDrPKKNLJ5EVDzCQBKR3gVImTAVaSzLl79zfLsYU9kUHxuqt3lwVzjE5tb7wbvogw9lzDaHFO1XNT7tXOyUlDxw3alQlUlniwizYEZrOr-tu4o05E"/>
 </div>
 </div>
 </header>
-<div class="flex-1 flex overflow-hidden">
-<main class="flex-1 flex flex-col bg-black relative">
-<div class="flex-1 flex items-center justify-center p-8 bg-black">
-<div class="aspect-video w-full max-w-5xl relative bg-neutral-900 shadow-2xl ring-1 ring-white/5 overflow-hidden">
-<img alt="Review Content" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6C5kYDZtuJGpypOT0LOGUpiCxJ04IluVt0NtnMAYUS0KaSK5rKBHTwWoYhRpLCNOguVUdp4x8aElSCab-FeEK7zcRCeuHU09MwP0oiIT5O_vpnu-iQwo0k07ImqxZdPfYPfMFQKnaQwX-Wl0tvjk7lo0Pi7_cRyvPMARNGos_9HZqCOHcf0btx6Orh5Dhmwglxkvzm0IXdotBjZVGV4PDMpTrBRk3k76aJZybsz3wmBGGcOzodO_09Q9sDm26sZlRvo3MJm24asg"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
-</div>
-</div>
-<div class="h-24 bg-surface-accent border-t border-white/5 px-8 flex flex-col justify-center">
-<div class="relative w-full h-1 bg-white/10 rounded-full mb-4">
-<div class="absolute inset-y-0 left-0 bg-primary w-[42%] rounded-full"></div>
-<div class="absolute top-1/2 left-[42%] -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg border-2 border-primary"></div>
+<div class="flex-1 flex flex-col overflow-hidden">
+<section class="h-[50%] min-h-[400px] flex flex-col bg-black relative border-b border-white/5">
+<div class="flex-1 flex items-center justify-center p-6">
+<div class="aspect-video h-full relative bg-neutral-900 shadow-2xl ring-1 ring-white/10 overflow-hidden group">
+<img alt="Prep Content" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6C5kYDZtuJGpypOT0LOGUpiCxJ04IluVt0NtnMAYUS0KaSK5rKBHTwWoYhRpLCNOguVUdp4x8aElSCab-FeEK7zcRCeuHU09MwP0oiIT5O_vpnu-iQwo0k07ImqxZdPfYPfMFQKnaQwX-Wl0tvjk7lo0Pi7_cRyvPMARNGos_9HZqCOHcf0btx6Orh5Dhmwglxkvzm0IXdotBjZVGV4PDMpTrBRk3k76aJZybsz3wmBGGcOzodO_09Q9sDm26sZlRvo3MJm24asg"/>
+<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-6 opacity-0 group-hover:opacity-100 transition-opacity">
+<div class="relative w-full h-1 bg-white/20 rounded-full mb-4">
+<div class="absolute inset-y-0 left-0 bg-primary w-[35%] rounded-full"></div>
 </div>
 <div class="flex items-center justify-between">
-<div class="flex items-center gap-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-<button class="hover:text-white transition-colors">Frame-by-frame</button>
-<button class="hover:text-white transition-colors">Loop</button>
-</div>
-<div class="flex items-center gap-8">
-<button class="text-slate-400 hover:text-white transition-colors"><span class="material-symbols-outlined">fast_rewind</span></button>
-<button class="text-slate-400 hover:text-white transition-colors"><span class="material-symbols-outlined">skip_previous</span></button>
-<button class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform">
-<span class="material-symbols-outlined fill-1">play_arrow</span>
-</button>
-<button class="text-slate-400 hover:text-white transition-colors"><span class="material-symbols-outlined">skip_next</span></button>
-<button class="text-slate-400 hover:text-white transition-colors"><span class="material-symbols-outlined">fast_forward</span></button>
-</div>
 <div class="flex items-center gap-6">
-<span class="text-[11px] font-mono text-slate-400">00:14:02:11 / 00:24:00:00</span>
-<span class="material-symbols-outlined text-slate-500 hover:text-white cursor-pointer">volume_up</span>
+<span class="material-symbols-outlined text-white cursor-pointer">play_arrow</span>
+<span class="material-symbols-outlined text-white/70 cursor-pointer">skip_next</span>
+<span class="material-symbols-outlined text-white/70 cursor-pointer text-xl">volume_up</span>
 </div>
+<div class="text-[11px] font-mono text-white/80 tracking-widest">
+                                00:08:42:15 / 00:24:00:00
+                            </div>
 </div>
-</div>
-</main>
-<aside class="w-80 border-l border-white/5 bg-surface flex flex-col">
-<section class="h-[45%] flex flex-col border-b border-white/5">
-<div class="p-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
-<h3 class="text-[10px] font-black uppercase tracking-widest text-white/60">Technical Metadata</h3>
-<span class="material-symbols-outlined text-sm text-slate-500">info</span>
-</div>
-<div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
-<div>
-<span class="text-[9px] font-bold text-slate-500 uppercase block mb-1">File Info</span>
-<div class="space-y-1.5">
-<div class="flex justify-between text-[11px]">
-<span class="text-slate-400">Codec</span>
-<span class="text-white font-mono">Apple ProRes 4444 XQ</span>
-</div>
-<div class="flex justify-between text-[11px]">
-<span class="text-slate-400">Resolution</span>
-<span class="text-white font-mono">4096 x 1716</span>
-</div>
-<div class="flex justify-between text-[11px]">
-<span class="text-slate-400">Frame Rate</span>
-<span class="text-white font-mono">23.976 fps</span>
-</div>
-</div>
-</div>
-<div>
-<span class="text-[9px] font-bold text-slate-500 uppercase block mb-1">Color Space</span>
-<div class="space-y-1.5">
-<div class="flex justify-between text-[11px]">
-<span class="text-slate-400">Gamma</span>
-<span class="text-white font-mono">LogC4</span>
-</div>
-<div class="flex justify-between text-[11px]">
-<span class="text-slate-400">Gamut</span>
-<span class="text-white font-mono">ARRI Wide Gamut 4</span>
-</div>
-</div>
-</div>
-<div class="pt-2">
-<div class="p-3 bg-white/5 rounded border border-white/5">
-<span class="text-[9px] font-bold text-emerald-500 uppercase block mb-1">Status</span>
-<p class="text-[11px] text-slate-300">Awaiting Final VFX Compositing for shots 024-031</p>
 </div>
 </div>
 </div>
 </section>
-<section class="h-[55%] flex flex-col">
+<section class="flex-1 flex overflow-hidden">
+<div class="w-1/2 flex flex-col border-r border-white/5 bg-surface">
 <div class="p-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
-<h3 class="text-[10px] font-black uppercase tracking-widest text-white/60">Review Notes (4)</h3>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">auto_fix_high</span>
+<h3 class="text-[10px] font-black uppercase tracking-widest text-white/80">AI Cut Suggestions</h3>
+</div>
 <div class="flex gap-2">
+<button class="px-2 py-0.5 text-[9px] font-bold bg-white/5 rounded hover:bg-white/10 border border-white/10 transition-colors uppercase">Sort by Relevance</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3">
+<div class="group bg-white/5 border border-white/5 p-3 rounded-lg hover:border-primary/40 transition-all cursor-pointer">
+<div class="flex gap-4">
+<div class="w-32 aspect-video bg-neutral-800 rounded relative overflow-hidden flex-shrink-0">
+<img alt="Thumbnail" class="w-full h-full object-cover opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6C5kYDZtuJGpypOT0LOGUpiCxJ04IluVt0NtnMAYUS0KaSK5rKBHTwWoYhRpLCNOguVUdp4x8aElSCab-FeEK7zcRCeuHU09MwP0oiIT5O_vpnu-iQwo0k07ImqxZdPfYPfMFQKnaQwX-Wl0tvjk7lo0Pi7_cRyvPMARNGos_9HZqCOHcf0btx6Orh5Dhmwglxkvzm0IXdotBjZVGV4PDMpTrBRk3k76aJZybsz3wmBGGcOzodO_09Q9sDm26sZlRvo3MJm24asg"/>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white text-lg">play_circle</span>
+</div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<span class="text-[10px] font-bold text-primary uppercase tracking-tight">Emotional Peak</span>
+<span class="text-[9px] font-mono text-slate-500">00:04:12 - 00:04:18</span>
+</div>
+<h4 class="text-xs font-semibold text-white truncate mb-1">Close-up: Protagonist realization</h4>
+<p class="text-[10px] text-slate-400 line-clamp-2">High focus on facial expressions. Ideal for the transition into the third act. Score: 94%</p>
+</div>
+</div>
+</div>
+<div class="group bg-white/5 border border-white/5 p-3 rounded-lg hover:border-primary/40 transition-all cursor-pointer">
+<div class="flex gap-4">
+<div class="w-32 aspect-video bg-neutral-800 rounded relative overflow-hidden flex-shrink-0">
+<img alt="Thumbnail" class="w-full h-full object-cover opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6C5kYDZtuJGpypOT0LOGUpiCxJ04IluVt0NtnMAYUS0KaSK5rKBHTwWoYhRpLCNOguVUdp4x8aElSCab-FeEK7zcRCeuHU09MwP0oiIT5O_vpnu-iQwo0k07ImqxZdPfYPfMFQKnaQwX-Wl0tvjk7lo0Pi7_cRyvPMARNGos_9HZqCOHcf0btx6Orh5Dhmwglxkvzm0IXdotBjZVGV4PDMpTrBRk3k76aJZybsz3wmBGGcOzodO_09Q9sDm26sZlRvo3MJm24asg"/>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white text-lg">play_circle</span>
+</div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<span class="text-[10px] font-bold text-emerald-500 uppercase tracking-tight">Technical B-Roll</span>
+<span class="text-[9px] font-mono text-slate-500">00:08:42 - 00:08:50</span>
+</div>
+<h4 class="text-xs font-semibold text-white truncate mb-1">Wide Shot: Horizon at Dusk</h4>
+<p class="text-[10px] text-slate-400 line-clamp-2">Stable movement, excellent dynamic range. Suggested for pacing adjustment.</p>
+</div>
+</div>
+</div>
+<div class="group bg-white/5 border border-white/5 p-3 rounded-lg hover:border-primary/40 transition-all cursor-pointer">
+<div class="flex gap-4">
+<div class="w-32 aspect-video bg-neutral-800 rounded relative overflow-hidden flex-shrink-0 text-center flex flex-col items-center justify-center border border-white/5">
+<span class="material-symbols-outlined text-slate-600">image_not_supported</span>
+<span class="text-[8px] uppercase font-bold text-slate-600 mt-1">Generating</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="h-2 w-16 bg-white/5 rounded mb-2 animate-pulse"></div>
+<div class="h-3 w-3/4 bg-white/5 rounded mb-2 animate-pulse"></div>
+<div class="h-3 w-1/2 bg-white/5 rounded animate-pulse"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="w-1/2 flex flex-col bg-surface-accent">
+<div class="p-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-sm">segment</span>
+<h3 class="text-[10px] font-black uppercase tracking-widest text-white/80">Source Transcript</h3>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">English (US)</span>
 <button class="text-slate-500 hover:text-white transition-colors">
-<span class="material-symbols-outlined text-sm">filter_list</span>
+<span class="material-symbols-outlined text-sm">search</span>
 </button>
 </div>
 </div>
-<div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
-<div class="group relative bg-white/5 p-3 rounded-lg border border-white/5 hover:border-primary/50 transition-colors cursor-pointer">
-<div class="flex items-center justify-between mb-2">
-<span class="text-[10px] font-mono text-primary font-bold px-1.5 py-0.5 rounded bg-primary/10">00:12:05:00</span>
-<span class="text-[9px] text-slate-500 font-bold">2m ago</span>
-</div>
-<p class="text-xs text-slate-300 leading-relaxed italic border-l-2 border-primary/30 pl-2">"Adjust color grade on this shot. Shadows are slightly crushed."</p>
-<div class="mt-2 flex items-center gap-2">
-<div class="h-4 w-4 rounded-full overflow-hidden">
-<img alt="Sarah" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzKhWLSKnAzAauvIwjImoVPnPTt7-K2rcU455fWERDrWZcF8nPI2Q1G38CznoSOoZuwvZ6I01Vb789wHd_c9J01e6L5whT2ItHyaUQaMfx-izq9DyBNaPO5FPxnuh2UxkNcbRMVhQNRdKzrctpCwYbMvGqlOPrugw6B3N9Ot-OyWU131KF-43uxXfwexisEdIJhSoaUz9_ZY9Tw-5_EEBjWATiYcJlclLkKh40HR07xEi22LuZ4wJfpALdgSAPFdU2e0sOIHeZgbM"/>
-</div>
-<span class="text-[10px] font-medium text-slate-400">Sarah J.</span>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6 font-display">
+<div class="space-y-4">
+<div class="transcript-line group flex gap-6">
+<span class="timestamp text-[10px] font-mono text-primary font-bold opacity-40 transition-opacity w-16 flex-shrink-0">00:08:35</span>
+<div class="flex-1">
+<p class="text-[13px] leading-relaxed text-slate-400">
+<span class="text-white font-semibold">ELARA:</span> We've been tracking these signatures for three weeks. They don't follow any known orbital patterns. It's like they're choosing where to appear.
+                                </p>
 </div>
 </div>
-<div class="group relative bg-white/5 p-3 rounded-lg border border-white/5 hover:border-primary/50 transition-colors cursor-pointer">
-<div class="flex items-center justify-between mb-2">
-<span class="text-[10px] font-mono text-primary font-bold px-1.5 py-0.5 rounded bg-primary/10">00:14:05:12</span>
-<span class="text-[9px] text-slate-500 font-bold">1h ago</span>
-</div>
-<p class="text-xs text-slate-300 leading-relaxed">Audio peak at 00:14:05. Needs level normalization.</p>
-<div class="mt-2 flex items-center gap-2">
-<div class="h-4 w-4 rounded-full bg-slate-800 flex items-center justify-center">
-<span class="text-[8px] text-white">MK</span>
-</div>
-<span class="text-[10px] font-medium text-slate-400">Mark K.</span>
+<div class="transcript-line group flex gap-6 bg-primary/5 -mx-6 px-6 py-2 border-l-2 border-primary">
+<span class="timestamp text-[10px] font-mono text-primary font-bold w-16 flex-shrink-0">00:08:42</span>
+<div class="flex-1">
+<p class="text-[13px] leading-relaxed text-white">
+<span class="text-primary font-bold">KALEB:</span> Which means someone, or something, is looking back at us. If we cross that perimeter now, we're not just scouting anymore.
+                                </p>
+<div class="mt-2 flex gap-1.5">
+<span class="px-1.5 py-0.5 rounded bg-emerald-500/10 text-[9px] font-bold text-emerald-500 uppercase tracking-tighter">Key Dialogue</span>
+<span class="px-1.5 py-0.5 rounded bg-white/5 text-[9px] font-bold text-slate-500 uppercase tracking-tighter">High Confidence</span>
 </div>
 </div>
-<div class="group relative bg-white/5 p-3 rounded-lg border border-white/5 hover:border-primary/50 transition-colors cursor-pointer opacity-60">
-<div class="flex items-center justify-between mb-2">
-<span class="text-[10px] font-mono text-slate-500 font-bold px-1.5 py-0.5 rounded bg-white/5">00:15:22:00</span>
-<span class="text-[9px] text-slate-500 font-bold uppercase">Resolved</span>
 </div>
-<p class="text-xs text-slate-400 line-through">Check boom mic shadow in bottom right.</p>
+<div class="transcript-line group flex gap-6">
+<span class="timestamp text-[10px] font-mono text-primary font-bold opacity-40 transition-opacity w-16 flex-shrink-0">00:08:55</span>
+<div class="flex-1">
+<p class="text-[13px] leading-relaxed text-slate-400 italic">
+                                    [Silence - Ambient wind noise increases, metallic creaking in background]
+                                </p>
 </div>
 </div>
-<div class="p-4 bg-black/40 border-t border-white/5">
-<div class="relative">
-<textarea class="w-full bg-surface border border-white/10 rounded-lg p-2.5 text-xs focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-slate-600 resize-none h-16" placeholder="Add note at 00:14:02:11..."></textarea>
-<div class="absolute bottom-2 right-2 flex items-center gap-2">
-<button class="bg-primary hover:bg-primary/90 text-white p-1 rounded transition-colors">
-<span class="material-symbols-outlined text-sm">send</span>
-</button>
+<div class="transcript-line group flex gap-6">
+<span class="timestamp text-[10px] font-mono text-primary font-bold opacity-40 transition-opacity w-16 flex-shrink-0">00:09:02</span>
+<div class="flex-1">
+<p class="text-[13px] leading-relaxed text-slate-400">
+<span class="text-white font-semibold">ELARA:</span> Then let's make sure we have something worth seeing when they do.
+                                </p>
+</div>
+</div>
+<div class="transcript-line group flex gap-6">
+<span class="timestamp text-[10px] font-mono text-primary font-bold opacity-40 transition-opacity w-16 flex-shrink-0">00:09:14</span>
+<div class="flex-1">
+<p class="text-[13px] leading-relaxed text-slate-400">
+<span class="text-white font-semibold">KALEB:</span> Engaging thrusters. Hold on.
+                                </p>
+</div>
+</div>
 </div>
 </div>
 </div>
 </section>
-</aside>
 </div>
 <footer class="h-8 bg-black border-t border-white/5 px-6 flex items-center justify-between text-[9px] font-bold text-slate-600 uppercase tracking-widest z-50">
 <div class="flex items-center gap-8">
 <div class="flex items-center gap-2">
 <span class="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-                ACTIVE SESSION: ALEX_RIVERS
+                ACTIVE PREP: ALEX_RIVERS
             </div>
 <div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-[12px]">sensors</span>
-                SYNCED: 42.1 MS LATENCY
+<span class="material-symbols-outlined text-[12px]">neurology</span>
+                AI PROCESSING: OPTIMIZED
             </div>
 </div>
 <div class="flex items-center gap-8">
 <div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-base hover:text-white cursor-pointer transition-colors">history</span>
 <span class="material-symbols-outlined text-base hover:text-white cursor-pointer transition-colors">settings</span>
 <span class="material-symbols-outlined text-base hover:text-white cursor-pointer transition-colors">fullscreen</span>
 </div>
-<div class="text-slate-800">BUILD 0.92-ALPHA</div>
+<div class="text-slate-800">BUILD 0.92-BETA</div>
 </div>
 </footer>
 
