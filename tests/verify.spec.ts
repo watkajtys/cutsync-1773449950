@@ -1343,5 +1343,5 @@ test('Verify conflicting states in Review Notes panel are fixed', async ({ page 
   // Verify the empty state is now visible
   await expect(emptyStateText).toBeVisible();
 
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
