@@ -1512,5 +1512,5 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
   expect(hasPixels).toBe(true);
 
   // We should rename old evidence files.
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
