@@ -1270,3 +1270,78 @@ test('Pause the video, select the Bounding Box tool, draw a box over a subject, 
 
   await page.screenshot({ path: 'evidence_old.png' });
 });
+
+test('Verify conflicting states in Review Notes panel are fixed', async ({ page }) => {
+  const assetId = 'test-asset-123';
+  let requestCount = 0;
+
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      requestCount++;
+      if (requestCount === 1) {
+        // First request: simulate an error to show the error state
+        await route.fulfill({
+          status: 500,
+          contentType: 'application/json',
+          body: JSON.stringify({ message: 'Internal Server Error' })
+        });
+      } else {
+        // Second request: simulate a successful empty response
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            page: 1,
+            perPage: 30,
+            totalItems: 0,
+            totalPages: 1,
+            items: []
+          })
+        });
+      }
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: assetId,
+          file: 'dummy_file.mp4'
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.goto(`/review/${assetId}`);
+
+  // Wait for the UI to load and the first (failed) request to finish
+  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+
+  // Verify the error banner is visible
+  const errorBannerText = page.locator('text=Failed to load review notes. Please check your connection.');
+  await expect(errorBannerText).toBeVisible();
+
+  // Verify the empty state is NOT visible
+  const emptyStateText = page.locator('text=No notes added yet.');
+  await expect(emptyStateText).not.toBeVisible();
+
+  // Click the retry button
+  const retryButton = page.locator('button:has-text("Retry")');
+  await expect(retryButton).toBeVisible();
+  await retryButton.click();
+
+  // Verify the error banner is gone
+  await expect(errorBannerText).not.toBeVisible();
+
+  // Verify the empty state is now visible
+  await expect(emptyStateText).toBeVisible();
+
+  await page.screenshot({ path: 'evidence.png' });
+});
