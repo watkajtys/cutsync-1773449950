@@ -132,7 +132,7 @@ export const TheaterPlayer: React.FC = () => {
     <section className="flex-1 bg-black flex flex-col relative group">
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="video-container w-full max-w-6xl relative bg-slate-900 rounded-lg overflow-hidden shadow-2xl border border-white/5" style={{ aspectRatio: '21 / 9' }}>
-          {error === 'ASSET_NOT_FOUND' ? (
+          {error === 'ASSET_NOT_FOUND' && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0c0e14] z-50 overflow-hidden">
               <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at center, #1e293b 0%, transparent 70%)' }} />
               <div className="text-white font-mono text-sm border border-red-500/20 bg-red-500/5 p-6 rounded-none flex flex-col items-center gap-4 relative z-10 w-96 max-w-full shadow-2xl backdrop-blur-sm">
@@ -153,12 +153,12 @@ export const TheaterPlayer: React.FC = () => {
                 <span className="text-[9px] font-mono text-slate-600 tracking-widest uppercase">Connect: FAILED</span>
               </div>
             </div>
-          ) : (
-            <>
-              <video 
-                ref={videoRef}
-                src={assetUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"}
-                className="w-full h-full object-contain opacity-80"
+          )}
+          
+          <video 
+            ref={videoRef}
+            src={assetUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"}
+            className="w-full h-full object-contain opacity-80"
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
             onDurationChange={(e) => setDuration(e.currentTarget.duration)}
@@ -171,7 +171,7 @@ export const TheaterPlayer: React.FC = () => {
           />
           <canvas
             ref={canvasRef}
-            className={`absolute inset-0 w-full h-full z-10 touch-none ${activeTool !== 'pointer' ? 'cursor-crosshair' : 'cursor-default'} ${isPlaying ? 'hidden' : ''}`}
+            className={`absolute inset-0 w-full h-full z-10 touch-none ${activeTool !== 'pointer' ? 'cursor-crosshair' : 'cursor-default'} ${isPlaying ? 'hidden' : ''} ${error === 'ASSET_NOT_FOUND' ? 'opacity-0 pointer-events-none' : ''}`}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
@@ -189,11 +189,13 @@ export const TheaterPlayer: React.FC = () => {
             <p className="text-xs font-bold text-white/80">4K DCI (4096 x 1716)</p>
           </div>
 
-          <CanvasHUD />
+          <div className={`transition-opacity duration-300 ${error === 'ASSET_NOT_FOUND' ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
+            <CanvasHUD />
+          </div>
 
           <div 
             ref={timelineRef}
-            className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/10 z-20 cursor-pointer touch-none"
+            className={`absolute bottom-0 left-0 right-0 h-1.5 bg-white/10 z-20 cursor-pointer touch-none ${error === 'ASSET_NOT_FOUND' ? 'hidden' : ''}`}
             onPointerDown={handlePointerDownTimeline}
             onPointerMove={handlePointerMoveTimeline}
             onPointerUp={handlePointerUpTimeline}
@@ -203,8 +205,6 @@ export const TheaterPlayer: React.FC = () => {
               <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full border-2 border-white shadow-lg translate-x-1/2"></div>
             </div>
           </div>
-            </>
-          )}
         </div>
       </div>
       <div className="flex flex-col bg-surface-accent border-t border-border-subtle">
@@ -252,7 +252,7 @@ export const TheaterPlayer: React.FC = () => {
             </button>
             <button 
               onClick={togglePlay}
-              className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform"
+              className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center hover:scale-105 hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(43,108,238,0.5)]"
             >
               {isPlaying ? <Pause className="fill-current" size={20} /> : <Play className="fill-current" size={20} />}
             </button>
@@ -277,8 +277,9 @@ export const TheaterPlayer: React.FC = () => {
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-2">
               <Volume2 className="text-slate-500" size={18} />
-              <div className="w-24 h-1 bg-slate-700 rounded-full overflow-hidden">
-                <div className="bg-primary w-2/3 h-full"></div>
+              <div className="w-24 h-1 bg-slate-700/50 rounded-full overflow-hidden relative shadow-inner">
+                <div className="bg-primary w-2/3 h-full absolute left-0 top-0 shadow-[0_0_10px_rgba(43,108,238,0.8)]"></div>
+                <div className="w-2.5 h-2.5 bg-white rounded-full absolute top-1/2 -translate-y-1/2 shadow-md z-10" style={{ left: 'calc(66.66% - 5px)' }}></div>
               </div>
             </div>
             <div className="h-6 w-[1px] bg-border-subtle"></div>

@@ -477,7 +477,7 @@ test('View the review route and ensure the right 30% sidebar renders a scrollabl
   await expect(sidebar.locator('text=Technical Metadata')).toBeVisible();
   
   // Verify the Review Notes section and count
-  await expect(sidebar.locator('text=Review Notes (2)')).toBeVisible();
+  await expect(sidebar.locator('text=Markup History (2)')).toBeVisible();
 
   // Verify the scrollable list container for notes
   const notesContainer = sidebar.locator('.overflow-y-auto.custom-scrollbar').nth(1);
@@ -1323,7 +1323,7 @@ test('Pause the video, select the Bounding Box tool, draw a box over a subject, 
 
   // Resume playback by clicking play button
   // the play button is the one with Play/Pause icon. In TheaterPlayer it's the middle one in controls.
-  const playButton = page.locator('button.w-10.h-10.rounded-full.bg-white.text-black');
+  const playButton = page.locator('button.w-10.h-10.rounded-full.bg-primary.text-white');
   await playButton.click();
   
   // Wait for a short duration

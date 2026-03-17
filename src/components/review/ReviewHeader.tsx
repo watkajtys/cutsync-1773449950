@@ -29,8 +29,8 @@ export const ReviewHeader: React.FC = () => {
         </nav>
       </div>
       <div className="flex items-center gap-6">
-        <div data-testid="live-session-indicator" className="flex items-center gap-2 text-xs font-bold text-red-500 bg-red-500/10 px-3 py-1.5 rounded-md border border-red-500/20">
-          <Radio size={14} className="animate-pulse" />
+        <div data-testid="live-session-indicator" className="flex items-center gap-2 text-xs font-bold text-red-500 bg-red-500/10 px-3 py-1.5 rounded-md border border-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.3)] animate-pulse">
+          <Radio size={14} />
           LIVE SESSION
         </div>
         

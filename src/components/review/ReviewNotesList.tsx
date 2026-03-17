@@ -18,7 +18,7 @@ export const ReviewNotesList: React.FC<ReviewNotesListProps> = ({ notes, error }
   return (
     <>
       <div className="p-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Review Notes ({notes.length})</h3>
+        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Markup History ({notes.length})</h3>
         <div className="flex gap-2">
           <button className="text-slate-500 hover:text-white transition-colors">
             <ListFilter size={14} strokeWidth={1.5} />
