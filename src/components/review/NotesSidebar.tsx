@@ -5,6 +5,7 @@ import { useReview } from '../../contexts/ReviewContext';
 import { createReviewNote } from '../../api/reviews';
 import { TechnicalMetadata } from './TechnicalMetadata';
 import { ReviewNotesList } from './ReviewNotesList';
+import { formatTimecode } from '../../utils/timeFormat';
 
 export const NotesSidebar: React.FC = () => {
   const { assetId } = useParams<{ assetId: string }>();
@@ -53,7 +54,7 @@ export const NotesSidebar: React.FC = () => {
             <textarea
               ref={inputRef}
               className="w-full bg-surface border border-white/10 rounded-lg p-2.5 text-xs focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-slate-600 resize-none h-16"
-              placeholder="Add note at 00:14:02:11..."
+              placeholder={`Add note at ${formatTimecode(currentTime)}...`}
               value={noteText}
               onChange={(e) => setNoteText(e.target.value)}
               onKeyDown={(e) => {

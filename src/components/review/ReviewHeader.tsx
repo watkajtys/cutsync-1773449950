@@ -1,8 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Database, PlayCircle, Eye } from 'lucide-react';
+import { useReview } from '../../contexts/ReviewContext';
+import { formatTimecode } from '../../utils/timeFormat';
 
 export const ReviewHeader: React.FC = () => {
+  const { currentTime } = useReview();
+
   return (
     <header className="h-14 flex items-center justify-between px-6 border-b border-border-subtle bg-surface/80 backdrop-blur-xl z-50">
       <div className="flex items-center gap-8">
@@ -28,12 +32,12 @@ export const ReviewHeader: React.FC = () => {
         <div className="flex items-center gap-4 bg-black/30 border border-border-subtle rounded-lg px-3 py-1.5">
           <div className="flex flex-col items-end">
             <span className="text-[10px] text-slate-500 font-bold leading-none">TIMECODE</span>
-            <span className="text-sm font-mono text-emerald-400 font-bold">00:14:02:11</span>
+            <span className="text-sm font-mono text-emerald-400 font-bold">{formatTimecode(currentTime)}</span>
           </div>
           <div className="w-[1px] h-6 bg-border-subtle"></div>
           <div className="flex flex-col items-end">
             <span className="text-[10px] text-slate-500 font-bold leading-none">FRAME</span>
-            <span className="text-sm font-mono text-white font-bold">20,187</span>
+            <span className="text-sm font-mono text-white font-bold">{Math.floor(currentTime * 24).toLocaleString()}</span>
           </div>
         </div>
         <div className="flex items-center gap-3 border-l border-border-subtle pl-6">

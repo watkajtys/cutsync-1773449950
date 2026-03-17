@@ -349,7 +349,24 @@ test('Verify the Review Mode shell and layout for a specific asset', async ({ pa
 
   // Verify the Chronological River timeline section at the bottom
   await expect(page.locator('text=Chronological River • Frame-by-Frame Navigation').first()).toBeVisible();
-  await expect(page.locator('text=CURRENT: 0').first()).toBeVisible(); // Evaluates to 0 frames initially
+  
+  // Initially at 00:00:00:00
+  await expect(page.locator('text=00:00:00:00').first()).toBeVisible();
+
+  // Test dynamic timecode update
+  await page.evaluate(() => {
+    const vid = document.querySelector('video');
+    if (vid) {
+      vid.currentTime = 10;
+      vid.dispatchEvent(new Event('timeupdate'));
+    }
+  });
+
+  // Verify that the timecode dynamically updates to 00:00:10:00 (10 seconds)
+  await expect(page.locator('text=00:00:10:00').first()).toBeVisible();
+
+  // Wait for the UI update
+  await page.waitForTimeout(500);
 
   // Take screenshot of the new feature at the end
   await page.screenshot({ path: 'evidence_old.png' });

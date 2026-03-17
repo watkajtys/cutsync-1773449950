@@ -1,5 +1,6 @@
 import React from 'react';
 import { useReview } from '../../contexts/ReviewContext';
+import { formatTimecode } from '../../utils/timeFormat';
 
 export const ChronologicalRiver: React.FC = () => {
   const { notes, currentTime, seekToTime, videoRef } = useReview();
@@ -44,7 +45,9 @@ export const ChronologicalRiver: React.FC = () => {
                 style={{ width: `${getPercentage(currentTime)}%` }}
               ></div>
             </div>
-            <span className="absolute bottom-1 right-2 text-[8px] font-mono text-white/80 font-bold">CURRENT: {Math.floor(currentTime * 24)}</span>
+            <span className="absolute bottom-1 right-2 text-[10px] font-mono text-white/80 font-bold">
+              {formatTimecode(currentTime)} <span className="text-slate-500 font-normal ml-1">({Math.floor(currentTime * 24)} frames)</span>
+            </span>
           </div>
           
           {/* Note Indicators */}
