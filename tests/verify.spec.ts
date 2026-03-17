@@ -1268,5 +1268,5 @@ test('Pause the video, select the Bounding Box tool, draw a box over a subject, 
   // Ensure the canvas hides
   await expect(canvas).toHaveClass(/hidden/);
 
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
