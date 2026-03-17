@@ -4,6 +4,7 @@ import { ProjectsView } from './views/ProjectsView';
 import { RecentView } from './views/RecentView';
 import { SettingsView } from './views/SettingsView';
 import { ReviewView } from './views/ReviewView';
+import { PrepView } from './views/PrepView';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="settings" element={<SettingsView />} />
         </Route>
         <Route path="/review/:assetId" element={<ReviewView />} />
+        <Route path="/prep/:assetId" element={<PrepView />} />
       </Routes>
     </Router>
   );

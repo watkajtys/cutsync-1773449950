@@ -634,3 +634,81 @@ test('User saves a note at 0:15, it persists in PocketBase. Clicking an older no
 });
 
 
+
+test('Verify the Prep Mode UI layout and connect it to PocketBase to display source clips, AI transcripts, and cut suggestions.', async ({ page }) => {
+  const assetId = 'test-asset-123';
+  
+  await page.route('**/api/collections/ai_transcripts/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          page: 1,
+          perPage: 30,
+          totalItems: 1,
+          totalPages: 1,
+          items: [
+            {
+              id: 'mock-transcript-1',
+              asset_id: assetId,
+              raw_text: "We've been tracking these signatures for three weeks.",
+              created: new Date().toISOString()
+            }
+          ]
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.route('**/api/collections/ai_cut_suggestions/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          page: 1,
+          perPage: 30,
+          totalItems: 1,
+          totalPages: 1,
+          items: [
+            {
+              id: 'mock-cut-1',
+              asset_id: assetId,
+              start_timecode: 10,
+              end_timecode: 20,
+              cut_reason: "Dead air",
+              created: new Date().toISOString()
+            }
+          ]
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  // Navigate directly to the prep mode for this asset
+  await page.goto(`/prep/${assetId}`);
+
+  // Verify Header
+  await expect(page.locator('text=Prep Mode')).toBeVisible();
+  await expect(page.locator('text=AI Analysis Active')).toBeVisible();
+
+  // Verify Player
+  const video = page.locator('video').first();
+  await expect(video).toBeVisible();
+
+  // Verify Cut Suggestions
+  await expect(page.locator('text=AI Cut Suggestions')).toBeVisible();
+  await expect(page.locator('text=Dead air')).toBeVisible();
+
+  // Verify Transcript
+  await expect(page.locator('text=Source Transcript')).toBeVisible();
+  await expect(page.locator("text=We've been tracking these signatures for three weeks.")).toBeVisible();
+
+  // Take screenshot
+  await page.screenshot({ path: 'evidence.png' });
+});
