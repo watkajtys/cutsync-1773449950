@@ -1640,3 +1640,23 @@ test('User selects the Box tool, draws a box with real-time visual resizing feed
   // Screenshot required by rules
   await page.screenshot({ path: 'evidence_old.png' });
 });
+
+test('Verify the code structure to ensure God Component is decoupled', async () => {
+  const srcPath = path.resolve(process.cwd(), "tests", '../src/components/review');
+  
+  // Check that TheaterPlayer.tsx is significantly reduced in size
+  const theaterPlayerPath = path.join(srcPath, 'TheaterPlayer.tsx');
+  const theaterPlayerContent = fs.readFileSync(theaterPlayerPath, 'utf-8');
+  const theaterPlayerLines = theaterPlayerContent.split('\n').length;
+  expect(theaterPlayerLines).toBeLessThan(250);
+
+  // Check that the new decoupled components exist
+  expect(fs.existsSync(path.join(srcPath, 'CanvasToolbar.tsx'))).toBeTruthy();
+  expect(fs.existsSync(path.join(srcPath, 'CoordinateOverlay.tsx'))).toBeTruthy();
+  expect(fs.existsSync(path.join(srcPath, 'TimelineScrubber.tsx'))).toBeTruthy();
+  expect(fs.existsSync(path.join(srcPath, 'PlaybackControls.tsx'))).toBeTruthy();
+
+  // Check that the new videoCoordinates utility exists
+  const utilsPath = path.resolve(process.cwd(), "tests", '../src/utils/videoCoordinates.ts');
+  expect(fs.existsSync(utilsPath)).toBeTruthy();
+});
