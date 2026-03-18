@@ -5,7 +5,7 @@ import { useReview } from '../../contexts/ReviewContext';
 import { formatTimecode } from '../../utils/timeFormat';
 
 export const TheaterPlayer: React.FC = () => {
-  const { videoRef, inputRef, currentTime, setCurrentTime, seekToTime, assetUrl, clearDrawing, viewingNoteTime, setViewingNoteTime, notes, setShapes, currentShape } = useReview();
+  const { videoRef, inputRef, currentTime, setCurrentTime, seekToTime, assetUrl, clearDrawing, viewingNoteTime, setViewingNoteTime, notes, setShapes, currentShape, setActiveTool, activeColor, setActiveColor, resetCanvas, shapes } = useReview();
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -132,6 +132,68 @@ export const TheaterPlayer: React.FC = () => {
     <section className="flex-1 bg-black flex flex-col relative group">
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="video-container w-full max-w-6xl relative bg-slate-900 rounded-lg overflow-hidden shadow-2xl border border-white/5" style={{ aspectRatio: '21 / 9' }}>
+          
+          {/* Floating Toolbar */}
+          <div className="absolute left-6 top-1/2 -translate-y-1/2 bg-black/80 backdrop-blur-md border border-white/10 rounded-2xl p-2 z-30 flex flex-col gap-3 shadow-2xl">
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => setActiveTool('pointer')}
+                className={`p-2 rounded-xl transition-all ${
+                  activeTool === 'pointer' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[20px]">near_me</span>
+              </button>
+              <button
+                onClick={() => setActiveTool('freehand')}
+                className={`p-2 rounded-xl transition-all ${
+                  activeTool === 'freehand' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[20px]">gesture</span>
+              </button>
+              <button
+                onClick={() => setActiveTool('rect')}
+                className={`p-2 rounded-xl transition-all ${
+                  activeTool === 'rect' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[20px]">rectangle</span>
+              </button>
+              <button
+                onClick={() => setActiveTool('arrow')}
+                className={`p-2 rounded-xl transition-all ${
+                  activeTool === 'arrow' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[20px]">north_east</span>
+              </button>
+            </div>
+            
+            <div className="w-full h-px bg-white/10 my-1"></div>
+            
+            <div className="flex flex-col gap-2 items-center pb-1">
+              {['#39FF14', '#ef4444', '#3b82f6', '#facc15', '#ffffff'].map(color => (
+                <button
+                  key={color}
+                  onClick={() => setActiveColor(color)}
+                  className={`w-4 h-4 rounded-full transition-transform ${activeColor === color ? 'scale-125 ring-2 ring-white ring-offset-2 ring-offset-black' : 'hover:scale-110'}`}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
+            
+            <div className="w-full h-px bg-white/10 my-1"></div>
+            
+            <button
+              onClick={resetCanvas}
+              className="p-2 rounded-xl text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-colors flex items-center justify-center"
+              title="Clear Canvas"
+            >
+              <span className="material-symbols-outlined text-[20px]">delete_sweep</span>
+            </button>
+          </div>
+
           <video 
             ref={videoRef}
             src={assetUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"}
@@ -161,10 +223,35 @@ export const TheaterPlayer: React.FC = () => {
               <span className="text-[11px] font-mono text-white/60 tracking-tighter">SCENE 04 | TAKE 02 | V03</span>
             </div>
           </div>
-          <div className="absolute top-4 right-4 text-right pointer-events-none z-20">
+          <div className="absolute bottom-4 right-4 text-right pointer-events-none z-20 bg-black/50 p-2 rounded backdrop-blur-sm border border-white/10">
             <p className="text-[10px] font-bold text-white/40 tracking-widest uppercase">Resolution</p>
-            <p className="text-xs font-bold text-white/80">4K DCI (4096 x 1716)</p>
+            <p className="text-xs font-bold text-white/80 font-mono">4K DCI (4096 x 1716)</p>
           </div>
+          
+          {/* Dynamic Coordinate Overlays */}
+          {shapes.map((s, i) => {
+             const x = s.points[0]?.x;
+             const y = s.points[0]?.y;
+             if (x === undefined || y === undefined) return null;
+             return (
+               <div 
+                 key={i} 
+                 className="absolute pointer-events-none z-30 bg-black/60 backdrop-blur-sm px-1.5 py-0.5 rounded text-[9px] font-mono text-white/70 border border-white/10"
+                 style={{ left: `${x * 100}%`, top: `calc(${y * 100}% - 20px)` }}
+               >
+                 X: {x.toFixed(2)} Y: {y.toFixed(2)}
+               </div>
+             );
+          })}
+          {currentShape && currentShape.points.length > 0 && (
+            <div 
+              className="absolute pointer-events-none z-30 bg-primary/20 backdrop-blur-sm px-1.5 py-0.5 rounded text-[9px] font-mono text-primary border border-primary/30"
+              style={{ left: `${currentShape.points[0].x * 100}%`, top: `calc(${currentShape.points[0].y * 100}% - 20px)` }}
+            >
+              X: {currentShape.points[0].x.toFixed(2)} Y: {currentShape.points[0].y.toFixed(2)}
+            </div>
+          )}
+
           <div 
             ref={timelineRef}
             className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/10 z-20 cursor-pointer touch-none"

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Database, PlayCircle, Eye } from 'lucide-react';
+import { Database, PlayCircle, Eye, Download, Radio } from 'lucide-react';
 import { useReview } from '../../contexts/ReviewContext';
 import { formatTimecode } from '../../utils/timeFormat';
 
@@ -29,7 +29,18 @@ export const ReviewHeader: React.FC = () => {
         </nav>
       </div>
       <div className="flex items-center gap-6">
-        <div className="flex items-center gap-4 bg-black/30 border border-border-subtle rounded-lg px-3 py-1.5">
+        <div className="flex items-center gap-3">
+          <button className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white rounded-md text-xs font-bold uppercase tracking-widest transition-colors border border-white/10">
+            <Download size={14} className="text-slate-400" />
+            Export Notes
+          </button>
+          <button className="flex items-center gap-2 px-3 py-1.5 bg-primary/20 hover:bg-primary/30 text-primary rounded-md text-xs font-bold uppercase tracking-widest transition-colors border border-primary/20">
+            <Radio size={14} className="animate-pulse" />
+            Live Session
+          </button>
+        </div>
+
+        <div className="flex items-center gap-4 bg-black/30 border border-border-subtle rounded-lg px-3 py-1.5 border-l border-border-subtle pl-6 ml-2">
           <div className="flex flex-col items-end">
             <span className="text-[10px] text-slate-500 font-bold leading-none">TIMECODE</span>
             <span className="text-sm font-mono text-emerald-400 font-bold">{formatTimecode(currentTime)}</span>
@@ -40,6 +51,7 @@ export const ReviewHeader: React.FC = () => {
             <span className="text-sm font-mono text-white font-bold">{Math.floor(currentTime * 24).toLocaleString()}</span>
           </div>
         </div>
+        
         <div className="flex items-center gap-3 border-l border-border-subtle pl-6">
           <div className="text-right hidden sm:block">
             <p className="text-xs font-semibold text-slate-200">Alex Rivers</p>
