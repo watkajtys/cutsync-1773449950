@@ -1718,5 +1718,5 @@ test('Verify that Review Notes section appears above Technical Metadata in DOM o
   // Second section should contain "Technical Metadata"
   expect(secondSectionText).toContain('TECHNICAL METADATA');
 
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
