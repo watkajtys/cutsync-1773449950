@@ -133,8 +133,8 @@ export const TheaterPlayer: React.FC = () => {
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="video-container w-full max-w-6xl relative bg-slate-900 rounded-lg overflow-hidden shadow-2xl border border-white/5" style={{ aspectRatio: '21 / 9' }}>
           {error === 'ASSET_NOT_FOUND' && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0c0e14] z-50 overflow-hidden">
-              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at center, #1e293b 0%, transparent 70%)' }} />
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0c0e14] z-50 overflow-hidden pointer-events-none">
+              <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at center, #1e293b 0%, transparent 70%)' }} />
               <div className="text-white font-mono text-sm border border-red-500/20 bg-red-500/5 p-6 rounded-none flex flex-col items-center gap-4 relative z-10 w-96 max-w-full shadow-2xl backdrop-blur-sm">
                 <div className="w-12 h-12 rounded-full border border-red-500/30 flex items-center justify-center bg-red-500/10 mb-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />

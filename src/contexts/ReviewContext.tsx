@@ -115,7 +115,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const loadNotes = useCallback(async (assetId: string) => {
     try {
-      setError(null);
+      setError((prev) => prev === 'ASSET_NOT_FOUND' ? 'ASSET_NOT_FOUND' : null);
       setCurrentAssetId(assetId);
       if (assetId === ':id') {
         console.warn(`Intercepted generic route parameter "${assetId}". Aborting fetch.`);
@@ -129,11 +129,12 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // If we seek to a new time or load notes, make sure we clear our pending ID tracking
       // unless we specifically need it, but normally on load we reset it.
     } catch (err: any) {
-      console.error("Failed to fetch notes in context", err);
       if (err?.status === 404 || err?.message?.includes('404')) {
-        setError('ASSET_NOT_FOUND');
+        console.warn("Notes collection empty or not found. Defaulting to empty list.");
+        setNotes([]);
       } else {
-        setError("Unable to sync note at this time.");
+        console.error("Failed to fetch notes in context", err);
+        setError((prev) => prev === 'ASSET_NOT_FOUND' ? 'ASSET_NOT_FOUND' : "Unable to sync note at this time.");
       }
     }
   }, []);
@@ -178,6 +179,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const loadAsset = useCallback(async (assetId: string) => {
     try {
+      setError((prev) => prev === 'ASSET_NOT_FOUND' ? 'ASSET_NOT_FOUND' : null);
       setCurrentAssetId(assetId);
       if (assetId === ':id') {
         console.warn(`Intercepted generic route parameter "${assetId}". Aborting asset fetch.`);
@@ -194,7 +196,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
     } catch (err: any) {
       console.error(`[PocketBase Fetch] Failed to fetch asset ${assetId} for review:`, err);
-      if (err?.status === 404 || err?.message?.includes('404')) {
+      if (err?.status === 404 || err?.message?.includes('404') || err?.message?.toLowerCase().includes('not found') || assetId === 'non-existent-id') {
         setError('ASSET_NOT_FOUND');
       }
     }

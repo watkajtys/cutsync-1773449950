@@ -547,6 +547,21 @@ test('Verify the Review Mode uses proper lucide icons after refactoring', async 
 });
 
 test('Verify the visual annotation tools render a drawing toolbar and overlay canvas in Review Mode', async ({ page }) => {
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'test-asset-123',
+          file: 'dummy_file.mp4'
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
   await page.route('**/api/collections/review_notes/records*', async (route, request) => {
     if (request.method() === 'GET') {
       await route.fulfill({
@@ -576,6 +591,7 @@ test('Verify the visual annotation tools render a drawing toolbar and overlay ca
   await page.goto('/review/test-asset-123');
   
   // Verify the drawing toolbar is present
+  await page.waitForSelector('[data-testid="canvas-hud"]', { state: 'visible' });
   const toolbar = page.getByTestId('canvas-hud');
   await expect(toolbar).toBeVisible();
 
@@ -1100,6 +1116,7 @@ test('Verify Canvas Annotation State Serialization and Playback Re-rendering', a
 
   // Test 1: Draw on canvas and save note
   // First, we need to select the box tool
+  await page.waitForSelector('[data-testid="canvas-hud"]', { state: 'visible' });
   const boxTool = page.getByTestId('canvas-hud').locator('button[title="Box"]');
   await boxTool.click();
 
@@ -1267,6 +1284,18 @@ test('Verify Theater Player Interactive Scrubber', async ({ page }) => {
 test('Pause the video, select the Bounding Box tool, draw a box over a subject, and verify the drawing renders correctly. Resume playback and ensure the canvas hides.', async ({ page }) => {
   const assetId = 'test-asset-123';
 
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ page: 1, perPage: 30, totalItems: 0, totalPages: 1, items: [] })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
   await page.route('**/api/collections/assets/records*', async (route, request) => {
     if (request.method() === 'GET') {
       await route.fulfill({
@@ -1307,6 +1336,7 @@ test('Pause the video, select the Bounding Box tool, draw a box over a subject, 
 
   // Pause the video if playing, but it shouldn't be playing on load
   // We'll select the box tool
+  await page.waitForSelector('[data-testid="canvas-hud"]', { state: 'visible' });
   const boxTool = page.getByTestId('canvas-hud').locator('button[title="Box"]');
   await boxTool.click();
 
@@ -1417,6 +1447,18 @@ test('Verify conflicting states in Review Notes panel are fixed', async ({ page 
 test('Draw a box on a frame, resize the browser window, and verify the box scales correctly and remains positioned over the intended video feature.', async ({ page }) => {
   const assetId = 'test-asset-123';
 
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ page: 1, perPage: 30, totalItems: 0, totalPages: 1, items: [] })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
   await page.route('**/api/collections/assets/records*', async (route, request) => {
     if (request.method() === 'GET') {
       await route.fulfill({
@@ -1448,6 +1490,7 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
 
   await page.waitForTimeout(500);
 
+  await page.waitForSelector('[data-testid="canvas-hud"]', { state: 'visible' });
   const boxTool = page.getByTestId('canvas-hud').locator('button[title="Box"]');
   await boxTool.click();
 
@@ -1517,6 +1560,47 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
 });
 
 test('User pauses video, selects freehand, draws, switches to box, draws, clears canvas, and verifies smooth UI interactions and that cleared data is not saved to the note.', async ({ page }) => {
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ page: 1, perPage: 30, totalItems: 0, totalPages: 1, items: [] })
+      });
+    } else if (request.method() === 'POST') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'mock-new-note',
+          asset_id: 'asset_123',
+          author: 'Current User',
+          timestamp: 0,
+          note_text: 'A mock created note',
+          canvas_data: null,
+          created: new Date().toISOString()
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'asset_123',
+          file: 'dummy_file.mp4'
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
   // Navigate to review view
   await page.goto('/review/asset_123');
   
@@ -1542,6 +1626,7 @@ test('User pauses video, selects freehand, draws, switches to box, draws, clears
   });
 
   // Check the initial state of the markup tools
+  await page.waitForSelector('[data-testid="canvas-hud"]', { state: 'visible' });
   const floatingToolbar = page.getByTestId('canvas-hud');
   await floatingToolbar.waitFor({ state: 'visible' });
 
