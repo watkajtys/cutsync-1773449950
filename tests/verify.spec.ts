@@ -222,7 +222,7 @@ test('Verify Clear Canvas button is decoupled from Lifecycle & Versioning panel 
   // Verify clear button is hidden again
   await expect(clearButton).not.toBeVisible();
 
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify "Render & Cache" is moved to ReviewHeader and removed from NotesSidebar', async ({ page }) => {
