@@ -9,7 +9,7 @@ import { formatTimecode } from '../../utils/timeFormat';
 
 export const NotesSidebar: React.FC = () => {
   const { assetId } = useParams<{ assetId: string }>();
-  const { clearDrawing, setActiveTool, inputRef, notes, loadNotes, currentTime, shapes, error, setError, loadAsset } = useReview();
+  const { resetCanvas, inputRef, notes, loadNotes, currentTime, shapes, error, setError, loadAsset } = useReview();
   const [noteText, setNoteText] = useState('');
 
   useEffect(() => {
@@ -33,8 +33,7 @@ export const NotesSidebar: React.FC = () => {
       );
       
       setNoteText('');
-      clearDrawing();
-      setActiveTool('pointer');
+      resetCanvas();
       await loadNotes(assetId); // Refresh list
     } catch (err) {
       console.error("Failed to save note:", err);

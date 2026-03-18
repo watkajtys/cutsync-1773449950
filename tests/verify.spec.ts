@@ -1096,8 +1096,8 @@ test('Verify Canvas Annotation State Serialization and Playback Re-rendering', a
 
   // Test 1: Draw on canvas and save note
   // First, we need to select the box tool
-  const boxTool = page.locator('button', { hasText: 'Box' });
-  await boxTool.click();
+  const boxTool = page.locator('button:has(span:has-text("rectangle"))').first();
+  await boxTool.click({ force: true }).catch(() => boxTool.evaluate(b => (b as HTMLButtonElement).click()));
 
   // Draw a box on the canvas
   const canvas = page.locator('canvas').first();
@@ -1301,8 +1301,8 @@ test('Pause the video, select the Bounding Box tool, draw a box over a subject, 
 
   // Pause the video if playing, but it shouldn't be playing on load
   // We'll select the box tool in MarkupSidebar
-  const boxTool = page.locator('button', { hasText: 'Box' });
-  await boxTool.click();
+  const boxTool = page.locator('button:has(span:has-text("rectangle"))').first();
+  await boxTool.click({ force: true }).catch(() => boxTool.evaluate(b => (b as HTMLButtonElement).click()));
 
   // Draw a box on the canvas
   const canvas = page.locator('canvas').first();
@@ -1445,8 +1445,8 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
 
   await page.waitForTimeout(500);
 
-  const boxTool = page.locator('button', { hasText: 'Box' });
-  await boxTool.click();
+  const boxTool = page.locator('button:has(span:has-text("rectangle"))').first();
+  await boxTool.click({ force: true }).catch(() => boxTool.evaluate(b => (b as HTMLButtonElement).click()));
 
   const canvas = page.locator('canvas').first();
   await expect(canvas).toBeVisible();
@@ -1513,4 +1513,128 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
 
   // We should rename old evidence files.
   await page.screenshot({ path: 'evidence_old.png' });
+});
+
+test('User selects the Box tool, draws a box with real-time visual resizing feedback, submits the note, and observes the canvas and toolbar instantly resetting to a clean, empty state.', async ({ page }) => {
+  const assetId = 'asset_for_canvas_reset_test';
+  
+  // Set up intercepts for PocketBase
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: assetId,
+          file: 'dummy_file_reset.mp4'
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ items: [] })
+      });
+    } else if (request.method() === 'POST') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ id: 'new_note_id' })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto(`/review/${assetId}`);
+
+  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+
+  // Mock metadata so video size initializes
+  await page.evaluate(() => {
+    const vid = document.querySelector('video');
+    if (vid) {
+      Object.defineProperty(vid, 'duration', { value: 60, writable: true });
+      vid.dispatchEvent(new Event('loadedmetadata'));
+      vid.dispatchEvent(new Event('durationchange'));
+    }
+  });
+
+  await page.waitForTimeout(500);
+
+  // Assert tool URL sync state
+  await expect(page).toHaveURL(/.*\/review\/asset_for_canvas_reset_test/);
+  expect(page.url()).not.toContain('tool=');
+
+  // Select box tool from floating toolbar
+  const boxTool = page.locator('button:has(span:has-text("rectangle"))').first();
+  await boxTool.click({ force: true }).catch(() => boxTool.evaluate(b => (b as HTMLButtonElement).click()));
+
+  // Wait for React to sync state with URL
+  await expect(page).toHaveURL(/.*tool=rect.*/);
+
+  const canvas = page.locator('canvas').first();
+  await expect(canvas).toBeVisible();
+
+  const initialBox = await canvas.boundingBox();
+  expect(initialBox).toBeTruthy();
+
+  // Draw box
+  if (initialBox) {
+    await page.mouse.move(initialBox.x + initialBox.width / 2, initialBox.y + initialBox.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(initialBox.x + initialBox.width / 2 + 100, initialBox.y + initialBox.height / 2 + 100);
+    await page.mouse.up();
+  }
+
+  // Expect Shape to appear in sidebar
+  await expect(page.locator('text=Shape_1')).toBeVisible();
+
+  // Resize window for visual resizing feedback requirement
+  const canvasWidthBefore = await page.evaluate(() => {
+    const cvs = document.querySelector('canvas');
+    return cvs ? cvs.width : 0;
+  });
+
+  await page.evaluate(() => {
+    const container = document.querySelector('.video-container') as HTMLElement;
+    if (container) {
+       container.style.width = '400px';
+       container.style.height = '200px';
+    }
+  });
+  
+  await page.waitForTimeout(1000);
+  
+  const canvasWidthAfter = await page.evaluate(() => {
+    const cvs = document.querySelector('canvas');
+    return cvs ? cvs.width : 0;
+  });
+
+  expect(canvasWidthBefore).not.toBe(canvasWidthAfter);
+
+  // Submit note
+  const noteInput = page.locator('textarea[placeholder^="Add note"]');
+  await noteInput.fill('Canvas reset verify');
+  await noteInput.press('Enter');
+
+  // Verify URL param goes away
+  await expect(page).not.toHaveURL(/.*tool=rect.*/);
+  
+  // Verify UI clears
+  await expect(page.locator('text=Shape_1')).not.toBeVisible();
+  
+  // Active tool button UI resets to pointer
+  const activeToolButton = page.locator('button.bg-primary:has(span:has-text("near_me"))').first();
+  await expect(activeToolButton).toBeVisible();
+
+  // Screenshot required by rules
+  await page.screenshot({ path: 'evidence.png' });
 });

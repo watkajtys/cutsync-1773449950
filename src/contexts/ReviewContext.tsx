@@ -27,12 +27,19 @@ interface ReviewContextType {
   setError: React.Dispatch<React.SetStateAction<string | null>>;
   assetUrl: string | null;
   loadAsset: (assetId: string) => Promise<void>;
+  resetCanvas: () => void;
 }
 
 const ReviewContext = createContext<ReviewContextType | undefined>(undefined);
 
+import { useURLState } from '../hooks/useURLState';
+
 export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [activeTool, setActiveTool] = useState<Tool>('pointer');
+  const [activeToolRaw, setActiveTool] = useURLState<string>('tool', 'pointer');
+  const activeTool = (activeToolRaw === 'freehand' || activeToolRaw === 'rect' || activeToolRaw === 'arrow' || activeToolRaw === 'pointer') 
+    ? (activeToolRaw as Tool) 
+    : 'pointer';
+
   const [activeColor, setActiveColor] = useState<string>('#ef4444');
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
@@ -49,6 +56,11 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setShapes([]);
     setCurrentShape(null);
   };
+
+  const resetCanvas = useCallback(() => {
+    clearDrawing();
+    setActiveTool('pointer');
+  }, [setActiveTool]);
 
   const seekToTime = (time: number) => {
     if (videoRef.current) {
@@ -111,7 +123,8 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       error,
       setError,
       assetUrl,
-      loadAsset
+      loadAsset,
+      resetCanvas
     }}>
       {children}
     </ReviewContext.Provider>

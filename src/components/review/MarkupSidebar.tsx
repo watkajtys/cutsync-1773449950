@@ -2,7 +2,7 @@ import React from 'react';
 import { useReview } from '../../contexts/ReviewContext';
 
 export const MarkupSidebar: React.FC = () => {
-  const { activeTool, setActiveTool, activeColor, setActiveColor, clearDrawing, shapes } = useReview();
+  const { activeTool, setActiveTool, activeColor, setActiveColor, resetCanvas, shapes } = useReview();
 
   const colors = [
     '#39FF14', // markup-green
@@ -129,9 +129,20 @@ export const MarkupSidebar: React.FC = () => {
         </div>
       </div>
 
-      <div className="p-4 border-t border-white/5">
+      <div className="p-4 border-t border-white/5 space-y-4">
+        <div>
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-3">Lifecycle & Versioning</h3>
+          <div className="flex gap-2">
+            <button className="flex-1 py-2 bg-slate-800/50 hover:bg-slate-700 text-slate-300 rounded text-[9px] font-bold uppercase tracking-wider transition-colors">
+              Save Draft
+            </button>
+            <button className="flex-1 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded text-[9px] font-bold uppercase tracking-wider transition-colors">
+              Commit V4
+            </button>
+          </div>
+        </div>
         <button
-          onClick={clearDrawing}
+          onClick={resetCanvas}
           className="w-full py-2 flex items-center justify-center gap-2 rounded bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 transition-all font-bold text-[10px] uppercase tracking-widest"
         >
           <span className="material-symbols-outlined text-sm">delete_sweep</span>

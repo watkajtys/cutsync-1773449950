@@ -148,7 +148,7 @@ export const TheaterPlayer: React.FC = () => {
           />
           <canvas
             ref={canvasRef}
-            className={`absolute inset-0 w-full h-full z-10 touch-none ${activeTool !== 'pointer' ? 'cursor-crosshair' : 'cursor-default'} ${isPlaying ? 'hidden' : ''}`}
+            className={`absolute inset-0 w-full h-full z-10 touch-none ${activeTool && activeTool !== 'pointer' ? 'cursor-crosshair' : 'cursor-default'} ${isPlaying ? 'hidden' : ''}`}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
