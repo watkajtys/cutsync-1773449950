@@ -143,6 +143,88 @@ test('Verify that the React app loads and displays the main dashboard shell with
   await page.screenshot({ path: 'evidence_old.png' });
 });
 
+test('Verify Clear Canvas button is decoupled from Lifecycle & Versioning panel and moved to Markup History area', async ({ page }) => {
+  const assetId = 'test-asset-123';
+
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: assetId,
+          file: 'dummy_file.mp4'
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.goto(`/review/${assetId}`);
+
+  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+
+  // The sidebar should exist
+  const sidebar = page.locator('aside').first();
+  await expect(sidebar).toBeVisible();
+
+  // Verify Lifecycle & Versioning section
+  await expect(page.locator('text=Lifecycle & Versioning')).toBeVisible();
+
+  // Verify "Clear Canvas" is NOT present in the document at load
+  await expect(page.locator('text=Clear Canvas')).not.toBeVisible();
+
+  // Mock metadata so video size initializes
+  await page.evaluate(() => {
+    const vid = document.querySelector('video');
+    if (vid) {
+      Object.defineProperty(vid, 'duration', { value: 60, writable: true });
+      vid.dispatchEvent(new Event('loadedmetadata'));
+      vid.dispatchEvent(new Event('durationchange'));
+    }
+  });
+
+  await page.waitForTimeout(500);
+
+  // Select box tool from floating toolbar
+  const boxTool = page.locator('button:has(span:has-text("rectangle"))').first();
+  await boxTool.click({ force: true }).catch(() => boxTool.evaluate(b => (b as HTMLButtonElement).click()));
+
+  const canvas = page.locator('canvas').first();
+  await expect(canvas).toBeVisible();
+
+  const initialBox = await canvas.boundingBox();
+  expect(initialBox).toBeTruthy();
+
+  // Draw box
+  if (initialBox) {
+    await page.mouse.move(initialBox.x + initialBox.width / 2, initialBox.y + initialBox.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(initialBox.x + initialBox.width / 2 + 100, initialBox.y + initialBox.height / 2 + 100);
+    await page.mouse.up();
+  }
+
+  // Expect Shape to appear in sidebar
+  await expect(page.locator('text=Shape_1')).toBeVisible();
+
+  // Verify the new "Clear" button is visible in the Markup History section now that a shape exists
+  const markupHistoryHeader = page.locator('h3', { hasText: 'Markup History' }).locator('..');
+  const clearButton = markupHistoryHeader.locator('button:has-text("Clear")');
+  await expect(clearButton).toBeVisible();
+
+  // Click the clear button
+  await clearButton.click();
+
+  // Verify shape is gone
+  await expect(page.locator('text=Shape_1')).not.toBeVisible();
+  
+  // Verify clear button is hidden again
+  await expect(clearButton).not.toBeVisible();
+
+  await page.screenshot({ path: 'evidence.png' });
+});
+
 test('Verify "Render & Cache" is moved to ReviewHeader and removed from NotesSidebar', async ({ page }) => {
   await page.route('**/api/collections/assets/records*', async (route, request) => {
     if (request.method() === 'GET') {

@@ -7,7 +7,18 @@ export const MarkupSidebar: React.FC = () => {
   return (
     <aside className="w-72 flex flex-col border-r border-white/5 bg-panel-dark p-5 gap-6">
       <div className="flex-1 overflow-y-auto telemetry-panel bg-white/5 rounded-lg border border-white/10 p-4">
-        <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-4">Markup History</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Markup History</h3>
+          {shapes.length > 0 && (
+            <button
+              onClick={resetCanvas}
+              className="text-[9px] font-bold uppercase tracking-wider text-red-400 hover:text-red-300 transition-colors flex items-center gap-1"
+            >
+              <span className="material-symbols-outlined text-[12px]">delete_sweep</span>
+              Clear
+            </button>
+          )}
+        </div>
         <div className="space-y-2">
           {shapes.length === 0 && (
             <p className="text-xs text-slate-500 text-center py-4">No shapes drawn.</p>
@@ -43,13 +54,6 @@ export const MarkupSidebar: React.FC = () => {
             </button>
           </div>
         </div>
-        <button
-          onClick={resetCanvas}
-          className="w-full py-2 flex items-center justify-center gap-2 rounded bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 transition-all font-bold text-[10px] uppercase tracking-widest"
-        >
-          <span className="material-symbols-outlined text-sm">delete_sweep</span>
-          Clear Canvas
-        </button>
       </div>
     </aside>
   );
