@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import { test, expect } from '@playwright/test';
 
+test.use({ baseURL: 'http://127.0.0.1:5173' });
+
 test('Verify that the React app loads and displays the main dashboard shell with navigation.', async ({ page }) => {
   await page.goto('/');
   
@@ -368,6 +370,8 @@ test('Verify the Review Mode shell and layout for a specific asset', async ({ pa
   // Navigate directly to the review mode for a mock asset
   await page.goto('/review/test-asset-123');
   
+  await page.waitForLoadState('networkidle');
+
   // Verify that the header navigation is present
   await expect(page.getByTestId('nav-workspace')).toBeVisible();
   await expect(page.getByTestId('nav-review-pipeline')).toBeVisible();
@@ -470,7 +474,7 @@ test('View the review route and ensure the right 30% sidebar renders a scrollabl
   await page.goto('/review/test-asset-123');
   
   // Verify the Sidebar container (should be ~30% equivalent width logic based on the design - e.g. w-80 or flex-basis)
-  const sidebar = page.locator('aside').nth(1);
+  const sidebar = page.getByTestId('notes-sidebar');
   await expect(sidebar).toBeVisible();
 
   // Verify the Technical Metadata section
@@ -480,13 +484,13 @@ test('View the review route and ensure the right 30% sidebar renders a scrollabl
   await expect(sidebar.locator('text=Markup History (2)')).toBeVisible();
 
   // Verify the scrollable list container for notes
-  const notesContainer = sidebar.locator('.overflow-y-auto.custom-scrollbar').nth(1);
+  const notesContainer = sidebar.locator('.overflow-y-auto.custom-scrollbar').first();
   await expect(notesContainer).toBeVisible();
 
   // Verify a specific styled note with timestamp
   const firstNote = notesContainer.locator('text=Adjust color grade on this shot').first();
   await expect(firstNote).toBeVisible();
-   
+  await expect(notesContainer.locator('text=00:12:05:00').first()).toBeVisible();
 
   // Verify the input field at the bottom
   const inputField = sidebar.locator('textarea[placeholder*="Add note at"]');
@@ -1393,8 +1397,8 @@ test('Verify conflicting states in Review Notes panel are fixed', async ({ page 
   await expect(errorBannerText).toBeVisible();
 
   // Verify the empty state is NOT visible
-  const emptyStateText = page.locator('text=No notes added yet').first();
-  await expect(emptyStateText).not.toBeVisible();
+  const emptyStateContainer = page.getByTestId('empty-notes-state');
+  await expect(emptyStateContainer).not.toBeVisible();
 
   // Click the retry button
   const retryButton = page.locator('button:has-text("Retry")');
@@ -1405,7 +1409,7 @@ test('Verify conflicting states in Review Notes panel are fixed', async ({ page 
   await expect(errorBannerText).not.toBeVisible();
 
   // Verify the empty state is now visible
-  await expect(emptyStateText).toBeVisible();
+  await expect(emptyStateContainer).toBeVisible();
 
   await page.screenshot({ path: 'evidence_old.png' });
 });
@@ -1512,28 +1516,6 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
   await page.screenshot({ path: 'evidence_old.png' });
 });
 
-test('Verify 404 Asset Not Found UI renders for literal :id route parameter', async ({ page }) => {
-  await page.route('**/api/collections/assets/records*', async (route, request) => {
-    // This route should NOT be called for the literal ':id' parameter
-    // If it is, the test will fail on the frontend side due to the 404
-    await route.continue();
-  });
-
-  await page.goto('/review/:id');
-  
-  // Wait for the Review Pipeline text or a basic element to confirm the page has loaded
-  await expect(page.locator('text=Review Pipeline')).toBeVisible();
-
-  // Verify the 404 empty state overlay is visible
-  const notFoundError = page.locator('text=ERROR 404: ASSET NOT FOUND');
-  await expect(notFoundError).toBeVisible();
-  
-  const notFoundDesc = page.locator('text=The requested asset ID could not be located in the database.');
-  await expect(notFoundDesc).toBeVisible();
-
-  await page.screenshot({ path: 'evidence_old.png' });
-});
-
 test('User pauses video, selects freehand, draws, switches to box, draws, clears canvas, and verifies smooth UI interactions and that cleared data is not saved to the note.', async ({ page }) => {
   // Navigate to review view
   await page.goto('/review/asset_123');
@@ -1569,7 +1551,7 @@ test('User pauses video, selects freehand, draws, switches to box, draws, clears
   
   // Make sure it becomes active (primary colored)
   await page.waitForTimeout(200);
-  await expect(gestureButton).toHaveClass(/text-\[#3b82f6\]/);
+  await expect(gestureButton).toHaveClass(/bg-blue-500/);
 
   // Wait a moment for state change
   await page.waitForTimeout(100);
@@ -1653,5 +1635,62 @@ test('User pauses video, selects freehand, draws, switches to box, draws, clears
   expect(hasMarkupIcon).toBe(0);
 
   // Take screenshot of evidence
+  await page.screenshot({ path: 'evidence_old.png' });
+});
+
+test('Verify the Asset Not Found empty state renders for both literal :id and non-existent-id routes', async ({ page }) => {
+  let apiCalled = false;
+  
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      apiCalled = true;
+      if (request.url().includes('non-existent-id')) {
+        await route.fulfill({
+          status: 404,
+          contentType: 'application/json',
+          body: JSON.stringify({ message: 'Not Found', code: 404 })
+        });
+      } else {
+        await route.continue();
+      }
+    } else {
+      await route.continue();
+    }
+  });
+  
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      apiCalled = true;
+      if (request.url().includes('non-existent-id')) {
+        await route.fulfill({
+          status: 404,
+          contentType: 'application/json',
+          body: JSON.stringify({ message: 'Not Found', code: 404 })
+        });
+      } else {
+        await route.continue();
+      }
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.goto('/review/:id');
+  
+  await expect(page.locator('text=System Error 404')).toBeVisible();
+  await expect(page.locator('text=Asset Not Found').first()).toBeVisible();
+  await expect(page.locator('text=The requested asset ID could not be located in the database.')).toBeVisible();
+
+  expect(apiCalled).toBe(false);
+
+  // Additionally check non-existent-id
+  apiCalled = false;
+  await page.goto('/review/non-existent-id');
+  
+  await expect(page.locator('text=System Error 404')).toBeVisible();
+  await expect(page.locator('text=Asset Not Found').first()).toBeVisible();
+
+  expect(apiCalled).toBe(true);
+
   await page.screenshot({ path: 'evidence_old.png' });
 });

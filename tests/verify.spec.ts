@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import { test, expect } from '@playwright/test';
 
+test.use({ baseURL: 'http://127.0.0.1:5173' });
+
 test('Verify that the React app loads and displays the main dashboard shell with navigation.', async ({ page }) => {
   await page.goto('/');
   
@@ -1636,13 +1638,21 @@ test('User pauses video, selects freehand, draws, switches to box, draws, clears
   await page.screenshot({ path: 'evidence_old.png' });
 });
 
-test('Verify the Asset Not Found empty state renders when a literal :id is requested', async ({ page }) => {
+test('Verify the Asset Not Found empty state renders for both literal :id and non-existent-id routes', async ({ page }) => {
   let apiCalled = false;
   
   await page.route('**/api/collections/assets/records*', async (route, request) => {
     if (request.method() === 'GET') {
       apiCalled = true;
-      await route.continue();
+      if (request.url().includes('non-existent-id')) {
+        await route.fulfill({
+          status: 404,
+          contentType: 'application/json',
+          body: JSON.stringify({ message: 'Not Found', code: 404 })
+        });
+      } else {
+        await route.continue();
+      }
     } else {
       await route.continue();
     }
@@ -1651,7 +1661,15 @@ test('Verify the Asset Not Found empty state renders when a literal :id is reque
   await page.route('**/api/collections/review_notes/records*', async (route, request) => {
     if (request.method() === 'GET') {
       apiCalled = true;
-      await route.continue();
+      if (request.url().includes('non-existent-id')) {
+        await route.fulfill({
+          status: 404,
+          contentType: 'application/json',
+          body: JSON.stringify({ message: 'Not Found', code: 404 })
+        });
+      } else {
+        await route.continue();
+      }
     } else {
       await route.continue();
     }
@@ -1664,6 +1682,15 @@ test('Verify the Asset Not Found empty state renders when a literal :id is reque
   await expect(page.locator('text=The requested asset ID could not be located in the database.')).toBeVisible();
 
   expect(apiCalled).toBe(false);
+
+  // Additionally check non-existent-id
+  apiCalled = false;
+  await page.goto('/review/non-existent-id');
+  
+  await expect(page.locator('text=System Error 404')).toBeVisible();
+  await expect(page.locator('text=Asset Not Found').first()).toBeVisible();
+
+  expect(apiCalled).toBe(true);
 
   await page.screenshot({ path: 'evidence_old.png' });
 });

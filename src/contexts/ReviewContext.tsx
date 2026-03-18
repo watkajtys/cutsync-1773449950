@@ -118,7 +118,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setError(null);
       setCurrentAssetId(assetId);
       if (assetId === ':id') {
-        console.warn('Intercepted generic route parameter ":id". Aborting fetch.');
+        console.warn(`Intercepted generic route parameter "${assetId}". Aborting fetch.`);
         setNotes([]);
         setError('ASSET_NOT_FOUND');
         return;
@@ -128,9 +128,13 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       // If we seek to a new time or load notes, make sure we clear our pending ID tracking
       // unless we specifically need it, but normally on load we reset it.
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to fetch notes in context", err);
-      setError("Unable to sync note at this time.");
+      if (err?.status === 404 || err?.message?.includes('404')) {
+        setError('ASSET_NOT_FOUND');
+      } else {
+        setError("Unable to sync note at this time.");
+      }
     }
   }, []);
 
@@ -176,7 +180,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       setCurrentAssetId(assetId);
       if (assetId === ':id') {
-        console.warn('Intercepted generic route parameter ":id". Aborting asset fetch.');
+        console.warn(`Intercepted generic route parameter "${assetId}". Aborting asset fetch.`);
         setAssetUrl(null);
         setError('ASSET_NOT_FOUND');
         return;
@@ -188,8 +192,11 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         console.log(`[PocketBase Fetch] Asset resolved. Media URL: ${fileUrl}`);
         setAssetUrl(fileUrl);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(`[PocketBase Fetch] Failed to fetch asset ${assetId} for review:`, err);
+      if (err?.status === 404 || err?.message?.includes('404')) {
+        setError('ASSET_NOT_FOUND');
+      }
     }
   }, []);
 
