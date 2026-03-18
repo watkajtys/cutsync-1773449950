@@ -52,13 +52,14 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
 
-  const clearDrawing = () => {
+  const clearDrawing = useCallback(() => {
     setShapes([]);
     setCurrentShape(null);
-  };
+  }, []);
 
   const resetCanvas = useCallback(() => {
-    clearDrawing();
+    setShapes([]);
+    setCurrentShape(null);
     setActiveTool('pointer');
   }, [setActiveTool]);
 

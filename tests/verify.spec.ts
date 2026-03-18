@@ -1853,3 +1853,107 @@ test('Verify that Review Notes section appears above Technical Metadata in DOM o
 
   await page.screenshot({ path: 'evidence_old.png' });
 });
+
+test('User draws on the canvas and submits the note. The canvas should clear instantly. User navigates back to Dashboard, and no stale event listener or memory leak warnings appear in the console.', async ({ page }) => {
+  const assetId = 'asset_for_unmount_test';
+  const consoleMessages: string[] = [];
+  
+  page.on('console', msg => {
+    if (msg.type() === 'warning' || msg.type() === 'error') {
+      consoleMessages.push(msg.text());
+    }
+  });
+
+  // Set up intercepts for PocketBase
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: assetId,
+          file: 'dummy_file_unmount.mp4'
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ items: [] })
+      });
+    } else if (request.method() === 'POST') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ id: 'unmount_note_id' })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto(`/review/${assetId}`);
+
+  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+
+  // Mock metadata so video size initializes
+  await page.evaluate(() => {
+    const vid = document.querySelector('video');
+    if (vid) {
+      Object.defineProperty(vid, 'duration', { value: 60, writable: true });
+      vid.dispatchEvent(new Event('loadedmetadata'));
+      vid.dispatchEvent(new Event('durationchange'));
+    }
+  });
+
+  await page.waitForTimeout(500);
+
+  // Select box tool from floating toolbar
+  const boxTool = page.locator('button:has(span:has-text("rectangle"))').first();
+  await boxTool.click({ force: true }).catch(() => boxTool.evaluate(b => (b as HTMLButtonElement).click()));
+
+  const canvas = page.locator('canvas').first();
+  await expect(canvas).toBeVisible();
+
+  const initialBox = await canvas.boundingBox();
+  expect(initialBox).toBeTruthy();
+
+  // Draw box
+  if (initialBox) {
+    await page.mouse.move(initialBox.x + initialBox.width / 2, initialBox.y + initialBox.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(initialBox.x + initialBox.width / 2 + 100, initialBox.y + initialBox.height / 2 + 100);
+    await page.mouse.up();
+  }
+
+  // Expect Shape to appear in sidebar
+  await expect(page.locator('text=Shape_1')).toBeVisible();
+
+  // Submit note
+  const noteInput = page.locator('textarea[placeholder^="Add note"]');
+  await noteInput.fill('Note before unmount');
+  await noteInput.press('Enter');
+
+  // Verify UI clears
+  await expect(page.locator('text=Shape_1')).not.toBeVisible();
+
+  // Navigate back to Dashboard
+  await page.goto('/');
+
+  // Wait a moment for unmount to fully process
+  await page.waitForTimeout(500);
+
+  // Check console messages for React warning about memory leaks
+  const leakWarnings = consoleMessages.filter(msg => msg.toLowerCase().includes('memory leak') || msg.toLowerCase().includes('event listener'));
+  expect(leakWarnings).toHaveLength(0);
+
+  // Take screenshot as required
+  await page.screenshot({ path: 'evidence.png' });
+});

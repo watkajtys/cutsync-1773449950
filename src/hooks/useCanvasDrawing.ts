@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { useReview } from '../contexts/ReviewContext';
 import { getNormalizedCoordinates, getVideoRenderedDimensions } from '../utils/videoCoordinates';
 import { Shape } from '../types/review';
@@ -7,73 +7,22 @@ export const useCanvasDrawing = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isDrawing = useRef(false);
 
-  const shapesRef = useRef(useReview().shapes);
-  const currentShapeRef = useRef(useReview().currentShape);
-
   const {
     activeTool, activeColor, shapes, currentShape,
     setShapes, setCurrentShape, videoRef
   } = useReview();
 
+  const shapesRef = useRef(shapes);
+  const currentShapeRef = useRef(currentShape);
+  const activeToolRef = useRef(activeTool);
+  const activeColorRef = useRef(activeColor);
+
   useEffect(() => {
     shapesRef.current = shapes;
     currentShapeRef.current = currentShape;
-  }, [shapes, currentShape]);
-
-  const getCoordinates = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return { x: 0, y: 0 };
-    
-    const rect = canvas.getBoundingClientRect();
-    const video = videoRef.current;
-    
-    if (video && video.videoWidth && video.videoHeight) {
-      return getNormalizedCoordinates(e.clientX, e.clientY, rect, video.videoWidth, video.videoHeight);
-    }
-    
-    // Fallback if video isn't loaded
-    return {
-      x: (e.clientX - rect.left) / rect.width,
-      y: (e.clientY - rect.top) / rect.height
-    };
-  };
-
-  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (activeTool === 'pointer') return;
-    
-    isDrawing.current = true;
-    const { x, y } = getCoordinates(e);
-    setCurrentShape({
-      tool: activeTool,
-      color: activeColor,
-      points: [{ x, y }]
-    });
-  };
-
-  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (!isDrawing.current || activeTool === 'pointer' || !currentShape) return;
-    
-    const { x, y } = getCoordinates(e);
-    
-    if (activeTool === 'freehand') {
-      setCurrentShape({
-        ...currentShape,
-        points: [...currentShape.points, { x, y }]
-      });
-    } else {
-      setCurrentShape({
-        ...currentShape,
-        points: [currentShape.points[0], { x, y }]
-      });
-    }
-  };
-
-  const handlePointerUp = () => {
-    if (!isDrawing.current || activeTool === 'pointer' || !currentShape) return;
-    isDrawing.current = false;
-    setShapes([...shapes, currentShape]);
-    setCurrentShape(null);
-  };
+    activeToolRef.current = activeTool;
+    activeColorRef.current = activeColor;
+  }, [shapes, currentShape, activeTool, activeColor]);
 
   const renderShapes = (
     ctx: CanvasRenderingContext2D,
@@ -147,6 +96,86 @@ export const useCanvasDrawing = () => {
     });
   };
 
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const getCoordinates = (e: PointerEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      const video = videoRef.current;
+      
+      if (video && video.videoWidth && video.videoHeight) {
+        return getNormalizedCoordinates(e.clientX, e.clientY, rect, video.videoWidth, video.videoHeight);
+      }
+      
+      // Fallback if video isn't loaded
+      return {
+        x: (e.clientX - rect.left) / rect.width,
+        y: (e.clientY - rect.top) / rect.height
+      };
+    };
+
+    const handlePointerDown = (e: PointerEvent) => {
+      if (activeToolRef.current === 'pointer') return;
+      
+      isDrawing.current = true;
+      const { x, y } = getCoordinates(e);
+      setCurrentShape({
+        tool: activeToolRef.current,
+        color: activeColorRef.current,
+        points: [{ x, y }]
+      });
+    };
+
+    const handlePointerMove = (e: PointerEvent) => {
+      if (!isDrawing.current || activeToolRef.current === 'pointer' || !currentShapeRef.current) return;
+      
+      const { x, y } = getCoordinates(e);
+      const currShape = currentShapeRef.current;
+      
+      if (activeToolRef.current === 'freehand') {
+        setCurrentShape({
+          ...currShape,
+          points: [...currShape.points, { x, y }]
+        });
+      } else {
+        setCurrentShape({
+          ...currShape,
+          points: [currShape.points[0], { x, y }]
+        });
+      }
+    };
+
+    const handlePointerUp = () => {
+      if (!isDrawing.current || activeToolRef.current === 'pointer' || !currentShapeRef.current) return;
+      isDrawing.current = false;
+      setShapes([...shapesRef.current, currentShapeRef.current]);
+      setCurrentShape(null);
+    };
+
+    canvas.addEventListener('pointerdown', handlePointerDown);
+    canvas.addEventListener('pointermove', handlePointerMove);
+    canvas.addEventListener('pointerup', handlePointerUp);
+    canvas.addEventListener('pointercancel', handlePointerUp);
+    canvas.addEventListener('pointerout', handlePointerUp);
+
+    return () => {
+      canvas.removeEventListener('pointerdown', handlePointerDown);
+      canvas.removeEventListener('pointermove', handlePointerMove);
+      canvas.removeEventListener('pointerup', handlePointerUp);
+      canvas.removeEventListener('pointercancel', handlePointerUp);
+      canvas.removeEventListener('pointerout', handlePointerUp);
+      
+      // Explicitly clear and reset canvas context on unmount to prevent ghost drawing buffers
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      canvas.width = 0;
+      canvas.height = 0;
+    };
+  }, [setShapes, setCurrentShape, videoRef]);
+
   // ResizeObserver to draw whenever the window size changes
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -202,9 +231,6 @@ export const useCanvasDrawing = () => {
 
   return {
     canvasRef,
-    activeTool,
-    handlePointerDown,
-    handlePointerMove,
-    handlePointerUp
+    activeTool
   };
 };

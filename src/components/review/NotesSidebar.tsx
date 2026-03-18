@@ -32,8 +32,10 @@ export const NotesSidebar: React.FC = () => {
         shapes.length > 0 ? shapes : null
       );
       
-      setNoteText('');
+      // Atomic lifecycle reset: synchronously clear drawing buffers and reset active tool
+      // immediately upon successful backend submission.
       resetCanvas();
+      setNoteText('');
       await loadNotes(assetId); // Refresh list
     } catch (err) {
       console.error("Failed to save note:", err);

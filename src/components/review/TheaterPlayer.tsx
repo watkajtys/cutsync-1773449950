@@ -17,10 +17,7 @@ export const TheaterPlayer: React.FC = () => {
 
   const {
     canvasRef,
-    activeTool,
-    handlePointerDown,
-    handlePointerMove,
-    handlePointerUp
+    activeTool
   } = useCanvasDrawing();
 
   useEffect(() => {
@@ -118,11 +115,6 @@ export const TheaterPlayer: React.FC = () => {
           <canvas
             ref={canvasRef}
             className={`absolute inset-0 w-full h-full z-10 touch-none ${activeTool && activeTool !== 'pointer' ? 'cursor-crosshair' : 'cursor-default'} ${isPlaying ? 'hidden' : ''}`}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={handlePointerUp}
-            onPointerOut={handlePointerUp}
           />
           
           <div className="absolute top-4 left-4 pointer-events-none z-20">
