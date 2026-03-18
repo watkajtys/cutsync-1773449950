@@ -1636,5 +1636,5 @@ test('User selects the Box tool, draws a box with real-time visual resizing feed
   await expect(activeToolButton).toBeVisible();
 
   // Screenshot required by rules
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
