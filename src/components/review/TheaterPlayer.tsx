@@ -189,7 +189,7 @@ export const TheaterPlayer: React.FC = () => {
             <p className="text-xs font-bold text-white/80">4K DCI (4096 x 1716)</p>
           </div>
 
-          <div className={`transition-opacity duration-300 ${error === 'ASSET_NOT_FOUND' ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
+          <div className={`transition-opacity duration-300 absolute inset-0 pointer-events-none z-50 ${error === 'ASSET_NOT_FOUND' ? 'opacity-50 grayscale' : ''}`}>
             <CanvasHUD />
           </div>
 

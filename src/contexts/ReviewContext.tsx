@@ -117,7 +117,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       setError((prev) => prev === 'ASSET_NOT_FOUND' ? 'ASSET_NOT_FOUND' : null);
       setCurrentAssetId(assetId);
-      if (assetId === ':id') {
+      if (assetId === ':id' || !assetId) {
         console.warn(`Intercepted generic route parameter "${assetId}". Aborting fetch.`);
         setNotes([]);
         setError('ASSET_NOT_FOUND');
@@ -181,7 +181,7 @@ export const ReviewProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       setError((prev) => prev === 'ASSET_NOT_FOUND' ? 'ASSET_NOT_FOUND' : null);
       setCurrentAssetId(assetId);
-      if (assetId === ':id') {
+      if (assetId === ':id' || !assetId) {
         console.warn(`Intercepted generic route parameter "${assetId}". Aborting asset fetch.`);
         setAssetUrl(null);
         setError('ASSET_NOT_FOUND');

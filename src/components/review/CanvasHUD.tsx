@@ -16,7 +16,7 @@ export const CanvasHUD: React.FC = () => {
   const hasShapes = shapes.length > 0 || currentShape !== null;
 
   return (
-    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[100] flex gap-4">
+    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[100] flex gap-4 pointer-events-auto">
       {/* Tool Properties Panel (Colors) */}
       {activeTool !== 'pointer' && (
         <aside className="flex items-center gap-3 bg-slate-900/90 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 shadow-2xl h-12">
