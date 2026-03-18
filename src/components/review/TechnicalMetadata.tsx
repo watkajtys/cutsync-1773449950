@@ -3,7 +3,7 @@ import { Info } from 'lucide-react';
 
 export const TechnicalMetadata: React.FC = () => {
   return (
-    <section className="h-[45%] flex flex-col border-b border-white/5">
+    <section className="h-[40%] flex flex-col border-t border-white/5">
       <div className="p-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
         <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">Technical Metadata</h3>
         <Info className="text-slate-500" size={14} strokeWidth={1.5} />

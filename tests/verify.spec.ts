@@ -480,7 +480,8 @@ test('View the review route and ensure the right 30% sidebar renders a scrollabl
   await expect(sidebar.locator('text=Review Notes (2)')).toBeVisible();
 
   // Verify the scrollable list container for notes
-  const notesContainer = sidebar.locator('.overflow-y-auto.custom-scrollbar').nth(1);
+  // Since we swapped the order, the notes container is now the first (.nth(0)) custom-scrollbar in the sidebar
+  const notesContainer = sidebar.locator('.overflow-y-auto.custom-scrollbar').nth(0);
   await expect(notesContainer).toBeVisible();
 
   // Verify a specific styled note with timestamp
@@ -1659,4 +1660,63 @@ test('Verify the code structure to ensure God Component is decoupled', async () 
   // Check that the new videoCoordinates utility exists
   const utilsPath = path.resolve(process.cwd(), "tests", '../src/utils/videoCoordinates.ts');
   expect(fs.existsSync(utilsPath)).toBeTruthy();
+});
+
+test('Verify that Review Notes section appears above Technical Metadata in DOM order', async ({ page }) => {
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'test-asset-123',
+          file: 'dummy_file.mp4'
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          page: 1,
+          perPage: 30,
+          totalItems: 0,
+          totalPages: 1,
+          items: []
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.goto(`/review/test-asset-123`);
+  
+  // Wait for elements to load
+  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+
+  // Find the NotesSidebar container
+  const sidebar = page.locator('aside').nth(1);
+  await expect(sidebar).toBeVisible();
+
+  // Get all top-level sections in the sidebar
+  const sections = sidebar.locator('> section');
+  
+  // Verify order
+  const firstSectionText = await sections.nth(0).innerText();
+  const secondSectionText = await sections.nth(1).innerText();
+
+  // First section should contain "Review Notes"
+  expect(firstSectionText).toContain('REVIEW NOTES');
+  
+  // Second section should contain "Technical Metadata"
+  expect(secondSectionText).toContain('TECHNICAL METADATA');
+
+  await page.screenshot({ path: 'evidence.png' });
 });
