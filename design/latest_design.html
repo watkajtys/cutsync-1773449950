@@ -2,7 +2,7 @@
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>CutSync Professional Review Suite</title>
+<title>CutSync Professional Review Suite - Lifecycle Variant</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -53,6 +53,16 @@
         }
         .theater-player {
             box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+        }.property-drawer {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+        }
+        .property-drawer.collapsed {
+            width: 0;
+            padding-left: 0;
+            padding-right: 0;
+            overflow: hidden;
+            opacity: 0;
+            border-right-width: 0;
         }
     </style>
 </head>
@@ -95,44 +105,29 @@
 </div>
 </header>
 <main class="flex-1 flex overflow-hidden">
-<aside class="w-72 flex flex-col border-r border-white/5 bg-panel-dark">
+<aside class="property-drawer w-64 flex flex-col border-r border-white/5 bg-panel-dark" id="tool-properties-panel">
 <div class="p-5 border-b border-white/5">
-<h3 class="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500 mb-5">Markup Toolkit</h3>
-<div class="grid grid-cols-2 gap-2 mb-6">
-<button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-primary text-white ring-1 ring-primary/50 shadow-lg shadow-primary/20 transition-all">
-<span class="material-symbols-outlined">gesture</span>
-<span class="text-[9px] font-bold uppercase">Freehand</span>
-</button>
-<button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-slate-800/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-all border border-white/5">
-<span class="material-symbols-outlined">rectangle</span>
-<span class="text-[9px] font-bold uppercase">Box</span>
-</button>
-<button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-slate-800/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-all border border-white/5">
-<span class="material-symbols-outlined">text_fields</span>
-<span class="text-[9px] font-bold uppercase">Text</span>
-</button>
-<button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-slate-800/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-all border border-white/5">
-<span class="material-symbols-outlined">near_me</span>
-<span class="text-[9px] font-bold uppercase">Pointer</span>
-</button>
+<div class="flex items-center justify-between mb-5">
+<h3 class="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">Tool Properties</h3>
+<span class="material-symbols-outlined text-sm text-primary">tune</span>
 </div>
 <div class="space-y-6">
 <div class="space-y-3">
 <div class="flex justify-between items-center">
-<label class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Color Palette</label>
+<label class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Color</label>
 <span class="text-[9px] font-mono text-markup-green">#39FF14</span>
 </div>
 <div class="flex flex-wrap gap-2">
-<button class="size-6 rounded-full bg-markup-green ring-2 ring-white ring-offset-2 ring-offset-panel-dark"></button>
-<button class="size-6 rounded-full bg-red-500 hover:scale-110 transition-transform"></button>
-<button class="size-6 rounded-full bg-blue-500 hover:scale-110 transition-transform"></button>
-<button class="size-6 rounded-full bg-yellow-400 hover:scale-110 transition-transform"></button>
-<button class="size-6 rounded-full bg-white hover:scale-110 transition-transform"></button>
+<button class="size-5 rounded-full bg-markup-green ring-2 ring-white ring-offset-2 ring-offset-panel-dark"></button>
+<button class="size-5 rounded-full bg-red-500 hover:scale-110 transition-transform"></button>
+<button class="size-5 rounded-full bg-blue-500 hover:scale-110 transition-transform"></button>
+<button class="size-5 rounded-full bg-yellow-400 hover:scale-110 transition-transform"></button>
+<button class="size-5 rounded-full bg-white hover:scale-110 transition-transform"></button>
 </div>
 </div>
 <div class="space-y-3">
 <div class="flex justify-between items-center">
-<label class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Stroke Weight</label>
+<label class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Stroke</label>
 <span class="text-[10px] font-mono text-slate-100">2PX</span>
 </div>
 <div class="px-1">
@@ -144,10 +139,30 @@
 </div>
 <div class="flex items-center justify-between pt-2">
 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Snap to Grid</span>
-<button class="w-8 h-4 bg-primary rounded-full relative">
-<div class="absolute right-0.5 top-0.5 size-3 bg-white rounded-full"></div>
+<button class="w-7 h-3.5 bg-primary rounded-full relative">
+<div class="absolute right-0.5 top-0.5 size-2.5 bg-white rounded-full"></div>
 </button>
 </div>
+</div>
+</div>
+<div class="p-5 border-b border-white/5 bg-white/[0.02]">
+<h3 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">history_toggle_off</span>
+                Lifecycle &amp; Versioning
+            </h3>
+<div class="grid grid-cols-2 gap-2">
+<button class="flex flex-col items-center justify-center gap-1.5 p-3 rounded bg-white/5 border border-white/10 hover:bg-primary/10 hover:border-primary/30 transition-all group">
+<span class="material-symbols-outlined text-lg text-slate-400 group-hover:text-primary">save</span>
+<span class="text-[8px] font-bold uppercase tracking-tighter text-slate-500 group-hover:text-slate-300">Save State</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-1.5 p-3 rounded bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all group">
+<span class="material-symbols-outlined text-lg text-slate-400 group-hover:text-slate-200">settings_backup_restore</span>
+<span class="text-[8px] font-bold uppercase tracking-tighter text-slate-500 group-hover:text-slate-300">Revert</span>
+</button>
+<button class="col-span-2 py-2 flex items-center justify-center gap-2 rounded bg-red-500/5 text-red-500/70 border border-red-500/10 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 transition-all font-bold text-[9px] uppercase tracking-[0.15em]">
+<span class="material-symbols-outlined text-sm">delete_sweep</span>
+                    Clear Canvas
+                </button>
 </div>
 </div>
 <div class="flex-1 overflow-y-auto telemetry-panel p-5">
@@ -169,14 +184,26 @@
 </div>
 </div>
 </div>
-<div class="p-4 border-t border-white/5">
-<button class="w-full py-2 flex items-center justify-center gap-2 rounded bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 transition-all font-bold text-[10px] uppercase tracking-widest">
-<span class="material-symbols-outlined text-sm">delete_sweep</span>
-                Clear Canvas
-            </button>
-</div>
 </aside>
 <section class="flex-1 relative flex flex-col bg-black overflow-hidden">
+<div class="absolute left-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2 p-1.5 bg-panel-dark/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl">
+<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-primary text-white shadow-lg shadow-primary/20 transition-all">
+<span class="material-symbols-outlined">gesture</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined">rectangle</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined">text_fields</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined">near_me</span>
+</button>
+<div class="w-8 h-px bg-white/10 mx-auto my-1"></div>
+<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined">undo</span>
+</button>
+</div>
 <div class="flex-1 relative theater-player group cursor-crosshair">
 <div class="absolute inset-0 bg-cover bg-center grayscale-[0.3] brightness-[0.6]" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD2AZ_NMPDe4Kos-nYVqsRmUb3TXmsfEQ6AZ1Cp-BQZXIF_NySXN66WQDBpvpAxvWHg_bTX3-jdFipaJxvR1YTzd3TnhDB6tUizEZIMM5FVSwzz3Gx-lav-Nn6pd6qY43UE_frcoAm4u_Pu3ILQqeMvlWpnd2fu2IvGUqoXRF_nMgeweVTbrkDhAuJ80hZ_Z5uI_oQOlDaIGc-rxWNfsqEqwRSA2b8l4GHo6PJ1aS9EsXzZ13uJAgVpRjnrtxja1qEGXz45gIaXTSal");'></div>
 <div class="absolute inset-0 vfx-grid pointer-events-none opacity-20"></div>
@@ -188,16 +215,12 @@
 </div>
 <div class="absolute -left-[100vw] right-[-100vw] top-1/2 h-[0.5px] bg-markup-green/30 dashed"></div>
 <div class="absolute -top-[1024px] bottom-[-100vh] left-1/2 w-[0.5px] bg-markup-green/30 dashed"></div>
-<div class="absolute -top-1 -left-1 size-3 border-t-2 border-l-2 border-white"></div>
-<div class="absolute -top-1 -right-1 size-3 border-t-2 border-r-2 border-white"></div>
-<div class="absolute -bottom-1 -left-1 size-3 border-b-2 border-l-2 border-white"></div>
-<div class="absolute -bottom-1 -right-1 size-3 border-b-2 border-r-2 border-white"></div>
 </div>
 </div>
-<div class="absolute left-8 top-8 font-mono text-slate-500 text-[10px] space-y-1">
-<div class="flex items-center gap-2"><span class="w-12">REC</span> <span class="text-red-500">â</span></div>
-<div class="flex items-center gap-2"><span class="w-12">GAMMA</span> <span>2.4</span></div>
-<div class="flex items-center gap-2"><span class="w-12">ISO</span> <span>800</span></div>
+<div class="absolute left-20 top-8 font-mono text-slate-500 text-[10px] space-y-1 bg-black/40 backdrop-blur p-2 rounded border border-white/5">
+<div class="flex items-center gap-2"><span class="w-12 text-slate-400">REC</span> <span class="text-red-500">â</span></div>
+<div class="flex items-center gap-2"><span class="w-12 text-slate-400">GAMMA</span> <span>2.4</span></div>
+<div class="flex items-center gap-2"><span class="w-12 text-slate-400">ISO</span> <span>800</span></div>
 </div>
 <div class="absolute right-8 bottom-8 flex flex-col gap-2 z-30">
 <div class="px-3 py-1.5 bg-black/80 border border-white/10 backdrop-blur-md rounded flex items-center gap-4">
@@ -223,7 +246,6 @@
 <div class="absolute inset-y-0 left-0 w-[42%] bg-primary">
 <div class="absolute right-0 top-1/2 -translate-y-1/2 size-4 bg-white rounded-full shadow-[0_0_15px_rgba(13,127,242,1)] border-2 border-primary"></div>
 </div>
-<div class="absolute inset-y-0 left-0 w-[65%] bg-white/10 -z-10"></div>
 </div>
 <div class="flex justify-between mt-2 font-mono text-[9px] text-slate-500">
 <span>00:00:00:00</span>
@@ -235,9 +257,7 @@
 <div class="flex items-center gap-6 pr-4">
 <div class="text-right">
 <div class="text-2xl font-mono font-bold text-slate-100 tracking-tighter">00:14:22:09</div>
-<div class="text-[9px] font-mono text-slate-500 uppercase flex items-center justify-end gap-1">
-                            FRAME: 20,494
-                        </div>
+<div class="text-[9px] font-mono text-slate-500 uppercase">FRAME: 20,494</div>
 </div>
 <div class="h-10 w-px bg-white/10"></div>
 <div class="flex items-center gap-1">
@@ -273,19 +293,6 @@
 </div>
 </div>
 </div>
-<div class="p-4 bg-white/5 rounded-xl border border-white/5 opacity-60 hover:opacity-100 transition-all cursor-pointer">
-<div class="flex items-center justify-between mb-3">
-<span class="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded">00:12:05:22</span>
-<span class="text-[10px] text-slate-500">12m ago</span>
-</div>
-<p class="text-[11px] text-slate-400 leading-relaxed mb-4">Check grain consistency across the transition between live plate and CGI replacement.</p>
-<div class="flex items-center gap-2">
-<div class="size-6 rounded bg-slate-800 flex items-center justify-center border border-white/5">
-<span class="material-symbols-outlined text-[14px] text-slate-500">rectangle</span>
-</div>
-<span class="text-[9px] text-slate-500 font-bold uppercase tracking-tight">VFX Bounding Box</span>
-</div>
-</div>
 <div class="p-6 border-2 border-dashed border-white/5 rounded-xl flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition-all cursor-pointer group">
 <span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors">add_comment</span>
 <span class="text-[10px] font-bold text-slate-600 uppercase tracking-widest group-hover:text-slate-400">New Annotation</span>
@@ -299,10 +306,6 @@
 </div>
 <div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
 <div class="h-full bg-primary w-[82%] shadow-[0_0_10px_rgba(13,127,242,0.4)]"></div>
-</div>
-<div class="text-[8px] font-mono text-slate-600 flex justify-between">
-<span>VFX_CACHE_TEMP_042</span>
-<span>1.2GB / 1.5GB</span>
 </div>
 </div>
 </div>
