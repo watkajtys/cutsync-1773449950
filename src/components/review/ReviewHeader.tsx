@@ -29,6 +29,16 @@ export const ReviewHeader: React.FC = () => {
         </nav>
       </div>
       <div className="flex items-center gap-6">
+        <div className="flex flex-col w-32 justify-center mr-2">
+          <div className="flex justify-between items-center text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">
+            <span>Render & Cache</span>
+            <span className="text-primary">100%</span>
+          </div>
+          <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+            <div className="h-full bg-primary/80 w-full rounded-full"></div>
+          </div>
+        </div>
+
         <div className="flex items-center gap-3">
           <button className="flex items-center gap-2 px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white rounded-md text-xs font-bold uppercase tracking-widest transition-colors border border-white/10">
             <Download size={14} className="text-slate-400" />

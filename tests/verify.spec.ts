@@ -143,6 +143,57 @@ test('Verify that the React app loads and displays the main dashboard shell with
   await page.screenshot({ path: 'evidence_old.png' });
 });
 
+test('Verify "Render & Cache" is moved to ReviewHeader and removed from NotesSidebar', async ({ page }) => {
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'test-asset-123',
+          file: 'dummy_file.mp4'
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          page: 1,
+          perPage: 30,
+          totalItems: 0,
+          totalPages: 1,
+          items: []
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.goto('/review/test-asset-123');
+
+  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+
+  // Verify 'Render & Cache' is not in the sidebar
+  const sidebar = page.locator('aside').nth(1);
+  await expect(sidebar).toBeVisible();
+  await expect(sidebar.locator('text=Render & Cache')).not.toBeVisible();
+
+  // Verify 'Render & Cache' is in the header
+  const header = page.locator('header').first();
+  await expect(header).toBeVisible();
+  await expect(header.locator('text=Render & Cache')).toBeVisible();
+
+  await page.screenshot({ path: 'evidence.png' });
+});
+
 test('Verify the Chronological River displays structural elements like tick marks and waveforms in Review Mode.', async ({ page }) => {
   const assetId = 'test-asset-123';
 

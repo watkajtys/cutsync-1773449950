@@ -70,16 +70,6 @@ export const NotesSidebar: React.FC = () => {
               </button>
             </div>
           </div>
-          
-          <div className="space-y-2">
-            <div className="flex justify-between items-center text-[9px] font-bold text-slate-500 uppercase tracking-widest">
-              <span>Render & Cache</span>
-              <span className="text-primary">100%</span>
-            </div>
-            <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full bg-primary/80 w-full rounded-full"></div>
-            </div>
-          </div>
         </div>
       </section>
       
