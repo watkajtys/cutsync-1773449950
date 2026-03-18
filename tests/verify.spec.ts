@@ -191,7 +191,7 @@ test('Verify "Render & Cache" is moved to ReviewHeader and removed from NotesSid
   await expect(header).toBeVisible();
   await expect(header.locator('text=Render & Cache')).toBeVisible();
 
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify the Chronological River displays structural elements like tick marks and waveforms in Review Mode.', async ({ page }) => {
