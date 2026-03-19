@@ -1,10 +1,12 @@
 import React from 'react';
 import { Wand2, PlayCircle, ImageOff } from 'lucide-react';
 import { usePrep } from '../../contexts/PrepContext';
+import { useVideoPlayback } from '../../contexts/VideoPlaybackContext';
 import { formatTimecode } from '../../utils/timeFormat';
 
 export const CutSuggestions: React.FC = () => {
-  const { cutSuggestions, setCurrentTime } = usePrep();
+  const { cutSuggestions } = usePrep();
+  const { setCurrentTime } = useVideoPlayback();
 
   return (
     <div className="w-1/2 flex flex-col border-r border-white/5 bg-surface">

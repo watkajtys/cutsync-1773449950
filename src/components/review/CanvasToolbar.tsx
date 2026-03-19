@@ -5,12 +5,12 @@ export const CanvasToolbar: React.FC = () => {
   const { activeTool, setActiveTool, activeColor, setActiveColor, resetCanvas } = useReview();
 
   return (
-    <div className="absolute left-6 top-1/2 -translate-y-1/2 bg-black/80 backdrop-blur-md border border-white/10 rounded-2xl p-2 z-30 flex flex-col gap-3 shadow-2xl">
+    <div className="absolute left-6 top-1/2 -translate-y-1/2 bg-black/80 backdrop-blur-xl border border-white/20 rounded-2xl p-2 z-30 flex flex-col gap-3 shadow-[0_0_30px_rgba(0,0,0,0.8)]">
       <div className="flex flex-col gap-2">
         <button
           onClick={() => setActiveTool('pointer')}
           className={`p-2 rounded-xl transition-all ${
-            activeTool === 'pointer' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white hover:bg-white/10'
+            activeTool === 'pointer' ? 'bg-primary text-white shadow-[0_0_15px_rgba(59,130,246,0.6)]' : 'text-slate-400 hover:text-white hover:bg-white/10'
           }`}
         >
           <span className="material-symbols-outlined text-[20px]">near_me</span>
@@ -18,7 +18,7 @@ export const CanvasToolbar: React.FC = () => {
         <button
           onClick={() => setActiveTool('freehand')}
           className={`p-2 rounded-xl transition-all ${
-            activeTool === 'freehand' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white hover:bg-white/10'
+            activeTool === 'freehand' ? 'bg-primary text-white shadow-[0_0_15px_rgba(59,130,246,0.6)]' : 'text-slate-400 hover:text-white hover:bg-white/10'
           }`}
         >
           <span className="material-symbols-outlined text-[20px]">gesture</span>
@@ -26,7 +26,7 @@ export const CanvasToolbar: React.FC = () => {
         <button
           onClick={() => setActiveTool('rect')}
           className={`p-2 rounded-xl transition-all ${
-            activeTool === 'rect' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white hover:bg-white/10'
+            activeTool === 'rect' ? 'bg-primary text-white shadow-[0_0_15px_rgba(59,130,246,0.6)]' : 'text-slate-400 hover:text-white hover:bg-white/10'
           }`}
         >
           <span className="material-symbols-outlined text-[20px]">rectangle</span>
@@ -34,7 +34,7 @@ export const CanvasToolbar: React.FC = () => {
         <button
           onClick={() => setActiveTool('arrow')}
           className={`p-2 rounded-xl transition-all ${
-            activeTool === 'arrow' ? 'bg-primary text-white' : 'text-slate-400 hover:text-white hover:bg-white/10'
+            activeTool === 'arrow' ? 'bg-primary text-white shadow-[0_0_15px_rgba(59,130,246,0.6)]' : 'text-slate-400 hover:text-white hover:bg-white/10'
           }`}
         >
           <span className="material-symbols-outlined text-[20px]">north_east</span>

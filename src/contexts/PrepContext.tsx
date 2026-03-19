@@ -1,65 +1,29 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import PocketBase from 'pocketbase';
 import { pb } from '../lib/pocketbase';
+import { fetchTranscripts, fetchCutSuggestions } from '../api/prep';
 
 export interface PrepContextType {
   assetId: string;
   pb: PocketBase;
-  currentTime: number;
-  duration: number;
-  setCurrentTime: (time: number, programmatic?: boolean) => void;
-  setDuration: (time: number) => void;
-  videoRef: React.RefObject<HTMLVideoElement | null>;
   transcripts: any[];
   cutSuggestions: any[];
-  assetUrl: string | null;
 }
 
 const PrepContext = createContext<PrepContextType | undefined>(undefined);
 
 export const PrepProvider: React.FC<{ assetId: string; children: React.ReactNode }> = ({ assetId, children }) => {
-  const [currentTime, setCurrentTimeState] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [transcripts, setTranscripts] = useState<any[]>([]);
   const [cutSuggestions, setCutSuggestions] = useState<any[]>([]);
-  const [assetUrl, setAssetUrl] = useState<string | null>(null);
-
-  const setCurrentTime = (time: number, programmatic: boolean = true) => {
-    setCurrentTimeState(time);
-    if (programmatic && videoRef.current) {
-        if (Math.abs(videoRef.current.currentTime - time) > 0.1) {
-            videoRef.current.currentTime = time;
-            // Dispatch native timeupdate event to trigger any internal listeners
-            videoRef.current.dispatchEvent(new Event('timeupdate'));
-        }
-    }
-  };
 
   useEffect(() => {
     const fetchPrepData = async () => {
         try {
-            try {
-                const assetRecord = await pb.collection('assets').getOne(assetId, { requestKey: null });
-                if (assetRecord && assetRecord.file) {
-                    setAssetUrl(pb.files.getUrl(assetRecord, assetRecord.file));
-                }
-            } catch (err) {
-                console.error('Failed to fetch asset record:', err);
-            }
             
-            const transcriptRes = await pb.collection('ai_transcripts').getFullList({
-                filter: `asset_id = "${assetId}"`,
-                sort: '+created',
-                requestKey: null
-            });
+            const transcriptRes = await fetchTranscripts(assetId);
             setTranscripts(transcriptRes);
 
-            const cutRes = await pb.collection('ai_cut_suggestions').getFullList({
-                filter: `asset_id = "${assetId}"`,
-                sort: '+start_timecode',
-                requestKey: null
-            });
+            const cutRes = await fetchCutSuggestions(assetId);
             setCutSuggestions(cutRes);
         } catch (error) {
             console.error('Failed to fetch prep data:', error);
@@ -73,14 +37,8 @@ export const PrepProvider: React.FC<{ assetId: string; children: React.ReactNode
       value={{
         assetId,
         pb,
-        currentTime,
-        duration,
-        setCurrentTime,
-        setDuration,
-        videoRef,
         transcripts,
-        cutSuggestions,
-        assetUrl
+        cutSuggestions
       }}
     >
       {children}

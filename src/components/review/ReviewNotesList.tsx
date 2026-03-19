@@ -48,13 +48,13 @@ export const ReviewNotesList: React.FC<ReviewNotesListProps> = ({ notes, error }
           <div 
             key={note.id}
             onClick={() => seekToNote(note)} 
-            className="group relative bg-white/5 p-3 rounded-lg border border-white/5 hover:border-primary/50 transition-colors cursor-pointer"
+            className="group relative bg-white/5 p-3 rounded-lg border border-white/5 hover:border-primary/50 transition-all cursor-pointer shadow-sm hover:shadow-[0_0_15px_rgba(59,130,246,0.15)]"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-mono text-primary font-bold px-1.5 py-0.5 rounded bg-primary/10">{formatTimecode(note.timestamp)}</span>
-              <span className="text-[9px] text-slate-500 font-bold">{note.created ? formatTimeAgo(note.created) : ''}</span>
+              <span className="text-[10px] font-mono text-primary font-bold px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20 shadow-[0_0_8px_rgba(59,130,246,0.3)]">{formatTimecode(note.timestamp)}</span>
+              <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">{note.created ? formatTimeAgo(note.created) : ''}</span>
             </div>
-            <p className={`text-xs text-slate-300 leading-relaxed ${note.canvas_data ? 'italic border-l-2 border-primary/30 pl-2' : ''}`}>
+            <p className={`text-[13px] text-slate-200 leading-relaxed font-medium ${note.canvas_data ? 'italic border-l-[3px] border-primary/40 pl-3 bg-gradient-to-r from-primary/5 to-transparent py-1' : ''}`}>
               {note.canvas_data ? `"${note.note_text}"` : note.note_text}
             </p>
             <div className="mt-2 flex items-center gap-2">

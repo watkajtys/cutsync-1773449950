@@ -169,8 +169,8 @@ test('Verify Clear Canvas button is decoupled from Lifecycle & Versioning panel 
   const sidebar = page.locator('aside').first();
   await expect(sidebar).toBeVisible();
 
-  // Verify Lifecycle & Versioning section
-  await expect(page.locator('text=Lifecycle & Versioning')).toBeVisible();
+  // Verify Lifecycle & Versioning section is removed
+  await expect(page.locator('text=Lifecycle & Versioning')).not.toBeVisible();
 
   // Verify "Clear Canvas" is NOT present in the document at load
   await expect(page.locator('text=Clear Canvas')).not.toBeVisible();
@@ -510,11 +510,6 @@ test('Verify the Review Mode shell and layout for a specific asset', async ({ pa
   await expect(page.locator('text=SCENE 04 | TAKE 02 | V03').first()).toBeVisible();
   await expect(page.locator('text=4K DCI (4096 x 1716)').first()).toBeVisible();
 
-  // Verify the NotesSidebar section
-  await expect(page.locator('h3:has-text("Technical Metadata")').first()).toBeVisible();
-  await expect(page.locator('text=File Info').first()).toBeVisible();
-  await expect(page.locator('text=Color Space').first()).toBeVisible();
-
   // Verify mock timestamped notes in the sidebar
   await expect(page.locator('text=Sarah J.').first()).toBeVisible();
   await expect(page.locator('text=Mark K.').first()).toBeVisible();
@@ -606,9 +601,6 @@ test('View the review route and ensure the right 30% sidebar renders a scrollabl
   const sidebar = page.locator('aside').nth(1);
   await expect(sidebar).toBeVisible();
 
-  // Verify the Technical Metadata section
-  await expect(sidebar.locator('text=Technical Metadata')).toBeVisible();
-  
   // Verify the Review Notes section and count
   await expect(sidebar.locator('text=Review Notes (2)')).toBeVisible();
 
@@ -1795,64 +1787,6 @@ test('Verify the code structure to ensure God Component is decoupled', async () 
   expect(fs.existsSync(utilsPath)).toBeTruthy();
 });
 
-test('Verify that Review Notes section appears above Technical Metadata in DOM order', async ({ page }) => {
-  await page.route('**/api/collections/assets/records*', async (route, request) => {
-    if (request.method() === 'GET') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          id: 'test-asset-123',
-          file: 'dummy_file.mp4'
-        })
-      });
-    } else {
-      await route.continue();
-    }
-  });
-
-  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
-    if (request.method() === 'GET') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          page: 1,
-          perPage: 30,
-          totalItems: 0,
-          totalPages: 1,
-          items: []
-        })
-      });
-    } else {
-      await route.continue();
-    }
-  });
-
-  await page.goto(`/review/test-asset-123`);
-  
-  // Wait for elements to load
-  await expect(page.locator('text=Review Pipeline')).toBeVisible();
-
-  // Find the NotesSidebar container
-  const sidebar = page.locator('aside').nth(1);
-  await expect(sidebar).toBeVisible();
-
-  // Get all top-level sections in the sidebar
-  const sections = sidebar.locator('> section');
-  
-  // Verify order
-  const firstSectionText = await sections.nth(0).innerText();
-  const secondSectionText = await sections.nth(1).innerText();
-
-  // First section should contain "Review Notes"
-  expect(firstSectionText).toContain('REVIEW NOTES');
-  
-  // Second section should contain "Technical Metadata"
-  expect(secondSectionText).toContain('TECHNICAL METADATA');
-
-  await page.screenshot({ path: 'evidence_old.png' });
-});
 
 test('User draws on the canvas and submits the note. The canvas should clear instantly. User navigates back to Dashboard, and no stale event listener or memory leak warnings appear in the console.', async ({ page }) => {
   const assetId = 'asset_for_unmount_test';

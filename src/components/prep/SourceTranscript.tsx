@@ -1,10 +1,12 @@
 import React from 'react';
 import { AlignLeft, Search } from 'lucide-react';
 import { usePrep } from '../../contexts/PrepContext';
+import { useVideoPlayback } from '../../contexts/VideoPlaybackContext';
 import { formatTimecode } from '../../utils/timeFormat';
 
 export const SourceTranscript: React.FC = () => {
-  const { transcripts, currentTime, setCurrentTime } = usePrep();
+  const { transcripts } = usePrep();
+  const { currentTime, setCurrentTime } = useVideoPlayback();
 
   return (
     <div className="w-1/2 flex flex-col bg-surface-accent">

@@ -2,14 +2,15 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 import { fetchReviewNotes } from '../api/reviews';
 import { ReviewNote } from '../types/review';
 import { pb } from '../lib/pocketbase';
-import { useAnnotation } from './AnnotationContext';
 
 interface VideoPlaybackContextType {
   videoRef: React.RefObject<HTMLVideoElement>;
   seekToTime: (time: number) => void;
   seekToNote: (note: ReviewNote) => void;
   currentTime: number;
-  setCurrentTime: React.Dispatch<React.SetStateAction<number>>;
+  setCurrentTime: (time: number, programmatic?: boolean) => void;
+  duration: number;
+  setDuration: React.Dispatch<React.SetStateAction<number>>;
   viewingNoteTime: number | null;
   setViewingNoteTime: React.Dispatch<React.SetStateAction<number | null>>;
   notes: ReviewNote[];
@@ -23,21 +24,28 @@ interface VideoPlaybackContextType {
 const VideoPlaybackContext = createContext<VideoPlaybackContextType | undefined>(undefined);
 
 export const VideoPlaybackProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [currentTime, setCurrentTimeState] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
   const [viewingNoteTime, setViewingNoteTime] = useState<number | null>(null);
   const [notes, setNotes] = useState<ReviewNote[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [assetUrl, setAssetUrl] = useState<string | null>(null);
 
   const videoRef = React.useRef<HTMLVideoElement>(null);
-  const { setShapes } = useAnnotation();
+  
+  const setCurrentTime = (time: number, programmatic: boolean = true) => {
+    setCurrentTimeState(time);
+    if (programmatic && videoRef.current) {
+      if (Math.abs(videoRef.current.currentTime - time) > 0.1) {
+        videoRef.current.currentTime = time;
+        // Dispatch native timeupdate event to trigger any internal listeners
+        videoRef.current.dispatchEvent(new Event('timeupdate'));
+      }
+    }
+  };
 
   const seekToTime = (time: number) => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = time;
-      setCurrentTime(time);
-      videoRef.current.dispatchEvent(new Event('timeupdate'));
-    }
+    setCurrentTime(time, true);
   };
 
   const seekToNote = (note: ReviewNote) => {
@@ -46,7 +54,13 @@ export const VideoPlaybackProvider: React.FC<{ children: React.ReactNode }> = ({
       videoRef.current.currentTime = note.timestamp;
       setCurrentTime(note.timestamp);
       setViewingNoteTime(note.timestamp);
-      setShapes(note.canvas_data || []);
+      // We'll update shapes separately in ReviewContext if needed, 
+      // but VideoPlaybackContext shouldn't know about shapes directly.
+      // Actually, since ReviewContext combines them, we should emit an event or let AnnotationContext handle it, 
+      // but we can just use an event listener to decouple it.
+      // Wait, let's keep it simple: the caller of seekToNote in ReviewNotesList can also call setShapes.
+      // Or we can just leave it to ReviewContext.
+      videoRef.current.dispatchEvent(new CustomEvent('seekToNote', { detail: note }));
       videoRef.current.dispatchEvent(new Event('timeupdate'));
     }
   };
@@ -80,6 +94,8 @@ export const VideoPlaybackProvider: React.FC<{ children: React.ReactNode }> = ({
       seekToNote,
       currentTime,
       setCurrentTime,
+      duration,
+      setDuration,
       viewingNoteTime,
       setViewingNoteTime,
       notes,

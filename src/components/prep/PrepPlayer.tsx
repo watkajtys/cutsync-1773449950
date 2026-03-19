@@ -1,10 +1,18 @@
 import React, { useEffect } from 'react';
 import { Play, SkipForward, Volume2 } from 'lucide-react';
 import { usePrep } from '../../contexts/PrepContext';
+import { useVideoPlayback } from '../../contexts/VideoPlaybackContext';
 import { formatTimecode } from '../../utils/timeFormat';
 
 export const PrepPlayer: React.FC = () => {
-  const { videoRef, setCurrentTime, setDuration, currentTime, duration, assetUrl } = usePrep();
+  const { assetId } = usePrep();
+  const { videoRef, setCurrentTime, setDuration, currentTime, duration, assetUrl, loadAsset } = useVideoPlayback();
+
+  useEffect(() => {
+    if (assetId) {
+      loadAsset(assetId);
+    }
+  }, [assetId, loadAsset]);
 
   const handleTimeUpdate = () => {
     if (videoRef.current) {
