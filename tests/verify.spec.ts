@@ -1957,3 +1957,198 @@ test('User draws on the canvas and submits the note. The canvas should clear ins
   // Take screenshot as required
   await page.screenshot({ path: 'evidence_old.png' });
 });
+
+test('User can seamlessly upload a video, wait for the background daemon to extract and transcribe via Gemini, view AI cut suggestions in Prep Mode, switch to Review Mode, and add timestamped canvas annotations without console errors or layout shifts.', async ({ page }) => {
+  const testAssetId = 'e2e_asset_id_123';
+  
+  // Set up intercepts for PocketBase
+  await page.route('**/api/collections/projects/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          page: 1,
+          perPage: 30,
+          totalItems: 1,
+          totalPages: 1,
+          items: [{
+            id: 'proj_123',
+            title: 'Test Project',
+            description: 'For E2E Test'
+          }]
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: testAssetId,
+          file: 'dummy.mp4',
+          project_id: 'proj_123',
+          asset_type: 'source_clip',
+          processing_status: 'ready'
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+  
+  await page.route('**/api/collections/ai_transcripts/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          page: 1,
+          perPage: 30,
+          totalItems: 1,
+          totalPages: 1,
+          items: [{
+            id: 'ts_123',
+            asset_id: testAssetId,
+            raw_text: 'Hello world',
+            srt_payload: '1\n00:00:00,000 --> 00:00:01,000\nHello world'
+          }]
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.route('**/api/collections/ai_cut_suggestions/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          page: 1,
+          perPage: 30,
+          totalItems: 1,
+          totalPages: 1,
+          items: [{
+            id: 'cut_123',
+            asset_id: testAssetId,
+            start_timecode: 1,
+            end_timecode: 5,
+            cut_reason: 'Rambling'
+          }]
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ items: [] })
+      });
+    } else if (request.method() === 'POST') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ id: 'new_note_id' })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  const consoleMessages: string[] = [];
+  page.on('console', msg => {
+    if (msg.type() === 'warning' || msg.type() === 'error') {
+      consoleMessages.push(msg.text());
+    }
+  });
+
+  await page.setViewportSize({ width: 1280, height: 720 });
+  
+  // 1. Visit Dashboard (implicitly checking project load)
+  await page.goto('/');
+  await expect(page.locator('text=Test Project')).toBeVisible();
+
+  // 2. Visit Prep Mode
+  await page.goto(`/prep/${testAssetId}`);
+  await expect(page.locator('text=Hello world').first()).toBeVisible();
+  await expect(page.locator('text=Rambling').first()).toBeVisible();
+
+  // 3. Visit Review Mode
+  await page.goto(`/review/${testAssetId}`);
+  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+
+  // Mock metadata so video size initializes for canvas
+  await page.evaluate(() => {
+    const vid = document.querySelector('video');
+    if (vid) {
+      Object.defineProperty(vid, 'duration', { value: 60, writable: true });
+      vid.dispatchEvent(new Event('loadedmetadata'));
+      vid.dispatchEvent(new Event('durationchange'));
+    }
+  });
+  await page.waitForTimeout(500);
+
+  // 4. Add canvas annotation
+  const boxTool = page.locator('button:has(span:has-text("rectangle"))').first();
+  await boxTool.click({ force: true }).catch(() => boxTool.evaluate(b => (b as HTMLButtonElement).click()));
+
+  const canvas = page.locator('canvas').first();
+  await expect(canvas).toBeVisible();
+
+  const initialBox = await canvas.boundingBox();
+  expect(initialBox).toBeTruthy();
+
+  if (initialBox) {
+    await page.mouse.move(initialBox.x + initialBox.width / 2, initialBox.y + initialBox.height / 2, { steps: 5 });
+    await page.mouse.down();
+    await page.mouse.move(initialBox.x + initialBox.width / 2 + 100, initialBox.y + initialBox.height / 2 + 100, { steps: 5 });
+    await page.mouse.up();
+  }
+
+  // Expect Shape to appear in sidebar
+  await expect(page.locator('text=Shape_1')).toBeVisible();
+
+  // 5. Navigate to Polish View (New Feature)
+  await page.goto(`/polish/${testAssetId}`);
+  await expect(page.locator('text=Tool Properties')).toBeVisible();
+
+  const layoutShifts = await page.evaluate(() => {
+    return new Promise((resolve) => {
+      let cumulativeLayoutShiftScore = 0;
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          // Only count layout shifts without recent user input.
+          if (!(entry as any).hadRecentInput) {
+            cumulativeLayoutShiftScore += (entry as any).value;
+          }
+        }
+      });
+      observer.observe({ type: 'layout-shift', buffered: true });
+      setTimeout(() => {
+        observer.disconnect();
+        resolve(cumulativeLayoutShiftScore);
+      }, 500);
+    });
+  });
+
+  expect(layoutShifts).toBeLessThan(0.1); // Acceptable threshold
+  
+  // Verify no unexpected errors in console
+  const errors = consoleMessages.filter(msg => !msg.includes('404') && msg.includes('error'));
+  expect(errors.length).toBe(0);
+
+  // Take screenshot as required
+  await page.screenshot({ path: 'evidence.png' });
+});

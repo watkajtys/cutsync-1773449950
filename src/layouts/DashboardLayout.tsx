@@ -45,6 +45,15 @@ export const DashboardLayout: React.FC = () => {
               <PlayCircle size={18} />
               Review Pipeline
             </NavLink>
+            <NavLink 
+              to="/polish/test-asset"
+              className={({ isActive }) => 
+                `w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${isActive ? 'bg-blue-600/10 text-blue-400 font-medium' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`
+              }
+            >
+              <Film size={18} />
+              Production Polish
+            </NavLink>
           </div>
         </div>
 
