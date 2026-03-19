@@ -2,6 +2,7 @@ import React from 'react';
 import { Play, Pause, FastForward, Rewind, SkipBack, SkipForward, Volume2, Subtitles, Settings, Maximize } from 'lucide-react';
 import { useReview } from '../../contexts/ReviewContext';
 import { formatTimecode } from '../../utils/timeFormat';
+import { CanvasToolbar } from './CanvasToolbar';
 
 interface PlaybackControlsProps {
   isPlaying: boolean;
@@ -43,6 +44,10 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({ isPlaying, d
             {formatTimecode(duration)}
           </div>
         </div>
+      </div>
+      
+      <div className="flex-1 flex justify-center">
+        <CanvasToolbar />
       </div>
 
       <div className="flex items-center gap-8">

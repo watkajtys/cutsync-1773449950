@@ -3,7 +3,6 @@ import { useCanvasDrawing } from '../../hooks/useCanvasDrawing';
 import { useReview } from '../../contexts/ReviewContext';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { useNoteSync } from '../../hooks/useNoteSync';
-import { CanvasToolbar } from './CanvasToolbar';
 import { CoordinateOverlay } from './CoordinateOverlay';
 import { TimelineScrubber } from './TimelineScrubber';
 import { PlaybackControls } from './PlaybackControls';
@@ -46,8 +45,6 @@ export const TheaterPlayer: React.FC = () => {
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="video-container w-full max-w-6xl relative bg-slate-900 rounded-lg overflow-hidden shadow-2xl border border-white/5" style={{ aspectRatio: '21 / 9' }}>
           
-          <CanvasToolbar />
-
           <video 
             ref={videoRef}
             src={assetUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"}
