@@ -1955,5 +1955,5 @@ test('User draws on the canvas and submits the note. The canvas should clear ins
   expect(leakWarnings).toHaveLength(0);
 
   // Take screenshot as required
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
