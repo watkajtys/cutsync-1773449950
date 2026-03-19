@@ -2150,5 +2150,5 @@ test('User can seamlessly upload a video, wait for the background daemon to extr
   expect(errors.length).toBe(0);
 
   // Take screenshot as required
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
