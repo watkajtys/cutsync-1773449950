@@ -168,7 +168,7 @@ test('Verify CanvasToolbar is relocated from video container to bottom playback 
   await freehandTool.click();
   await expect(freehandTool).toHaveClass(/bg-primary/);
   
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify Clear Canvas button is decoupled from Lifecycle & Versioning panel and moved to Markup History area', async ({ page }) => {
