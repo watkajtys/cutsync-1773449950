@@ -5,7 +5,6 @@ import { RecentView } from './views/RecentView';
 import { SettingsView } from './views/SettingsView';
 import { ReviewView } from './views/ReviewView';
 import { PrepView } from './views/PrepView';
-import { ProductionPolishView } from './views/ProductionPolishView';
 
 export default function App() {
   return (
@@ -19,7 +18,6 @@ export default function App() {
         </Route>
         <Route path="/review/:assetId?" element={<ReviewView />} />
         <Route path="/prep/:assetId" element={<PrepView />} />
-        <Route path="/polish/:assetId?" element={<ProductionPolishView />} />
       </Routes>
     </Router>
   );

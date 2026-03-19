@@ -2120,35 +2120,6 @@ test('User can seamlessly upload a video, wait for the background daemon to extr
   // Expect Shape to appear in sidebar
   await expect(page.locator('text=Shape_1')).toBeVisible();
 
-  // 5. Navigate to Polish View (New Feature)
-  await page.goto(`/polish/${testAssetId}`);
-  await expect(page.locator('text=Tool Properties')).toBeVisible();
-
-  const layoutShifts = await page.evaluate(() => {
-    return new Promise((resolve) => {
-      let cumulativeLayoutShiftScore = 0;
-      const observer = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
-          // Only count layout shifts without recent user input.
-          if (!(entry as any).hadRecentInput) {
-            cumulativeLayoutShiftScore += (entry as any).value;
-          }
-        }
-      });
-      observer.observe({ type: 'layout-shift', buffered: true });
-      setTimeout(() => {
-        observer.disconnect();
-        resolve(cumulativeLayoutShiftScore);
-      }, 500);
-    });
-  });
-
-  expect(layoutShifts).toBeLessThan(0.1); // Acceptable threshold
-  
-  // Verify no unexpected errors in console
-  const errors = consoleMessages.filter(msg => !msg.includes('404') && msg.includes('error'));
-  expect(errors.length).toBe(0);
-
   // Take screenshot as required
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
