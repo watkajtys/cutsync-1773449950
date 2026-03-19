@@ -2198,5 +2198,5 @@ test('User draws a shape on the canvas and comment input is auto-focused', async
   await expect(textarea).toBeFocused();
 
   // Take screenshot as required
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
