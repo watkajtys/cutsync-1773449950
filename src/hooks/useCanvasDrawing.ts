@@ -9,7 +9,7 @@ export const useCanvasDrawing = () => {
 
   const {
     activeTool, activeColor, shapes, currentShape,
-    setShapes, setCurrentShape, videoRef
+    setShapes, setCurrentShape, videoRef, inputRef
   } = useReview();
 
   const shapesRef = useRef(shapes);
@@ -151,6 +151,9 @@ export const useCanvasDrawing = () => {
       isDrawing.current = false;
       setShapes([...shapesRef.current, currentShapeRef.current]);
       setCurrentShape(null);
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
     };
 
     canvas.addEventListener('pointerdown', handlePointerDown);
