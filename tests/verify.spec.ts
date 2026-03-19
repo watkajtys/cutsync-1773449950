@@ -2121,5 +2121,5 @@ test('User can seamlessly upload a video, wait for the background daemon to extr
   await expect(page.locator('text=Shape_1')).toBeVisible();
 
   // Take screenshot as required
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
