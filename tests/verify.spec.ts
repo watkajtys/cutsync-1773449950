@@ -2513,5 +2513,5 @@ test('The application loads cleanly in production mode with no console errors, a
   // Filter out the intentional PocketBase connection refused errors from contexts
   const filteredErrors = consoleErrors.filter(err => !err.includes('Failed to fetch asset for review') && !err.includes('Something went wrong while processing your request'));
   expect(filteredErrors).toHaveLength(0);
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
