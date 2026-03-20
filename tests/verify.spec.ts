@@ -2819,5 +2819,5 @@ test('Click a "Rambling" cut suggestion and verify the video jumps to the exact 
   });
   expect(currentTime).toBeCloseTo(15, 1);
 
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
