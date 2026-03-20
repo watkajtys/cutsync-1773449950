@@ -62,7 +62,7 @@ export const ReviewNotesList: React.FC<ReviewNotesListProps> = ({ notes, error }
                 {note.author === 'Sarah J.' ? (
                   <img alt="Sarah" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzKhWLSKnAzAauvIwjImoVPnPTt7-K2rcU455fWERDrWZcF8nPI2Q1G38CznoSOoZuwvZ6I01Vb789wHd_c9J01e6L5whT2ItHyaUQaMfx-izq9DyBNaPO5FPxnuh2UxkNcbRMVhQNRdKzrctpCwYbMvGqlOPrugw6B3N9Ot-OyWU131KF-43uxXfwexisEdIJhSoaUz9_ZY9Tw-5_EEBjWATiYcJlclLkKh40HR07xEi22LuZ4wJfpALdgSAPFdU2e0sOIHeZgbM"/>
                 ) : (
-                  <span className="text-[8px] text-white">{note.author.substring(0,2).toUpperCase()}</span>
+                  <span className="text-[8px] text-white">{note.author!.substring(0,2).toUpperCase()}</span>
                 )}
               </div>
               <span className="text-[10px] font-medium text-slate-400">{note.author}</span>
