@@ -2376,8 +2376,14 @@ test('The React application compiles to production without warnings, all PocketB
   expect(buildOutput.toLowerCase()).not.toContain('warn');
 
   // 3. Verify PocketBase indices (collections exist)
-  // MUST connect to http://loom-cutsync-pocketbase:8090 to reach the database inside the Docker network.
-  const collectionsResponse = await request.get('http://loom-cutsync-pocketbase:8090/api/collections');
+  // MUST connect to http://127.0.0.1:8090 to reach the database inside the Docker network.
+  const adminTokenRes = await request.post('http://127.0.0.1:8090/api/admins/auth-with-password', {
+    data: { identity: 'test@test.com', password: 'password123' }
+  });
+  const adminData = await adminTokenRes.json();
+  const collectionsResponse = await request.get('http://127.0.0.1:8090/api/collections', {
+    headers: { Authorization: adminData.token }
+  });
   expect(collectionsResponse.status()).toBe(200);
   
   const collectionsData = await collectionsResponse.json();
