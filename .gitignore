@@ -15,3 +15,4 @@ pb_data
 *.png.old
 node_modules\npocketbase.log\npb_data
 pocketbase
+venv/
