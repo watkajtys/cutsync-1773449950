@@ -14,7 +14,9 @@ export const ReviewView: React.FC = () => {
     <div className="text-slate-300 h-screen overflow-hidden flex flex-col bg-[#0c0e14] w-full">
       <ReviewHeader />
       <main className="flex-1 flex overflow-hidden">
-        <MarkupSidebar />
+        <ReviewErrorBoundary>
+          <MarkupSidebar />
+        </ReviewErrorBoundary>
         <ReviewErrorBoundary>
           <TheaterPlayer />
         </ReviewErrorBoundary>
