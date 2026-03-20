@@ -144,7 +144,7 @@ test('Verify that the React app loads and displays the main dashboard shell with
   await expect(page.locator('h3:has-text("Integration Test Project")').first()).toBeVisible();
 
   // Take screenshot at the end
-  
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify CanvasToolbar is relocated from video container to bottom playback controls', async ({ page }) => {
@@ -400,7 +400,7 @@ test('Verify center play button overlay is removed', async ({ page }) => {
   await expect(largePlayButton).toHaveCount(0);
 
   // Take screenshot of the new feature at the end
-  
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('User hits spacebar during playback; video pauses and new note input is focused.', async ({ page }) => {
@@ -475,7 +475,7 @@ test('User hits spacebar during playback; video pauses and new note input is foc
   await expect(textarea).toBeFocused();
 
   // Take screenshot of the evidence
-  
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify the Review Mode shell and layout for a specific asset', async ({ page }) => {
@@ -572,7 +572,7 @@ test('Verify the Review Mode shell and layout for a specific asset', async ({ pa
   await page.waitForTimeout(500);
 
   // Take screenshot of the new feature at the end
-  
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('View the review route and ensure the right 30% sidebar renders a scrollable list of styled mock notes with timestamps, alongside an input field at the bottom.', async ({ page }) => {
@@ -755,7 +755,7 @@ test('Verify the visual annotation tools render a drawing toolbar and overlay ca
   await expect(canvas).toHaveClass(/cursor-crosshair/);
 
   // Take screenshot of the new feature at the end
-  
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('User saves a note at 0:15, it persists in PocketBase. Clicking an older note at 0:05 scrubs the video directly to 0:05.', async ({ page }) => {
@@ -853,7 +853,7 @@ test('User saves a note at 0:15, it persists in PocketBase. Clicking an older no
   await expect(page.locator('text=New note at 0:15')).toBeVisible();
 
   // Take screenshot of evidence
-  
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 
@@ -951,7 +951,7 @@ test('Verify the Prep Mode UI layout and connect it to PocketBase to display sou
   await expect(page.locator("text=We've been tracking these signatures for three weeks.")).toBeVisible();
 
   // Take screenshot
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify Prep Mode video synchronization and click-to-scrub navigation', async ({ page }) => {
@@ -1956,7 +1956,7 @@ test('User draws on the canvas and submits the note. The canvas should clear ins
   expect(leakWarnings).toHaveLength(0);
 
   // Take screenshot as required
-  
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test("User rapidly clicks 'Save Note' during simulated high latency; UI prevents duplicate PocketBase records, maintains canvas state safely, and displays appropriate sync status without crashing.", async ({ page }) => {
@@ -2056,7 +2056,7 @@ test("User rapidly clicks 'Save Note' during simulated high latency; UI prevents
   expect(submitCount).toBe(1);
 
   // Take screenshot as required
-  
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('User can seamlessly upload a video, wait for the background daemon to extract and transcribe via Gemini, view AI cut suggestions in Prep Mode, switch to Review Mode, and add timestamped canvas annotations without console errors or layout shifts.', async ({ page }) => {
@@ -2222,7 +2222,7 @@ test('User can seamlessly upload a video, wait for the background daemon to extr
   await expect(page.locator('text=Shape_1')).toBeVisible();
 
   // Take screenshot as required
-  
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('User draws a shape on the canvas and comment input is auto-focused', async ({ page }) => {
@@ -2299,7 +2299,7 @@ test('User draws a shape on the canvas and comment input is auto-focused', async
   await expect(textarea).toBeFocused();
 
   // Take screenshot as required
-  
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify ReviewErrorBoundary catches rendering errors in ReviewNotesList', async ({ page }) => {
