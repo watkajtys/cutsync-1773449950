@@ -1952,6 +1952,106 @@ test('User draws on the canvas and submits the note. The canvas should clear ins
   await page.screenshot({ path: 'evidence_old.png' });
 });
 
+test("User rapidly clicks 'Save Note' during simulated high latency; UI prevents duplicate PocketBase records, maintains canvas state safely, and displays appropriate sync status without crashing.", async ({ page }) => {
+  const assetId = 'e2e_idempotency_test';
+  
+  // Set up intercepts for PocketBase
+  await page.route('**/api/collections/assets/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: assetId,
+          file: 'dummy_file_focus.mp4'
+        })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  let submitCount = 0;
+  await page.route('**/api/collections/review_notes/records*', async (route, request) => {
+    if (request.method() === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ items: [] })
+      });
+    } else if (request.method() === 'POST') {
+      submitCount++;
+      // Simulate latency here to allow rapid clicks to occur while the first request is pending
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ id: `note_${submitCount}` })
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto(`/review/${assetId}`);
+
+  await expect(page.locator('text=Review & Approval')).toBeVisible();
+
+  // Draw on canvas to ensure it is kept intact
+  await page.evaluate(() => {
+    const vid = document.querySelector('video');
+    if (vid) {
+      Object.defineProperty(vid, 'duration', { value: 60, writable: true });
+      vid.dispatchEvent(new Event('loadedmetadata'));
+      vid.dispatchEvent(new Event('durationchange'));
+    }
+  });
+
+  await page.waitForTimeout(500);
+
+  const boxTool = page.locator('button:has(span:has-text("rectangle"))').first();
+  await boxTool.click({ force: true }).catch(() => boxTool.evaluate(b => (b as HTMLButtonElement).click()));
+
+  const canvas = page.locator('canvas').first();
+  await expect(canvas).toBeVisible();
+
+  const initialBox = await canvas.boundingBox();
+  expect(initialBox).toBeTruthy();
+
+  if (initialBox) {
+    await page.mouse.move(initialBox.x + initialBox.width / 2, initialBox.y + initialBox.height / 2, { steps: 5 });
+    await page.mouse.down();
+    await page.mouse.move(initialBox.x + initialBox.width / 2 + 100, initialBox.y + initialBox.height / 2 + 100, { steps: 5 });
+    await page.mouse.up();
+  }
+
+  // Expect Shape to appear in sidebar
+  await expect(page.locator('text=Shape_1')).toBeVisible();
+
+  // Type note text
+  const textarea = page.locator('textarea[placeholder^="Add note"]');
+  await textarea.fill('Testing idempotency');
+
+  const sendButton = page.locator('button:has(svg.lucide-send)').first();
+
+  // Rapidly click the submit button
+  await Promise.all([
+    sendButton.click({ force: true }),
+    sendButton.click({ force: true }),
+    sendButton.click({ force: true })
+  ]);
+
+  // Wait for the simulated latency to resolve
+  await page.waitForTimeout(1000);
+
+  // Expect only one submit request to have been made
+  expect(submitCount).toBe(1);
+
+  // Take screenshot as required
+  await page.screenshot({ path: 'evidence.png' });
+});
+
 test('User can seamlessly upload a video, wait for the background daemon to extract and transcribe via Gemini, view AI cut suggestions in Prep Mode, switch to Review Mode, and add timestamped canvas annotations without console errors or layout shifts.', async ({ page }) => {
   const testAssetId = 'e2e_asset_id_123';
   

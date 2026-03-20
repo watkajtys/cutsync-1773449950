@@ -10,6 +10,7 @@ export const NotesSidebar: React.FC = () => {
   const { assetId } = useParams<{ assetId: string }>();
   const { resetCanvas, inputRef, notes, loadNotes, currentTime, shapes, error, setError, loadAsset } = useReview();
   const [noteText, setNoteText] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (assetId) {
@@ -19,8 +20,9 @@ export const NotesSidebar: React.FC = () => {
   }, [assetId, loadNotes, loadAsset]);
 
   const handleSubmitNote = async () => {
-    if (!noteText.trim() || !assetId) return;
+    if (!noteText.trim() || !assetId || isSubmitting) return;
     
+    setIsSubmitting(true);
     try {
       setError(null);
       await createReviewNote(
@@ -39,6 +41,8 @@ export const NotesSidebar: React.FC = () => {
     } catch (err) {
       console.error("Failed to save note:", err);
       setError("Failed to save review note. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -65,9 +69,14 @@ export const NotesSidebar: React.FC = () => {
             <div className="absolute bottom-3 right-3 flex items-center gap-2">
               <button
                 onClick={handleSubmitNote}
-                className="bg-primary hover:bg-primary/90 text-white p-1.5 rounded-md transition-colors shadow-lg"
+                disabled={isSubmitting}
+                className={`bg-primary hover:bg-primary/90 text-white p-1.5 rounded-md transition-colors shadow-lg ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                <Send size={16} strokeWidth={1.5} />
+                {isSubmitting ? (
+                  <span className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin"></span>
+                ) : (
+                  <Send size={16} strokeWidth={1.5} />
+                )}
               </button>
             </div>
           </div>

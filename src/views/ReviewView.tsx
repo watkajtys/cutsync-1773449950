@@ -6,6 +6,7 @@ import { NotesSidebar } from '../components/review/NotesSidebar';
 import { MarkupSidebar } from '../components/review/MarkupSidebar';
 import { ChronologicalRiver } from '../components/review/ChronologicalRiver';
 import { ReviewProvider } from '../contexts/ReviewContext';
+import { ReviewErrorBoundary } from '../components/review/ReviewErrorBoundary';
 
 export const ReviewView: React.FC = () => {
   return (
@@ -14,8 +15,12 @@ export const ReviewView: React.FC = () => {
       <ReviewHeader />
       <main className="flex-1 flex overflow-hidden">
         <MarkupSidebar />
-        <TheaterPlayer />
-        <NotesSidebar />
+        <ReviewErrorBoundary>
+          <TheaterPlayer />
+        </ReviewErrorBoundary>
+        <ReviewErrorBoundary>
+          <NotesSidebar />
+        </ReviewErrorBoundary>
       </main>
       <ChronologicalRiver />
       <footer className="h-8 bg-black border-t border-border-subtle px-4 flex items-center justify-between text-[9px] font-bold text-slate-500 uppercase tracking-widest">
