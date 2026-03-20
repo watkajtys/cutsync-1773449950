@@ -78,12 +78,16 @@ export const VideoPlaybackProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const loadAsset = useCallback(async (assetId: string) => {
     try {
+      if (!assetId) return;
       const assetRecord = await pb.collection('assets').getOne(assetId, { requestKey: null });
       if (assetRecord && assetRecord.file) {
         setAssetUrl(pb.files.getUrl(assetRecord, assetRecord.file));
+      } else {
+        setAssetUrl(null);
       }
     } catch (err) {
       console.error("Failed to fetch asset for review:", err);
+      setAssetUrl(null);
     }
   }, []);
 

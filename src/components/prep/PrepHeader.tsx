@@ -9,12 +9,12 @@ export const PrepHeader: React.FC = () => {
   const { transcripts, cutSuggestions } = usePrep();
 
   const handleExportSRT = () => {
-    const srtContent = exportTranscriptAsSRT(transcripts);
+    const srtContent = exportTranscriptAsSRT(transcripts || []);
     downloadBlob(srtContent, `transcript_${assetId}.srt`, 'text/plain');
   };
 
   const handleExportCSV = () => {
-    const csvContent = exportCutSuggestionsAsCSV(cutSuggestions);
+    const csvContent = exportCutSuggestionsAsCSV(cutSuggestions || []);
     downloadBlob(csvContent, `cut_suggestions_${assetId}.csv`, 'text/csv');
   };
 

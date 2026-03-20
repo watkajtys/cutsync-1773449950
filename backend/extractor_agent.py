@@ -124,6 +124,8 @@ def process_asset(asset):
         uploaded_file = None
         for attempt in range(5):
             try:
+                # We do not pass explicit retry options because we handle retries externally here.
+                # If internal tenacity/retry fails, it will throw an exception which we catch.
                 uploaded_file = genai.upload_file(local_audio_path)
                 break
             except Exception as upload_error:
@@ -141,11 +143,13 @@ def process_asset(asset):
             except Exception as poll_error:
                 logging.warning(f"[{asset_id}] Error polling file state: {poll_error}")
                 time.sleep(2)
-            else:
-                if uploaded_file.state.name == "ACTIVE":
-                    break
-                elif uploaded_file.state.name == "FAILED":
-                    raise Exception("Gemini file processing failed.")
+                continue
+            
+            if uploaded_file.state.name == "ACTIVE":
+                break
+            elif uploaded_file.state.name == "FAILED":
+                raise Exception("Gemini file processing failed.")
+            
             time.sleep(5)
         else:
             raise Exception("Timeout waiting for Gemini file processing.")
@@ -235,6 +239,8 @@ def process_asset(asset):
                     break
                 except Exception as del_err:
                     logging.warning(f"[{asset_id}] Failed to delete file from Gemini (attempt {del_attempt + 1}): {del_err}", exc_info=True)
+                    if del_attempt == 4:
+                        break # Give up without crashing after 5 retries
                     time.sleep(2)
 
 

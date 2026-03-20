@@ -21,7 +21,7 @@ export const CutSuggestions: React.FC = () => {
       </div>
 
       <div className="max-h-[320px] overflow-y-auto custom-scrollbar p-4 space-y-3">
-        {cutSuggestions.length > 0 ? (
+        {cutSuggestions && cutSuggestions.length > 0 ? (
           cutSuggestions.map((suggestion) => (
             <div
               key={suggestion.id}

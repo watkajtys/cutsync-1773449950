@@ -15,18 +15,25 @@ const PrepContext = createContext<PrepContextType | undefined>(undefined);
 export const PrepProvider: React.FC<{ assetId: string; children: React.ReactNode }> = ({ assetId, children }) => {
   const [transcripts, setTranscripts] = useState<any[]>([]);
   const [cutSuggestions, setCutSuggestions] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchPrepData = async () => {
+        setIsLoading(true);
         try {
-            
-            const transcriptRes = await fetchTranscripts(assetId);
-            setTranscripts(transcriptRes);
+            if (assetId) {
+                const transcriptRes = await fetchTranscripts(assetId);
+                setTranscripts(transcriptRes || []);
 
-            const cutRes = await fetchCutSuggestions(assetId);
-            setCutSuggestions(cutRes);
+                const cutRes = await fetchCutSuggestions(assetId);
+                setCutSuggestions(cutRes || []);
+            }
         } catch (error) {
             console.error('Failed to fetch prep data:', error);
+            setTranscripts([]);
+            setCutSuggestions([]);
+        } finally {
+            setIsLoading(false);
         }
     };
     fetchPrepData();

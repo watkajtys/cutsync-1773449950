@@ -22,7 +22,7 @@ export const SourceTranscript: React.FC = () => {
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-6">
         <div className="space-y-4">
-          {transcripts.length > 0 ? (
+          {transcripts && transcripts.length > 0 ? (
             transcripts.map((transcript, index) => {
               const mockTime = index * 10;
               const isActive = currentTime >= mockTime && currentTime < mockTime + 10;
