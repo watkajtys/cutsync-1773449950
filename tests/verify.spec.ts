@@ -2585,5 +2585,5 @@ test('Daemon detects a pending source_clip, transitions status to extracting_aud
 
   // Take the final screenshot required by the prompt
   await page.goto('/');
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
