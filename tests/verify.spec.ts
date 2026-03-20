@@ -2355,4 +2355,5 @@ test('Verify ReviewErrorBoundary catches rendering errors in ReviewNotesList', a
   
   
   await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
