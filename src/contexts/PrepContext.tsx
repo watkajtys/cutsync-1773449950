@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import PocketBase from 'pocketbase';
 import { pb } from '../lib/pocketbase';
-import { fetchTranscripts, fetchCutSuggestions } from '../api/prep';
 
 export interface PrepContextType {
   assetId: string;
@@ -22,10 +21,18 @@ export const PrepProvider: React.FC<{ assetId: string; children: React.ReactNode
         setIsLoading(true);
         try {
             if (assetId) {
-                const transcriptRes = await fetchTranscripts(assetId);
+                const transcriptRes = await pb.collection('ai_transcripts').getFullList({
+                  filter: `asset_id = "${assetId}"`,
+                  sort: '+created',
+                  requestKey: null
+                });
                 setTranscripts(transcriptRes || []);
 
-                const cutRes = await fetchCutSuggestions(assetId);
+                const cutRes = await pb.collection('ai_cut_suggestions').getFullList({
+                  filter: `asset_id = "${assetId}"`,
+                  sort: '+start_timecode',
+                  requestKey: null
+                });
                 setCutSuggestions(cutRes || []);
             }
         } catch (error) {
