@@ -2514,4 +2514,5 @@ test('The application loads cleanly in production mode with no console errors, a
   const filteredErrors = consoleErrors.filter(err => !err.includes('Failed to fetch asset for review') && !err.includes('Something went wrong while processing your request') && !err.includes('404 (Not Found)'));
   expect(filteredErrors).toHaveLength(0);
   await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
