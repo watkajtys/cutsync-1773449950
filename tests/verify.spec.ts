@@ -2360,7 +2360,7 @@ test('Verify ReviewErrorBoundary catches rendering errors in ReviewNotesList', a
   await expect(page.locator('button:has-text("Reload Interface")')).toBeVisible();
   
   
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 
@@ -2420,7 +2420,7 @@ test('The React application compiles to production without warnings, all PocketB
   expect(consoleErrors).toHaveLength(0);
 
   // 5. Take screenshot
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('The application loads cleanly in production mode with no console errors, and all core workflows (Prep Mode and Review Mode) operate as expected.', async ({ page }) => {
@@ -2513,5 +2513,5 @@ test('The application loads cleanly in production mode with no console errors, a
   // Filter out the intentional PocketBase connection refused errors from contexts
   const filteredErrors = consoleErrors.filter(err => !err.includes('Failed to fetch asset for review') && !err.includes('Something went wrong while processing your request') && !err.includes('404 (Not Found)'));
   expect(filteredErrors).toHaveLength(0);
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
