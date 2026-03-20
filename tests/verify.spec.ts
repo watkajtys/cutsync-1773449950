@@ -2049,7 +2049,7 @@ test("User rapidly clicks 'Save Note' during simulated high latency; UI prevents
   expect(submitCount).toBe(1);
 
   // Take screenshot as required
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('User can seamlessly upload a video, wait for the background daemon to extract and transcribe via Gemini, view AI cut suggestions in Prep Mode, switch to Review Mode, and add timestamped canvas annotations without console errors or layout shifts.', async ({ page }) => {
