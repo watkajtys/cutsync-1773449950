@@ -1,4 +1,5 @@
 migrate((app) => {
+  const assetsId = app.findCollectionByNameOrId("assets").id;
   // Update 'projects' collection
   const projects = app.findCollectionByNameOrId("projects");
   const nameField = projects.fields.getByName("name");
@@ -20,7 +21,7 @@ migrate((app) => {
     fields: [
       new RelationField({
         name: "asset_id",
-        collectionId: "pbc_1321337024",
+        collectionId: assetsId,
         maxSelect: 1
       }),
       new TextField({ name: "raw_text" }),
@@ -41,7 +42,7 @@ migrate((app) => {
     fields: [
       new RelationField({
         name: "asset_id",
-        collectionId: "pbc_1321337024",
+        collectionId: assetsId,
         maxSelect: 1
       }),
       new NumberField({ name: "start_timecode" }),
@@ -63,7 +64,7 @@ migrate((app) => {
     fields: [
       new RelationField({
         name: "asset_id",
-        collectionId: "pbc_1321337024",
+        collectionId: assetsId,
         maxSelect: 1
       }),
       new TextField({ name: "author" }),

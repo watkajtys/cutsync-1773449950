@@ -1,4 +1,5 @@
 migrate((app) => {
+  const assetsId = app.findCollectionByNameOrId("assets").id;
   // Create ai_transcripts collection
   const aiTranscripts = new Collection({
     name: "ai_transcripts",
@@ -6,7 +7,7 @@ migrate((app) => {
     fields: [
       new RelationField({
         name: "asset_id",
-        collectionId: "pbc_1321337024",
+        collectionId: assetsId,
         maxSelect: 1,
       }),
       new TextField({
@@ -26,7 +27,7 @@ migrate((app) => {
     fields: [
       new RelationField({
         name: "asset_id",
-        collectionId: "pbc_1321337024",
+        collectionId: assetsId,
         maxSelect: 1,
       }),
       new NumberField({
@@ -49,7 +50,7 @@ migrate((app) => {
     fields: [
       new RelationField({
         name: "asset_id",
-        collectionId: "pbc_1321337024",
+        collectionId: assetsId,
         maxSelect: 1,
       }),
       new TextField({

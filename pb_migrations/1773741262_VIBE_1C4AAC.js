@@ -1,5 +1,5 @@
 migrate((app) => {
-  const assetsCollectionId = "pbc_1321337024";
+  const assetsCollectionId = "pbc123456789013";
 
   const aiTranscripts = new Collection({
     name: "ai_transcripts",

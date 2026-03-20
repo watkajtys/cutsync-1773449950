@@ -1,5 +1,7 @@
 /* eslint-disable */
 migrate((db) => {
+  const dao = new Dao(db);
+  const assetsId = dao.findCollectionByNameOrId("assets").id;
   const collections = [
     {
       "id": "ait123456789012",
@@ -16,7 +18,7 @@ migrate((db) => {
           "presentable": false,
           "unique": false,
           "options": {
-            "collectionId": "pbc123456789013",
+            "collectionId": assetsId,
             "cascadeDelete": false,
             "minSelect": null,
             "maxSelect": 1,
@@ -75,7 +77,7 @@ migrate((db) => {
           "presentable": false,
           "unique": false,
           "options": {
-            "collectionId": "pbc123456789013",
+            "collectionId": assetsId,
             "cascadeDelete": false,
             "minSelect": null,
             "maxSelect": 1,
@@ -148,7 +150,7 @@ migrate((db) => {
           "presentable": false,
           "unique": false,
           "options": {
-            "collectionId": "pbc123456789013",
+            "collectionId": assetsId,
             "cascadeDelete": false,
             "minSelect": null,
             "maxSelect": 1,

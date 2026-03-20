@@ -1,4 +1,5 @@
 migrate((app) => {
+  const assetsId = app.findCollectionByNameOrId("assets").id;
   const collection = new Collection({
     name: "review_notes",
     type: "base",
@@ -10,7 +11,7 @@ migrate((app) => {
     fields: [
       new RelationField({
         name: "asset_id",
-        collectionId: "pbc_1321337024",
+        collectionId: assetsId,
         maxSelect: 1
       }),
       new TextField({

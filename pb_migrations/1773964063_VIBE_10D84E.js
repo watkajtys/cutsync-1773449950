@@ -1,4 +1,5 @@
 migrate((app) => {
+  const assetsId = app.findCollectionByNameOrId("assets").id;
   // 1. Update 'projects' collection: Industry standard copy (name -> title) and add description
   const projects = app.findCollectionByNameOrId("projects");
   const nameField = projects.fields.getByName("name");
@@ -17,7 +18,7 @@ migrate((app) => {
   });
   aiTranscripts.fields.add(new RelationField({
     name: "asset_id",
-    collectionId: "pbc_1321337024", // assets
+    collectionId: assetsId, // assets
     maxSelect: 1,
   }));
   aiTranscripts.fields.add(new TextField({
@@ -35,7 +36,7 @@ migrate((app) => {
   });
   aiCutSuggestions.fields.add(new RelationField({
     name: "asset_id",
-    collectionId: "pbc_1321337024", // assets
+    collectionId: assetsId, // assets
     maxSelect: 1,
   }));
   aiCutSuggestions.fields.add(new NumberField({
@@ -56,7 +57,7 @@ migrate((app) => {
   });
   reviewNotes.fields.add(new RelationField({
     name: "asset_id",
-    collectionId: "pbc_1321337024", // assets
+    collectionId: assetsId, // assets
     maxSelect: 1,
   }));
   reviewNotes.fields.add(new TextField({

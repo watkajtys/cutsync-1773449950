@@ -1,4 +1,5 @@
 migrate((app) => {
+  const assetsId = app.findCollectionByNameOrId("assets").id;
   const aiTranscripts = new Collection({
     name: "ai_transcripts",
     type: "base",
@@ -19,7 +20,7 @@ migrate((app) => {
       new Field({
         name: "asset_id",
         type: "relation",
-        collectionId: "pbc_1321337024",
+        collectionId: assetsId,
         maxSelect: 1
       }),
       new Field({
@@ -68,7 +69,7 @@ migrate((app) => {
       new Field({
         name: "asset_id",
         type: "relation",
-        collectionId: "pbc_1321337024",
+        collectionId: assetsId,
         maxSelect: 1
       }),
       new Field({
@@ -121,7 +122,7 @@ migrate((app) => {
       new Field({
         name: "asset_id",
         type: "relation",
-        collectionId: "pbc_1321337024",
+        collectionId: assetsId,
         maxSelect: 1
       }),
       new Field({

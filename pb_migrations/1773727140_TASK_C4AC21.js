@@ -1,4 +1,5 @@
 migrate((app) => {
+  const assetsId = app.findCollectionByNameOrId("assets").id;
     // 1. Update projects collection to match roadmap (title, description)
     const projects = app.findCollectionByNameOrId("pbc_484305853");
     if (projects) {
@@ -27,7 +28,7 @@ migrate((app) => {
     });
     aiTranscripts.fields.add(new RelationField({
         name: "asset_id",
-        collectionId: "pbc_1321337024",
+        collectionId: assetsId,
         maxSelect: 1
     }));
     aiTranscripts.fields.add(new TextField({ name: "raw_text" }));
@@ -47,7 +48,7 @@ migrate((app) => {
     });
     aiCutSuggestions.fields.add(new RelationField({
         name: "asset_id",
-        collectionId: "pbc_1321337024",
+        collectionId: assetsId,
         maxSelect: 1
     }));
     aiCutSuggestions.fields.add(new NumberField({ name: "start_timecode" }));
@@ -68,7 +69,7 @@ migrate((app) => {
     });
     reviewNotes.fields.add(new RelationField({
         name: "asset_id",
-        collectionId: "pbc_1321337024",
+        collectionId: assetsId,
         maxSelect: 1
     }));
     reviewNotes.fields.add(new TextField({ name: "author" }));
