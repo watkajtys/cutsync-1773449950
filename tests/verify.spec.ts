@@ -2354,6 +2354,5 @@ test('Verify ReviewErrorBoundary catches rendering errors in ReviewNotesList', a
   await expect(page.locator('button:has-text("Reload Interface")')).toBeVisible();
   
   
-  await page.screenshot({ path: 'evidence_old.png' });
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
