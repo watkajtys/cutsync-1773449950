@@ -2,7 +2,7 @@
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>CutSync Professional Review Suite - Lifecycle Variant</title>
+<title>CutSync - Immersive PrepMode</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -17,6 +17,8 @@
                         "background-dark": "#060a0d",
                         "panel-dark": "#0d1217",
                         "markup-green": "#39ff14",
+                        "polish-cyan": "#00f2ff",
+                        "prep-purple": "#a855f7",
                     },
                     fontFamily: {
                         "display": ["Space Grotesk", "sans-serif"]
@@ -37,32 +39,30 @@
         }
         .vfx-grid {
             background-image: 
-                linear-gradient(to right, rgba(57, 255, 20, 0.05) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(57, 255, 20, 0.05) 1px, transparent 1px);
-            background-size: 40px 40px;
+                linear-gradient(to right, rgba(168, 85, 247, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(168, 85, 247, 0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
         }
-        .telemetry-panel::-webkit-scrollbar {
+        .custom-scrollbar::-webkit-scrollbar {
             width: 4px;
         }
-        .telemetry-panel::-webkit-scrollbar-track {
+        .custom-scrollbar::-webkit-scrollbar-track {
             background: transparent;
         }
-        .telemetry-panel::-webkit-scrollbar-thumb {
-            background: #1e293b;
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
             border-radius: 10px;
         }
         .theater-player {
-            box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
-        }.property-drawer {
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+            box-shadow: inset 0 0 200px rgba(0,0,0,0.95);
         }
-        .property-drawer.collapsed {
-            width: 0;
-            padding-left: 0;
-            padding-right: 0;
-            overflow: hidden;
-            opacity: 0;
-            border-right-width: 0;
+        .overlay-panel {
+            backdrop-filter: blur(12px);
+            background: rgba(13, 18, 23, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .active-glow {
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
         }
     </style>
 </head>
@@ -70,246 +70,185 @@
 <header class="flex items-center justify-between whitespace-nowrap border-b border-white/5 px-6 py-3 bg-panel-dark z-50">
 <div class="flex items-center gap-8">
 <div class="flex items-center gap-3">
-<div class="size-8 flex items-center justify-center bg-primary rounded-lg shadow-lg shadow-primary/20">
-<span class="material-symbols-outlined text-white text-xl">sync_alt</span>
+<div class="size-8 flex items-center justify-center bg-prep-purple rounded-lg shadow-lg shadow-purple-500/20">
+<span class="material-symbols-outlined text-white text-xl">movie_edit</span>
 </div>
 <h1 class="text-slate-100 text-lg font-bold leading-tight tracking-tight uppercase">
-                CutSync <span class="text-primary text-[10px] font-mono border border-primary/40 rounded px-1.5 py-0.5 ml-1">PRO</span>
+                CutSync <span class="text-prep-purple text-[10px] font-mono border border-prep-purple/40 rounded px-1.5 py-0.5 ml-1 tracking-widest">PREP_MODE</span>
 </h1>
 </div>
 <div class="h-6 w-px bg-white/10 hidden md:block"></div>
 <nav class="hidden md:flex items-center gap-6">
 <div class="flex items-center gap-2">
-<span class="text-slate-500 text-[9px] font-bold uppercase tracking-widest">Project</span>
-<a class="text-slate-300 hover:text-primary transition-colors text-xs font-medium" href="#">ALPHA_PRODUCTION_R10</a>
+<span class="text-slate-500 text-[9px] font-bold uppercase tracking-widest">Source</span>
+<a class="text-slate-300 hover:text-prep-purple transition-colors text-xs font-medium" href="#">A004_C012_0412_RAW</a>
 </div>
 <span class="text-slate-700 text-xs">/</span>
 <div class="flex items-center gap-2">
-<span class="text-slate-500 text-[9px] font-bold uppercase tracking-widest">Asset</span>
-<span class="text-slate-100 text-xs font-medium">VFX_SHOT_SC042_V09</span>
+<span class="text-slate-500 text-[9px] font-bold uppercase tracking-widest">PocketBase</span>
+<span class="text-markup-green text-[10px] font-bold uppercase">Connected</span>
 </div>
 </nav>
 </div>
 <div class="flex items-center gap-4">
-<div class="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 rounded-full border border-red-500/30">
-<span class="size-1.5 rounded-full bg-red-500 animate-pulse"></span>
-<span class="text-[9px] font-mono tracking-widest text-red-400 font-bold uppercase">Live Session</span>
+<div class="flex items-center gap-2 px-3 py-1.5 bg-prep-purple/10 rounded-full border border-prep-purple/30">
+<span class="size-1.5 rounded-full bg-prep-purple animate-pulse"></span>
+<span class="text-[9px] font-mono tracking-widest text-prep-purple font-bold uppercase">AI Indexing Active</span>
 </div>
-<button class="flex items-center justify-center rounded-lg h-9 px-4 bg-slate-800 text-slate-100 text-[11px] font-bold uppercase tracking-wider hover:bg-slate-700 transition-all border border-white/5">
-<span class="material-symbols-outlined text-sm mr-2">ios_share</span>
-            Export Notes
+<button class="flex items-center justify-center rounded-lg h-9 px-4 border border-white/10 text-slate-300 text-[11px] font-bold uppercase tracking-wider hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined text-sm mr-2">settings_input_component</span>
+            Source Config
         </button>
-<div class="size-8 rounded-full border border-primary/40 overflow-hidden bg-slate-800">
+<div class="size-8 rounded-full border border-prep-purple/40 overflow-hidden bg-slate-800">
 <img alt="User Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBo3FUiQvMPUtmO6LyBn_8P6ZuAm7Dm8z-_xnVVDLn19_9zOjPWXdZo8Qdc1mHbSu4zfskNIzoolQQuM21m6J5s1GLom-YndlXh-OL6DU7iJ3SCWSD8nbceaECVL5MN6lwb3VNtvbTIww2B0DoGpubfaIWxtzv92SzhJIWp16KQ6Fp95S6gFUFfGVhYnZMmhyAMn-ob7wmgGJxhCMj_9owNUwDEZcqqvsHKvLukYxkiwuFVLAGm3hxkxkPI0cZZvmUkxS7kEizbpqQC"/>
 </div>
 </div>
 </header>
-<main class="flex-1 flex overflow-hidden">
-<aside class="property-drawer w-64 flex flex-col border-r border-white/5 bg-panel-dark" id="tool-properties-panel">
-<div class="p-5 border-b border-white/5">
-<div class="flex items-center justify-between mb-5">
-<h3 class="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">Tool Properties</h3>
-<span class="material-symbols-outlined text-sm text-primary">tune</span>
-</div>
-<div class="space-y-6">
-<div class="space-y-3">
-<div class="flex justify-between items-center">
-<label class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Color</label>
-<span class="text-[9px] font-mono text-markup-green">#39FF14</span>
-</div>
-<div class="flex flex-wrap gap-2">
-<button class="size-5 rounded-full bg-markup-green ring-2 ring-white ring-offset-2 ring-offset-panel-dark"></button>
-<button class="size-5 rounded-full bg-red-500 hover:scale-110 transition-transform"></button>
-<button class="size-5 rounded-full bg-blue-500 hover:scale-110 transition-transform"></button>
-<button class="size-5 rounded-full bg-yellow-400 hover:scale-110 transition-transform"></button>
-<button class="size-5 rounded-full bg-white hover:scale-110 transition-transform"></button>
-</div>
-</div>
-<div class="space-y-3">
-<div class="flex justify-between items-center">
-<label class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Stroke</label>
-<span class="text-[10px] font-mono text-slate-100">2PX</span>
-</div>
-<div class="px-1">
-<div class="relative h-1 bg-slate-800 rounded-full flex items-center">
-<div class="absolute inset-y-0 left-0 w-1/4 bg-primary rounded-full"></div>
-<div class="absolute left-1/4 size-3 bg-white rounded-full shadow-xl cursor-pointer"></div>
-</div>
-</div>
-</div>
-<div class="flex items-center justify-between pt-2">
-<span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Snap to Grid</span>
-<button class="w-7 h-3.5 bg-primary rounded-full relative">
-<div class="absolute right-0.5 top-0.5 size-2.5 bg-white rounded-full"></div>
+<main class="flex-1 flex overflow-hidden relative">
+<aside class="w-16 flex flex-col items-center py-6 border-r border-white/5 bg-panel-dark z-40">
+<div class="flex flex-col gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-prep-purple text-white shadow-lg shadow-purple-500/20 group relative">
+<span class="material-symbols-outlined">description</span>
+<span class="absolute left-14 bg-panel-dark border border-white/10 px-2 py-1 rounded text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">AI Transcript</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-transparent text-slate-500 hover:text-white hover:bg-white/5 transition-all group relative">
+<span class="material-symbols-outlined">auto_awesome_motion</span>
+<span class="absolute left-14 bg-panel-dark border border-white/10 px-2 py-1 rounded text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">Cut Suggestions</span>
+</button>
+<div class="w-6 h-px bg-white/10 my-2"></div>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-transparent text-slate-500 hover:text-white hover:bg-white/5 transition-all group relative">
+<span class="material-symbols-outlined">closed_caption</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-transparent text-slate-500 hover:text-white hover:bg-white/5 transition-all group relative">
+<span class="material-symbols-outlined">analytics</span>
 </button>
 </div>
-</div>
-</div>
-<div class="p-5 border-b border-white/5 bg-white/[0.02]">
-<h3 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
-<span class="material-symbols-outlined text-sm">history_toggle_off</span>
-                Lifecycle &amp; Versioning
-            </h3>
-<div class="grid grid-cols-2 gap-2">
-<button class="flex flex-col items-center justify-center gap-1.5 p-3 rounded bg-white/5 border border-white/10 hover:bg-primary/10 hover:border-primary/30 transition-all group">
-<span class="material-symbols-outlined text-lg text-slate-400 group-hover:text-primary">save</span>
-<span class="text-[8px] font-bold uppercase tracking-tighter text-slate-500 group-hover:text-slate-300">Save State</span>
+<div class="mt-auto flex flex-col gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-transparent text-slate-500 hover:text-white transition-all">
+<span class="material-symbols-outlined">fullscreen</span>
 </button>
-<button class="flex flex-col items-center justify-center gap-1.5 p-3 rounded bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all group">
-<span class="material-symbols-outlined text-lg text-slate-400 group-hover:text-slate-200">settings_backup_restore</span>
-<span class="text-[8px] font-bold uppercase tracking-tighter text-slate-500 group-hover:text-slate-300">Revert</span>
-</button>
-<button class="col-span-2 py-2 flex items-center justify-center gap-2 rounded bg-red-500/5 text-red-500/70 border border-red-500/10 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 transition-all font-bold text-[9px] uppercase tracking-[0.15em]">
-<span class="material-symbols-outlined text-sm">delete_sweep</span>
-                    Clear Canvas
-                </button>
-</div>
-</div>
-<div class="flex-1 overflow-y-auto telemetry-panel p-5">
-<h3 class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-4">Markup History</h3>
-<div class="space-y-2">
-<div class="p-3 bg-white/5 rounded border border-white/5 flex items-center justify-between group cursor-pointer hover:bg-white/10 transition-colors">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-sm text-markup-green">gesture</span>
-<span class="text-xs text-slate-300 font-medium">Path_01</span>
-</div>
-<span class="material-symbols-outlined text-sm text-slate-500 group-hover:text-slate-200">visibility</span>
-</div>
-<div class="p-3 bg-white/5 rounded border border-white/5 flex items-center justify-between group cursor-pointer hover:bg-white/10 transition-colors">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-sm text-markup-green">rectangle</span>
-<span class="text-xs text-slate-300 font-medium">Subject_Track</span>
-</div>
-<span class="material-symbols-outlined text-sm text-slate-500 group-hover:text-slate-200">visibility</span>
-</div>
-</div>
 </div>
 </aside>
-<section class="flex-1 relative flex flex-col bg-black overflow-hidden">
-<div class="absolute left-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2 p-1.5 bg-panel-dark/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl">
-<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-primary text-white shadow-lg shadow-primary/20 transition-all">
-<span class="material-symbols-outlined">gesture</span>
-</button>
-<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
-<span class="material-symbols-outlined">rectangle</span>
-</button>
-<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
-<span class="material-symbols-outlined">text_fields</span>
-</button>
-<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
-<span class="material-symbols-outlined">near_me</span>
-</button>
-<div class="w-8 h-px bg-white/10 mx-auto my-1"></div>
-<button class="w-12 h-12 flex items-center justify-center rounded-lg bg-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
-<span class="material-symbols-outlined">undo</span>
-</button>
+<section class="flex-1 relative flex flex-col bg-black overflow-hidden theater-player">
+<div class="absolute inset-0 bg-cover bg-center grayscale-[0.1] brightness-[0.6]" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCaiU-zZy-lKEZt0HFd9J0pawpp9jxpuixzD3nzMOCErZyqKbgP6G3iYmSRMIAq9AfCsxsdX5j5O9b5Y43N_C3Swoyd331ph3LdlNGrAQCGJFaCnIW3kQjoy9HVh-Z0iVeiEXDpLq1LYq3zTIBUQlzaFhkJcl2VYNWeUGmzmogifrQnkgPXyeNiMINUAlVpChS2FlGeS9yNy9XzdXu-GgbikUCzVNXwuaquGDrHFjR6bDax_q61a_J1N0Oh9R4MD_Qt71rjmhLMqj5n");'></div>
+<div class="absolute inset-0 vfx-grid pointer-events-none opacity-30"></div>
+<div class="absolute left-6 top-6 bottom-32 w-80 overlay-panel rounded-xl flex flex-col shadow-2xl z-30 transition-all">
+<div class="p-4 border-b border-white/5 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-prep-purple text-lg">description</span>
+<h3 class="text-[11px] font-bold uppercase tracking-widest text-slate-200">AI Transcript</h3>
 </div>
-<div class="flex-1 relative theater-player group cursor-crosshair">
-<div class="absolute inset-0 bg-cover bg-center grayscale-[0.3] brightness-[0.6]" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD2AZ_NMPDe4Kos-nYVqsRmUb3TXmsfEQ6AZ1Cp-BQZXIF_NySXN66WQDBpvpAxvWHg_bTX3-jdFipaJxvR1YTzd3TnhDB6tUizEZIMM5FVSwzz3Gx-lav-Nn6pd6qY43UE_frcoAm4u_Pu3ILQqeMvlWpnd2fu2IvGUqoXRF_nMgeweVTbrkDhAuJ80hZ_Z5uI_oQOlDaIGc-rxWNfsqEqwRSA2b8l4GHo6PJ1aS9EsXzZ13uJAgVpRjnrtxja1qEGXz45gIaXTSal");'></div>
-<div class="absolute inset-0 vfx-grid pointer-events-none opacity-20"></div>
-<div class="absolute inset-0 z-10 pointer-events-none">
-<div class="absolute top-[22%] left-[32%] w-[420px] h-[260px] border-2 border-markup-green shadow-[0_0_20px_rgba(57,255,20,0.3)]">
-<div class="absolute -top-7 left-0 flex gap-2">
-<span class="bg-markup-green text-black text-[9px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider">SUBJECT_TRACK_01</span>
-<span class="bg-black/90 text-markup-green text-[9px] font-mono px-2 py-0.5 border border-markup-green/40 backdrop-blur-md">X: 1242 Y: 432</span>
+<button class="material-symbols-outlined text-slate-500 hover:text-white text-sm">close</button>
 </div>
-<div class="absolute -left-[100vw] right-[-100vw] top-1/2 h-[0.5px] bg-markup-green/30 dashed"></div>
-<div class="absolute -top-[1024px] bottom-[-100vh] left-1/2 w-[0.5px] bg-markup-green/30 dashed"></div>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-6">
+<div class="space-y-2 opacity-60">
+<span class="text-[10px] font-mono text-prep-purple">00:12:05:10</span>
+<p class="text-xs leading-relaxed text-slate-300">"The initial sequence needs to establish the atmosphere of the abandoned warehouse."</p>
+</div>
+<div class="space-y-2 bg-white/5 p-3 rounded-lg border border-prep-purple/20">
+<span class="text-[10px] font-mono text-prep-purple font-bold">00:14:22:09</span>
+<p class="text-xs leading-relaxed text-white">"We should see a tighter close-up on the protagonist's hand as they reach for the dusty shelf."</p>
+<div class="flex gap-2 mt-2">
+<span class="text-[8px] bg-prep-purple/20 text-prep-purple px-1.5 py-0.5 rounded font-bold">KEYWORD: DUSTY</span>
+<span class="text-[8px] bg-prep-purple/20 text-prep-purple px-1.5 py-0.5 rounded font-bold">ACTION: REACH</span>
 </div>
 </div>
-<div class="absolute left-20 top-8 font-mono text-slate-500 text-[10px] space-y-1 bg-black/40 backdrop-blur p-2 rounded border border-white/5">
-<div class="flex items-center gap-2"><span class="w-12 text-slate-400">REC</span> <span class="text-red-500">â</span></div>
-<div class="flex items-center gap-2"><span class="w-12 text-slate-400">GAMMA</span> <span>2.4</span></div>
-<div class="flex items-center gap-2"><span class="w-12 text-slate-400">ISO</span> <span>800</span></div>
+<div class="space-y-2 opacity-60">
+<span class="text-[10px] font-mono text-prep-purple">00:16:30:00</span>
+<p class="text-xs leading-relaxed text-slate-300">"Light shafts through the broken windows should be the primary focal point."</p>
 </div>
-<div class="absolute right-8 bottom-8 flex flex-col gap-2 z-30">
-<div class="px-3 py-1.5 bg-black/80 border border-white/10 backdrop-blur-md rounded flex items-center gap-4">
-<span class="text-[9px] text-slate-500 uppercase font-bold tracking-widest">Resolution</span>
-<span class="text-[11px] font-mono text-slate-100">4096 Ã 2160 (DCI)</span>
+</div>
+<div class="p-3 border-t border-white/5">
+<div class="relative">
+<input class="w-full bg-black/40 border border-white/10 rounded-lg py-2 px-3 text-[10px] focus:border-prep-purple transition-all outline-none" placeholder="Search transcript..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-2 text-sm text-slate-500">search</span>
 </div>
 </div>
 </div>
-<div class="bg-panel-dark border-t border-white/10 p-4">
-<div class="flex items-center gap-6">
-<div class="flex items-center gap-1">
-<button class="p-2 text-slate-400 hover:text-white transition-colors"><span class="material-symbols-outlined">skip_previous</span></button>
-<button class="p-2 text-slate-400 hover:text-white transition-colors"><span class="material-symbols-outlined">replay_10</span></button>
-<button class="size-11 flex items-center justify-center rounded-full bg-primary text-white hover:bg-primary/80 mx-2 transition-all shadow-lg shadow-primary/20">
-<span class="material-symbols-outlined text-3xl">play_arrow</span>
-</button>
-<button class="p-2 text-slate-400 hover:text-white transition-colors"><span class="material-symbols-outlined">forward_10</span></button>
-<button class="p-2 text-slate-400 hover:text-white transition-colors"><span class="material-symbols-outlined">skip_next</span></button>
+<div class="absolute right-6 bottom-32 w-96 overlay-panel rounded-xl flex flex-col shadow-2xl z-30">
+<div class="p-4 border-b border-white/5 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-markup-green text-lg">auto_awesome_motion</span>
+<h3 class="text-[11px] font-bold uppercase tracking-widest text-slate-200">Smart Cut Suggestions</h3>
+</div>
+<button class="material-symbols-outlined text-slate-500 hover:text-white text-sm">expand_more</button>
+</div>
+<div class="p-4 space-y-3">
+<div class="flex items-start gap-3 p-3 bg-white/5 rounded-lg border border-white/5 hover:border-prep-purple/40 transition-all cursor-pointer group">
+<div class="size-12 rounded bg-slate-800 flex-shrink-0 flex items-center justify-center overflow-hidden border border-white/10">
+<img alt="cut thumb" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD98H2eY7T-H_6E4XvO6zUj-f1k6xZ9L6mY_H6v-V1Xq4"/>
 </div>
 <div class="flex-1">
-<div class="relative h-12 flex flex-col justify-center px-4">
-<div class="relative w-full h-1 bg-slate-800 rounded-full cursor-pointer">
-<div class="absolute inset-y-0 left-0 w-[42%] bg-primary">
-<div class="absolute right-0 top-1/2 -translate-y-1/2 size-4 bg-white rounded-full shadow-[0_0_15px_rgba(13,127,242,1)] border-2 border-primary"></div>
+<div class="flex justify-between items-start">
+<span class="text-[10px] font-bold text-slate-200">Action Match Cut</span>
+<span class="text-[9px] font-mono text-prep-purple">MATCH 88%</span>
+</div>
+<p class="text-[9px] text-slate-500 mt-1">Suggested jump from frame 429 to Scene 042 Close-up.</p>
 </div>
 </div>
-<div class="flex justify-between mt-2 font-mono text-[9px] text-slate-500">
-<span>00:00:00:00</span>
-<span class="text-primary font-bold">00:14:22:09</span>
-<span>00:32:15:00</span>
+<div class="flex items-start gap-3 p-3 bg-white/5 rounded-lg border border-white/5 hover:border-prep-purple/40 transition-all cursor-pointer">
+<div class="size-12 rounded bg-slate-800 flex-shrink-0 flex items-center justify-center overflow-hidden border border-white/10">
+<img alt="cut thumb" class="w-full h-full object-cover opacity-50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD98H2eY7T-H_6E4XvO6zUj-f1k6xZ9L6mY_H6v-V1Xq4"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<span class="text-[10px] font-bold text-slate-200">L-Cut Opportunity</span>
+<span class="text-[9px] font-mono text-slate-500">MATCH 74%</span>
+</div>
+<p class="text-[9px] text-slate-500 mt-1">Extend audio from previous clip for emotional continuity.</p>
 </div>
 </div>
 </div>
-<div class="flex items-center gap-6 pr-4">
-<div class="text-right">
-<div class="text-2xl font-mono font-bold text-slate-100 tracking-tighter">00:14:22:09</div>
-<div class="text-[9px] font-mono text-slate-500 uppercase">FRAME: 20,494</div>
+<div class="p-4 bg-prep-purple/5 flex justify-between items-center rounded-b-xl">
+<span class="text-[10px] font-bold text-prep-purple uppercase">PocketBase Sync</span>
+<div class="flex items-center gap-1.5">
+<span class="size-1.5 bg-markup-green rounded-full"></span>
+<span class="text-[9px] font-mono text-slate-400 uppercase">Real-time</span>
 </div>
-<div class="h-10 w-px bg-white/10"></div>
+</div>
+</div>
+<div class="absolute inset-x-0 bottom-0 bg-panel-dark/80 backdrop-blur-md border-t border-white/10 p-6 z-40">
+<div class="flex items-center gap-8">
 <div class="flex items-center gap-1">
-<button class="p-2 text-slate-400 hover:text-white transition-colors"><span class="material-symbols-outlined">volume_up</span></button>
-<button class="p-2 text-slate-400 hover:text-white transition-colors"><span class="material-symbols-outlined">fullscreen</span></button>
+<button class="p-2 text-slate-400 hover:text-white transition-colors"><span class="material-symbols-outlined">skip_previous</span></button>
+<button class="size-12 flex items-center justify-center rounded-full bg-prep-purple text-white hover:bg-purple-600 mx-2 transition-all shadow-lg shadow-purple-500/30">
+<span class="material-symbols-outlined text-3xl">play_arrow</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-white transition-colors"><span class="material-symbols-outlined">skip_next</span></button>
+</div>
+<div class="flex-1 flex flex-col gap-2">
+<div class="flex justify-between items-end mb-1">
+<div class="flex items-center gap-3">
+<span class="text-xs font-mono font-bold text-slate-100 tracking-tighter">00:14:22:09</span>
+<span class="text-[9px] font-mono text-slate-500 uppercase">Current TC</span>
+</div>
+<div class="flex gap-4">
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">In: 00:14:00:00</span>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Out: 00:14:45:12</span>
+</div>
+</div>
+<div class="relative h-2 w-full bg-slate-800/50 rounded-full cursor-pointer group/timeline">
+<div class="absolute left-[15%] top-0 bottom-0 w-1 bg-prep-purple/50"></div>
+<div class="absolute left-[45%] top-0 bottom-0 w-1 bg-prep-purple/50"></div>
+<div class="absolute left-[70%] top-0 bottom-0 w-1 bg-markup-green/50"></div>
+<div class="absolute inset-y-0 left-0 w-[42%] bg-prep-purple rounded-l-full relative">
+<div class="absolute right-0 top-1/2 -translate-y-1/2 size-4 bg-white rounded-full shadow-[0_0_15px_rgba(168,85,247,0.8)] border-2 border-prep-purple"></div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="h-10 w-px bg-white/5"></div>
+<div class="flex flex-col items-end">
+<div class="flex gap-2 mb-1">
+<button class="p-1 text-slate-500 hover:text-white"><span class="material-symbols-outlined text-xl">volume_up</span></button>
+<button class="p-1 text-slate-500 hover:text-white"><span class="material-symbols-outlined text-xl">settings</span></button>
+</div>
+<div class="text-[10px] font-mono text-slate-500 uppercase tracking-tighter">23.976 FPS | 4K RAW</div>
 </div>
 </div>
 </div>
 </div>
 </section>
-<aside class="w-80 border-l border-white/5 bg-panel-dark flex flex-col">
-<div class="p-5 border-b border-white/5 flex items-center justify-between">
-<h3 class="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">Annotations</h3>
-<span class="px-2 py-0.5 bg-primary/20 text-primary text-[10px] font-bold rounded-full">12 ACTIVE</span>
-</div>
-<div class="flex-1 overflow-y-auto telemetry-panel p-4 space-y-4">
-<div class="p-4 bg-white/5 rounded-xl border border-white/5 hover:border-primary/30 transition-all cursor-pointer">
-<div class="flex items-center justify-between mb-3">
-<span class="text-[10px] font-mono text-primary font-bold bg-primary/10 px-2 py-0.5 rounded">00:14:22:09</span>
-<span class="text-[10px] text-slate-500">NOW</span>
-</div>
-<p class="text-[11px] text-slate-300 leading-relaxed mb-4">Adjust exposure on background elements to match foreground tracking markers. Check the black point levels.</p>
-<div class="flex items-center justify-between">
-<div class="flex items-center gap-2">
-<div class="size-6 rounded bg-slate-800 flex items-center justify-center border border-white/5">
-<span class="material-symbols-outlined text-[14px] text-markup-green">gesture</span>
-</div>
-<span class="text-[9px] text-slate-400 font-bold uppercase tracking-tight">Markup Layer A</span>
-</div>
-<div class="flex -space-x-1.5">
-<div class="size-5 rounded-full border-2 border-panel-dark bg-slate-700"></div>
-<div class="size-5 rounded-full border-2 border-panel-dark bg-primary flex items-center justify-center text-[7px] font-bold">+2</div>
-</div>
-</div>
-</div>
-<div class="p-6 border-2 border-dashed border-white/5 rounded-xl flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition-all cursor-pointer group">
-<span class="material-symbols-outlined text-slate-600 group-hover:text-primary transition-colors">add_comment</span>
-<span class="text-[10px] font-bold text-slate-600 uppercase tracking-widest group-hover:text-slate-400">New Annotation</span>
-</div>
-</div>
-<div class="p-5 border-t border-white/5 bg-black/20">
-<div class="flex flex-col gap-3">
-<div class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500">
-<span>Rendering Cache</span>
-<span class="text-primary">82%</span>
-</div>
-<div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
-<div class="h-full bg-primary w-[82%] shadow-[0_0_10px_rgba(13,127,242,0.4)]"></div>
-</div>
-</div>
-</div>
-</aside>
 </main>
 
 </body></html>
