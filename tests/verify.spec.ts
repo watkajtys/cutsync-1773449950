@@ -2116,7 +2116,7 @@ test('User can seamlessly upload a video, wait for the background daemon to extr
           items: [{
             id: 'ts_123',
             asset_id: testAssetId,
-            raw_text: 'Hello world',
+            raw_text: '[{"timestamp": "00:00:00", "text": "Hello world"}]',
             srt_payload: '1\n00:00:00,000 --> 00:00:01,000\nHello world'
           }]
         })

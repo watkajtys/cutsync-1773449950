@@ -42,6 +42,32 @@ def update_asset_status(asset_id, status):
         logging.error(f"[{asset_id}] Error updating status: {e}")
         raise e
 
+def json_to_srt(transcript_json):
+    srt_lines = []
+    for i, entry in enumerate(transcript_json):
+        timestamp = entry.get("timestamp", "00:00:00")
+        text = entry.get("text", "")
+        if "," not in timestamp:
+            timestamp += ",000"
+        
+        try:
+            h, m, s_str = timestamp.split(',')[0].split(':')
+            ms_str = timestamp.split(',')[1] if ',' in timestamp else "000"
+            h, m, s = int(h), int(m), int(s_str)
+            s += 1
+            if s >= 60:
+                s = 0
+                m += 1
+            if m >= 60:
+                m = 0
+                h += 1
+            end_timestamp = f"{h:02d}:{m:02d}:{s:02d},{ms_str}"
+        except Exception:
+            end_timestamp = timestamp
+            
+        srt_lines.append(f"{i+1}\n{timestamp} --> {end_timestamp}\n{text}")
+    return "\n\n".join(srt_lines)
+
 def process_asset(asset):
     asset_id = asset.id
     file_name = asset.file
@@ -164,10 +190,13 @@ def process_asset(asset):
         logging.info(f"[{asset_id}] Received structured JSON from Gemini. Saving to Pocketbase...")
         
         # Save transcript
+        transcript_data = data.get("transcript", [])
+        srt_payload = json_to_srt(transcript_data)
+        
         pb.collection("ai_transcripts").create({
             "asset_id": asset_id,
-            "raw_text": json.dumps(data.get("transcript", [])),
-            "srt_payload": ""  # Dummy payload or simple mapping could go here
+            "raw_text": json.dumps(transcript_data),
+            "srt_payload": srt_payload
         })
         
         # Save cut suggestions
@@ -190,10 +219,12 @@ def process_asset(asset):
             logging.error(f"[{asset_id}] Failed to set error status fallback: {inner_e}", exc_info=True)
     finally:
         logging.info(f"[{asset_id}] Cleaning up temporary files...")
-        if os.path.exists(local_video_path):
-            os.remove(local_video_path)
-        if os.path.exists(local_audio_path):
-            os.remove(local_audio_path)
+        
+        for path in [local_video_path, local_audio_path]:
+            try:
+                os.remove(path)
+            except OSError:
+                pass
             
         # Also clean up the remote file from Gemini
         if 'uploaded_file' in locals() and uploaded_file is not None:
