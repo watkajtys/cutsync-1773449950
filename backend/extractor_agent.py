@@ -119,13 +119,17 @@ def main():
     logging.info(f"Starting extractor daemon, polling {PB_URL} for pending assets...")
     
     oneshot = os.getenv("ONESHOT", "false").lower() == "true"
-    if authenticate():
-        logging.info("Successfully acquired PocketBase admin token.")
-    else:
-        logging.warning("No PocketBase admin token acquired. API requests may fail if admin privileges are required.")
+    is_authenticated = False
     
     while True:
         try:
+            if not is_authenticated:
+                if authenticate():
+                    logging.info("Successfully acquired PocketBase admin token.")
+                    is_authenticated = True
+                else:
+                    logging.warning("No PocketBase admin token acquired. API requests may fail. Retrying next cycle...")
+            
             records = get_pending_assets()
             
             for record in records:
