@@ -2732,5 +2732,5 @@ with patch.dict('sys.modules', {'google.generativeai': mock_genai}):
 
   // Take the final screenshot
   await page.goto('/');
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
