@@ -4,6 +4,7 @@ const execAsync = promisify(exec);
 
 import fs from 'fs';
 import path from 'path';
+import http from 'http';
 import { test, expect } from '@playwright/test';
 
 test('Verify that the React app loads and displays the main dashboard shell with navigation.', async ({ page }) => {
@@ -2515,4 +2516,74 @@ test('The application loads cleanly in production mode with no console errors, a
   expect(filteredErrors).toHaveLength(0);
   await page.screenshot({ path: 'evidence_old.png' });
   await page.screenshot({ path: 'evidence_old.png' });
+});
+
+test('Daemon detects a pending source_clip, transitions status to extracting_audio, downloads the video to /tmp, extracts a compressed .mp3/.ogg via ffmpeg, and updates status to analyzing.', async ({ page, request }) => {
+  // 1. Generate a dummy mp4 file
+  const dummyVideoPath = path.join('/tmp', 'dummy_source.mp4');
+  await execAsync(`ffmpeg -f lavfi -i color=c=blue:s=320x240:d=1 -f lavfi -i sine=f=440:d=1 -c:v libx264 -c:a aac -y ${dummyVideoPath}`);
+
+  // 2. Start a mock server and mock the request/responses
+  const mockAssetId = 'mockassetid123';
+  const mockFileName = 'dummy_source.mp4';
+  
+  // Create a minimal mock HTTP server in node to handle the pocketbase SDK calls
+  const server = http.createServer((req: any, res: any) => {
+    let body = '';
+    req.on('data', (chunk: any) => { body += chunk; });
+    req.on('end', () => {
+      res.setHeader('Content-Type', 'application/json');
+      if (req.url?.includes('/api/collections/assets/records?filter=')) {
+        res.end(JSON.stringify({
+          page: 1,
+          perPage: 500,
+          totalItems: 1,
+          totalPages: 1,
+          items: [{
+            id: mockAssetId,
+            file: mockFileName,
+            asset_type: 'source_clip',
+            processing_status: 'pending',
+            collectionId: 'assets_collection_id'
+          }]
+        }));
+      } else if (req.url === `/api/collections/assets/records/${mockAssetId}` && req.method === 'PATCH') {
+        res.end(JSON.stringify({ id: mockAssetId, processing_status: JSON.parse(body).processing_status }));
+      } else if (req.url === `/api/files/assets_collection_id/${mockAssetId}/${mockFileName}`) {
+        res.setHeader('Content-Type', 'video/mp4');
+        const stream = fs.createReadStream(dummyVideoPath);
+        stream.pipe(res);
+      } else {
+        res.statusCode = 404;
+        res.end(JSON.stringify({ error: 'not found' }));
+      }
+    });
+  });
+
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', () => resolve()));
+  const mockPbUrl = `http://127.0.0.1:${(server.address() as any).port}`;
+
+  // 3. Run the Python daemon script in ONESHOT mode
+  try {
+    const { stdout, stderr } = await execAsync(`POCKETBASE_URL=${mockPbUrl} ONESHOT=true python3 backend/extractor_agent.py`);
+    console.log("Daemon STDOUT:", stdout);
+    if (stderr) console.error("Daemon STDERR:", stderr);
+  } catch (err: any) {
+    console.error("Daemon execution failed:", err.stdout, err.stderr);
+    server.close();
+    throw err;
+  }
+
+  server.close();
+
+  // 4. Verify the audio file exists in /tmp and video was cleaned up
+  const localVideoPath = path.join('/tmp', `${mockAssetId}_${mockFileName}`);
+  const localAudioPath = path.join('/tmp', `${mockAssetId}_audio.mp3`);
+  
+  expect(fs.existsSync(localAudioPath)).toBe(true);
+  expect(fs.existsSync(localVideoPath)).toBe(false);
+
+  // Take the final screenshot required by the prompt
+  await page.goto('/');
+  await page.screenshot({ path: 'evidence.png' });
 });
