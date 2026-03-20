@@ -7,7 +7,10 @@ export const fetchProjects = async (): Promise<Project[]> => {
       sort: '-created',
       requestKey: null,
     });
-    return records;
+    return records.map(record => ({
+      ...record,
+      id: record.id || crypto.randomUUID()
+    }));
   } catch (error) {
     console.error("Failed to fetch projects:", error);
     // Fallback for visual testing if PocketBase is not running during local dev

@@ -1,4 +1,7 @@
-import { execSync } from 'child_process';
+import { exec } from "child_process";
+import { promisify } from "util";
+const execAsync = promisify(exec);
+
 import fs from 'fs';
 import path from 'path';
 import { test, expect } from '@playwright/test';
@@ -2355,4 +2358,54 @@ test('Verify ReviewErrorBoundary catches rendering errors in ReviewNotesList', a
   
   
   await page.screenshot({ path: 'evidence_old.png' });
+});
+
+
+
+test('The React application compiles to production without warnings, all PocketBase indices are verified, and no console errors appear during end-to-end usage.', async ({ page, request }) => {
+  // 1. Compile the React application to production
+  let buildOutput = '';
+  try {
+    const { stdout, stderr } = await execAsync('npm run build');
+    buildOutput = stdout + '\n' + stderr;
+  } catch (err: any) {
+    throw new Error(`Build failed: ${err.message}\n${err.stdout}\n${err.stderr}`);
+  }
+
+  // 2. Verify no warnings in the build output
+  expect(buildOutput.toLowerCase()).not.toContain('warn');
+
+  // 3. Verify PocketBase indices (collections exist)
+  // MUST connect to http://loom-cutsync-pocketbase:8090 to reach the database inside the Docker network.
+  const collectionsResponse = await request.get('http://loom-cutsync-pocketbase:8090/api/collections');
+  expect(collectionsResponse.status()).toBe(200);
+  
+  const collectionsData = await collectionsResponse.json();
+  const collectionNames = collectionsData.items.map((col: any) => col.name);
+  
+  const expectedCollections = ['projects', 'assets', 'ai_transcripts', 'ai_cut_suggestions', 'review_notes'];
+  
+  for (const expected of expectedCollections) {
+    expect(collectionNames).toContain(expected);
+  }
+
+  // 4. Verify no console errors appear during end-to-end usage
+  const consoleErrors: string[] = [];
+  page.on('console', msg => {
+    if (msg.type() === 'error') {
+      consoleErrors.push(msg.text());
+    }
+  });
+
+  page.on('pageerror', err => {
+    consoleErrors.push(err.message);
+  });
+
+  await page.goto('/');
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(1000);
+  expect(consoleErrors).toHaveLength(0);
+
+  // 5. Take screenshot
+  await page.screenshot({ path: 'evidence.png' });
 });

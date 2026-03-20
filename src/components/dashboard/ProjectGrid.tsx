@@ -17,7 +17,7 @@ export const ProjectGrid: React.FC<ProjectGridProps> = ({ projects }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       {projects.map((project) => (
-        <div key={project.id} className="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-slate-700 transition-colors">
+        <div key={String(project.id)} className="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-slate-700 transition-colors">
           <h3 className="text-xl font-medium text-white mb-2">{project.title}</h3>
           <p className="text-slate-400 text-sm line-clamp-3">{project.description}</p>
         </div>
