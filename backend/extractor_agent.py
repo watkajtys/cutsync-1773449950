@@ -22,7 +22,7 @@ def authenticate():
         try:
             pb.admins.auth_with_password(admin_email, admin_password)
             return True
-        except Exception as e:
+        except Exception:
             try:
                 # Fallback to superusers collection for older pb versions if needed
                 pb.collection('_superusers').auth_with_password(admin_email, admin_password)
@@ -96,25 +96,30 @@ def process_asset(asset):
         
         logging.info(f"[{asset_id}] Uploading audio to Gemini API...")
         uploaded_file = None
-        for attempt in range(3):
+        for attempt in range(5):
             try:
                 uploaded_file = genai.upload_file(local_audio_path)
                 break
             except Exception as upload_error:
                 logging.warning(f"[{asset_id}] Upload attempt {attempt + 1} failed: {upload_error}")
-                if attempt == 2:
+                if attempt == 4:
                     raise upload_error
                 time.sleep(2 ** attempt)
 
         logging.info(f"[{asset_id}] File uploaded. Waiting for processing to complete...")
         max_retries = 30
         for _ in range(max_retries):
-            # Fetch the updated state from the API
-            uploaded_file = genai.get_file(uploaded_file.name)
-            if uploaded_file.state.name == "ACTIVE":
-                break
-            elif uploaded_file.state.name == "FAILED":
-                raise Exception("Gemini file processing failed.")
+            try:
+                # Fetch the updated state from the API
+                uploaded_file = genai.get_file(uploaded_file.name)
+            except Exception as poll_error:
+                logging.warning(f"[{asset_id}] Error polling file state: {poll_error}")
+                time.sleep(2)
+            else:
+                if uploaded_file.state.name == "ACTIVE":
+                    break
+                elif uploaded_file.state.name == "FAILED":
+                    raise Exception("Gemini file processing failed.")
             time.sleep(5)
         else:
             raise Exception("Timeout waiting for Gemini file processing.")
@@ -138,13 +143,13 @@ def process_asset(asset):
         model = genai.GenerativeModel("gemini-1.5-pro")
         
         response = None
-        for attempt in range(3):
+        for attempt in range(5):
             try:
                 response = model.generate_content([prompt, uploaded_file], request_options={"timeout": 600})
                 break
             except Exception as gen_error:
                 logging.warning(f"[{asset_id}] Generation attempt {attempt + 1} failed: {gen_error}")
-                if attempt == 2:
+                if attempt == 4:
                     raise gen_error
                 time.sleep(2 ** attempt)
 
@@ -192,11 +197,14 @@ def process_asset(asset):
             
         # Also clean up the remote file from Gemini
         if 'uploaded_file' in locals() and uploaded_file is not None:
-            try:
-                genai.delete_file(uploaded_file.name)
-                logging.info(f"[{asset_id}] Deleted file from Gemini: {uploaded_file.name}")
-            except Exception as del_err:
-                logging.warning(f"[{asset_id}] Failed to delete file from Gemini: {del_err}", exc_info=True)
+            for del_attempt in range(5):
+                try:
+                    genai.delete_file(uploaded_file.name)
+                    logging.info(f"[{asset_id}] Deleted file from Gemini: {uploaded_file.name}")
+                    break
+                except Exception as del_err:
+                    logging.warning(f"[{asset_id}] Failed to delete file from Gemini (attempt {del_attempt + 1}): {del_err}", exc_info=True)
+                    time.sleep(2)
 
 
 def get_pending_assets():
