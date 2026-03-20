@@ -43,7 +43,7 @@ export const CutSuggestions: React.FC = () => {
                     MATCH 88%
                   </span>
                 </div>
-                <p className="text-[9px] text-slate-500 mt-1 line-clamp-2">{suggestion.cut_reason}</p>
+                <span className="text-[9px] text-slate-500 mt-1 line-clamp-2">{suggestion.cut_reason}</span>
                 <span className="text-[9px] font-mono text-slate-500 opacity-60 mt-1 block">
                   {formatTimecode(suggestion.start_timecode, false)} - {formatTimecode(suggestion.end_timecode, false)}
                 </span>
