@@ -13,11 +13,7 @@ export const fetchProjects = async (): Promise<Project[]> => {
     }));
   } catch (error) {
     console.error("Failed to fetch projects:", error);
-    // Fallback for visual testing if PocketBase is not running during local dev
-    return [
-      { id: '1', title: 'Mock Project Alpha', description: 'A test project since DB connection failed.' },
-      { id: '2', title: 'Beta Commercial', description: 'Q3 marketing materials.' }
-    ];
+    throw error;
   }
 };
 
