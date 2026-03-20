@@ -4,11 +4,15 @@ import subprocess
 import urllib.request
 import urllib.parse
 import logging
+import json
+import re
+import google.generativeai as genai
 from pocketbase import PocketBase
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 PB_URL = os.getenv("POCKETBASE_URL", "http://127.0.0.1:8090")
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY", "dummy_key"))
 pb = PocketBase(PB_URL)
 
 def authenticate():
@@ -90,18 +94,110 @@ def process_asset(asset):
         logging.info(f"[{asset_id}] Audio extraction complete. Transitioning status: extracting_audio -> analyzing")
         update_asset_status(asset_id, "analyzing")
         
+        logging.info(f"[{asset_id}] Uploading audio to Gemini API...")
+        uploaded_file = None
+        for attempt in range(3):
+            try:
+                uploaded_file = genai.upload_file(local_audio_path)
+                break
+            except Exception as upload_error:
+                logging.warning(f"[{asset_id}] Upload attempt {attempt + 1} failed: {upload_error}")
+                if attempt == 2:
+                    raise upload_error
+                time.sleep(2 ** attempt)
+
+        logging.info(f"[{asset_id}] File uploaded. Waiting for processing to complete...")
+        max_retries = 30
+        for _ in range(max_retries):
+            # Fetch the updated state from the API
+            uploaded_file = genai.get_file(uploaded_file.name)
+            if uploaded_file.state.name == "ACTIVE":
+                break
+            elif uploaded_file.state.name == "FAILED":
+                raise Exception("Gemini file processing failed.")
+            time.sleep(5)
+        else:
+            raise Exception("Timeout waiting for Gemini file processing.")
+
+        logging.info(f"[{asset_id}] File processing complete. Requesting content generation...")
+        
+        prompt = """
+        You are an Assistant Video Editor. Analyze the provided audio file.
+        Please output a strict JSON object with the following schema:
+        {
+          "transcript": [
+            { "timestamp": "00:00:00", "text": "spoken text..." }
+          ],
+          "cut_suggestions": [
+            { "start_timecode": 0, "end_timecode": 5, "cut_reason": "Dead air / Rambling" }
+          ]
+        }
+        Do not include any formatting, markdown, or text outside the JSON object. 
+        "start_timecode" and "end_timecode" should be numbers (seconds).
+        """
+        model = genai.GenerativeModel("gemini-1.5-pro")
+        
+        response = None
+        for attempt in range(3):
+            try:
+                response = model.generate_content([prompt, uploaded_file], request_options={"timeout": 600})
+                break
+            except Exception as gen_error:
+                logging.warning(f"[{asset_id}] Generation attempt {attempt + 1} failed: {gen_error}")
+                if attempt == 2:
+                    raise gen_error
+                time.sleep(2 ** attempt)
+
+        response_text = response.text.strip()
+        # Clean up markdown code blocks if the model included them
+        if response_text.startswith("```"):
+            response_text = re.sub(r"^```(?:json)?", "", response_text)
+            response_text = re.sub(r"```$", "", response_text).strip()
+            
+        data = json.loads(response_text)
+        
+        logging.info(f"[{asset_id}] Received structured JSON from Gemini. Saving to Pocketbase...")
+        
+        # Save transcript
+        pb.collection("ai_transcripts").create({
+            "asset_id": asset_id,
+            "raw_text": json.dumps(data.get("transcript", [])),
+            "srt_payload": ""  # Dummy payload or simple mapping could go here
+        })
+        
+        # Save cut suggestions
+        for suggestion in data.get("cut_suggestions", []):
+            pb.collection("ai_cut_suggestions").create({
+                "asset_id": asset_id,
+                "start_timecode": suggestion.get("start_timecode", 0),
+                "end_timecode": suggestion.get("end_timecode", 0),
+                "cut_reason": suggestion.get("cut_reason", "")
+            })
+            
+        logging.info(f"[{asset_id}] Analysis complete. Transitioning status: analyzing -> ready")
+        update_asset_status(asset_id, "ready")
+        
     except Exception as e:
-        logging.error(f"[{asset_id}] Error processing asset: {e}")
+        logging.error(f"[{asset_id}] Error processing asset: {e}", exc_info=True)
         try:
             update_asset_status(asset_id, "error")
         except Exception as inner_e:
-            logging.error(f"[{asset_id}] Failed to set error status fallback: {inner_e}")
+            logging.error(f"[{asset_id}] Failed to set error status fallback: {inner_e}", exc_info=True)
     finally:
-        # Cleanup video temp file but keep audio for Gemini
-        logging.info(f"[{asset_id}] Cleaning up temporary video file...")
+        logging.info(f"[{asset_id}] Cleaning up temporary files...")
         if os.path.exists(local_video_path):
             os.remove(local_video_path)
-        # Note: We do NOT delete local_audio_path here because it is consumed by the Gemini agent in Phase 6.
+        if os.path.exists(local_audio_path):
+            os.remove(local_audio_path)
+            
+        # Also clean up the remote file from Gemini
+        if 'uploaded_file' in locals() and uploaded_file is not None:
+            try:
+                genai.delete_file(uploaded_file.name)
+                logging.info(f"[{asset_id}] Deleted file from Gemini: {uploaded_file.name}")
+            except Exception as del_err:
+                logging.warning(f"[{asset_id}] Failed to delete file from Gemini: {del_err}", exc_info=True)
+
 
 def get_pending_assets():
     try:
