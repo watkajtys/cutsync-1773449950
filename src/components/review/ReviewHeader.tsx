@@ -8,34 +8,34 @@ export const ReviewHeader: React.FC = () => {
   const { currentTime } = useReview();
 
   return (
-    <header className="h-14 flex items-center justify-between px-6 border-b border-border-subtle bg-surface/80 backdrop-blur-xl z-50">
+    <header className="h-14 flex items-center justify-between px-6 border-b border-border-subtle bg-[#0c0e14]/40 backdrop-blur-[12px] bg-white/[0.02] shadow-[0_4px_24px_-12px_rgba(0,0,0,0.5)] z-50">
       <div className="flex items-center gap-8">
         <div className="flex items-center gap-2.5">
-          <div className="bg-primary p-1 rounded-md flex items-center justify-center">
-            <Database className="text-white" size={18} />
+          <div className="bg-blue-600 p-1.5 rounded-md flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.4)] border border-blue-400/20">
+            <Database className="text-white" size={16} strokeWidth={1.5} />
           </div>
-          <h2 className="text-white text-lg font-black tracking-tight">CutSync</h2>
+          <h2 className="text-white text-lg font-black tracking-tight drop-shadow-md">CutSync</h2>
         </div>
-        <nav className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest">
-          <Link to="/" className="flex items-center gap-2 px-3 py-1.5 rounded-md text-primary bg-primary/10 transition-colors">
-            <PlayCircle size={14} />
-            Active Workspace
+        <nav className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em]">
+          <Link to="/" className="flex items-center gap-2 px-3 py-1.5 rounded-md text-blue-400 bg-blue-600/10 hover:bg-blue-600/20 transition-colors border border-blue-500/10 shadow-inner">
+            <PlayCircle size={14} strokeWidth={1.5} />
+            Current Project
           </Link>
-          <span className="text-slate-600 mx-1">/</span>
-          <span className="flex items-center gap-2 px-3 py-1.5 rounded-md text-slate-500 hover:text-slate-300 transition-colors cursor-default">
-            <Eye size={14} />
-            Review Pipeline
+          <span className="text-slate-700 mx-1">/</span>
+          <span className="flex items-center gap-2 px-3 py-1.5 rounded-md text-slate-300 hover:text-white transition-colors cursor-default bg-white/5 border border-white/5 shadow-inner">
+            <Eye size={14} strokeWidth={1.5} />
+            Review & Approval
           </span>
         </nav>
       </div>
       <div className="flex items-center gap-6">
         <div className="flex flex-col w-32 justify-center mr-2">
-          <div className="flex justify-between items-center text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">
-            <span>Render & Cache</span>
-            <span className="text-primary">100%</span>
+          <div className="flex justify-between items-center text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">
+            <span>Proxy & Cache</span>
+            <span className="text-blue-400 font-black">100%</span>
           </div>
-          <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-            <div className="h-full bg-primary/80 w-full rounded-full"></div>
+          <div className="h-1 w-full bg-black/40 rounded-full overflow-hidden shadow-inner border border-white/5">
+            <div className="h-full bg-blue-500 w-full rounded-full shadow-[0_0_8px_rgba(59,130,246,0.6)]"></div>
           </div>
         </div>
 

@@ -14,8 +14,8 @@ test('Verify that the React app loads and displays the main dashboard shell with
   await expect(sidebar).toBeVisible();
   
   // Check for the presence of standard navigation items
-  await expect(page.locator('a:has-text("Projects")').first()).toBeVisible();
-  await expect(page.locator('a:has-text("Recent Assets")').first()).toBeVisible();
+  await expect(page.locator('a:has-text("Workspaces")').first()).toBeVisible();
+  await expect(page.locator('a:has-text("Recent Media")').first()).toBeVisible();
   await expect(page.locator('a:has-text("Settings")').first()).toBeVisible();
 
   // Intercept the POST request to PocketBase
@@ -140,7 +140,7 @@ test('Verify that the React app loads and displays the main dashboard shell with
   await expect(page.locator('h3:has-text("Integration Test Project")').first()).toBeVisible();
 
   // Take screenshot at the end
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify CanvasToolbar is relocated from video container to bottom playback controls', async ({ page }) => {
@@ -168,7 +168,7 @@ test('Verify CanvasToolbar is relocated from video container to bottom playback 
   await freehandTool.click();
   await expect(freehandTool).toHaveClass(/bg-primary/);
   
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify Clear Canvas button is decoupled from Lifecycle & Versioning panel and moved to Markup History area', async ({ page }) => {
@@ -191,7 +191,7 @@ test('Verify Clear Canvas button is decoupled from Lifecycle & Versioning panel 
 
   await page.goto(`/review/${assetId}`);
 
-  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+  await expect(page.locator('text=Review & Approval')).toBeVisible();
 
   // The sidebar should exist
   const sidebar = page.locator('aside').first();
@@ -250,10 +250,10 @@ test('Verify Clear Canvas button is decoupled from Lifecycle & Versioning panel 
   // Verify clear button is hidden again
   await expect(clearButton).not.toBeVisible();
 
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
-test('Verify "Render & Cache" is moved to ReviewHeader and removed from NotesSidebar', async ({ page }) => {
+test('Verify "Proxy & Cache" is moved to ReviewHeader and removed from NotesSidebar', async ({ page }) => {
   await page.route('**/api/collections/assets/records*', async (route, request) => {
     if (request.method() === 'GET') {
       await route.fulfill({
@@ -289,19 +289,19 @@ test('Verify "Render & Cache" is moved to ReviewHeader and removed from NotesSid
 
   await page.goto('/review/test-asset-123');
 
-  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+  await expect(page.locator('text=Review & Approval')).toBeVisible();
 
-  // Verify 'Render & Cache' is not in the sidebar
+  // Verify 'Proxy & Cache' is not in the sidebar
   const sidebar = page.locator('aside').nth(1);
   await expect(sidebar).toBeVisible();
-  await expect(sidebar.locator('text=Render & Cache')).not.toBeVisible();
+  await expect(sidebar.locator('text=Proxy & Cache')).not.toBeVisible();
 
-  // Verify 'Render & Cache' is in the header
+  // Verify 'Proxy & Cache' is in the header
   const header = page.locator('header').first();
   await expect(header).toBeVisible();
-  await expect(header.locator('text=Render & Cache')).toBeVisible();
+  await expect(header.locator('text=Proxy & Cache')).toBeVisible();
 
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify the Chronological River displays structural elements like tick marks and waveforms in Review Mode.', async ({ page }) => {
@@ -325,7 +325,7 @@ test('Verify the Chronological River displays structural elements like tick mark
   await page.goto(`/review/${assetId}`);
 
   // Wait for the UI to load
-  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+  await expect(page.locator('text=Review & Approval')).toBeVisible();
 
   // Verify the Chronological River timeline section at the bottom
   const riverSection = page.locator('section').filter({ hasText: 'Chronological River • Frame-by-Frame Navigation' });
@@ -344,7 +344,7 @@ test('Verify the Chronological River displays structural elements like tick mark
   const waveformContainer = riverSection.locator('.opacity-30').first();
   await expect(waveformContainer).toBeVisible();
 
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify center play button overlay is removed', async ({ page }) => {
@@ -396,7 +396,7 @@ test('Verify center play button overlay is removed', async ({ page }) => {
   await expect(largePlayButton).toHaveCount(0);
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('User hits spacebar during playback; video pauses and new note input is focused.', async ({ page }) => {
@@ -471,7 +471,7 @@ test('User hits spacebar during playback; video pauses and new note input is foc
   await expect(textarea).toBeFocused();
 
   // Take screenshot of the evidence
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify the Review Mode shell and layout for a specific asset', async ({ page }) => {
@@ -530,8 +530,8 @@ test('Verify the Review Mode shell and layout for a specific asset', async ({ pa
   await page.goto('/review/test-asset-123');
   
   // Verify that the header navigation is present
-  await expect(page.locator('text=Active Workspace').first()).toBeVisible();
-  await expect(page.locator('text=Review Pipeline').first()).toBeVisible();
+  await expect(page.locator('text=Current Project').first()).toBeVisible();
+  await expect(page.locator('text=Review & Approval').first()).toBeVisible();
   await expect(page.locator('text=Alex Rivers').first()).toBeVisible();
 
   // Verify the Theater Mode video player section
@@ -568,7 +568,7 @@ test('Verify the Review Mode shell and layout for a specific asset', async ({ pa
   await page.waitForTimeout(500);
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('View the review route and ensure the right 30% sidebar renders a scrollable list of styled mock notes with timestamps, alongside an input field at the bottom.', async ({ page }) => {
@@ -648,7 +648,7 @@ test('View the review route and ensure the right 30% sidebar renders a scrollabl
   const sendButton = sidebar.locator('button:has(svg.lucide-send)').first();
   await expect(sendButton).toBeVisible();
 
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify the Review Mode uses proper lucide icons after refactoring', async ({ page }) => {
@@ -693,7 +693,7 @@ test('Verify the Review Mode uses proper lucide icons after refactoring', async 
   const cloudCogIcon = page.locator('footer svg').first();
   await expect(cloudCogIcon).toBeVisible();
 
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify the visual annotation tools render a drawing toolbar and overlay canvas in Review Mode', async ({ page }) => {
@@ -751,7 +751,7 @@ test('Verify the visual annotation tools render a drawing toolbar and overlay ca
   await expect(canvas).toHaveClass(/cursor-crosshair/);
 
   // Take screenshot of the new feature at the end
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('User saves a note at 0:15, it persists in PocketBase. Clicking an older note at 0:05 scrubs the video directly to 0:05.', async ({ page }) => {
@@ -849,7 +849,7 @@ test('User saves a note at 0:15, it persists in PocketBase. Clicking an older no
   await expect(page.locator('text=New note at 0:15')).toBeVisible();
 
   // Take screenshot of evidence
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 
@@ -947,7 +947,7 @@ test('Verify the Prep Mode UI layout and connect it to PocketBase to display sou
   await expect(page.locator("text=We've been tracking these signatures for three weeks.")).toBeVisible();
 
   // Take screenshot
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify Prep Mode video synchronization and click-to-scrub navigation', async ({ page }) => {
@@ -1098,7 +1098,7 @@ test('Verify Prep Mode video synchronization and click-to-scrub navigation', asy
     expect(currentTime).toBeCloseTo(duration * 0.25, 1);
   }
 
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify Prep Mode export functionality for SRT and CSV formats', async ({ page }) => {
@@ -1189,7 +1189,7 @@ test('Verify Prep Mode export functionality for SRT and CSV formats', async ({ p
   const downloadCSV = await downloadPromiseCSV;
   expect(downloadCSV.suggestedFilename()).toBe(`cut_suggestions_${assetId}.csv`);
 
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify Canvas Annotation State Serialization and Playback Re-rendering', async ({ page }) => {
@@ -1251,7 +1251,7 @@ test('Verify Canvas Annotation State Serialization and Playback Re-rendering', a
   await page.goto(`/review/${assetId}`);
 
   // Wait for things to load
-  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+  await expect(page.locator('text=Review & Approval')).toBeVisible();
 
   // Test 1: Draw on canvas and save note
   // First, we need to select the box tool
@@ -1355,7 +1355,7 @@ test('Verify Canvas Annotation State Serialization and Playback Re-rendering', a
   
   await page.waitForTimeout(500);
 
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify Theater Player Interactive Scrubber', async ({ page }) => {
@@ -1378,8 +1378,8 @@ test('Verify Theater Player Interactive Scrubber', async ({ page }) => {
 
   await page.goto(`/review/${assetId}`);
 
-  // Wait for the Review Pipeline text or a basic element to confirm the page has loaded
-  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+  // Wait for the Review & Approval text or a basic element to confirm the page has loaded
+  await expect(page.locator('text=Review & Approval')).toBeVisible();
 
   // Find the video element
   const video = page.locator('video');
@@ -1446,7 +1446,7 @@ test('Verify Theater Player Interactive Scrubber', async ({ page }) => {
   expect(currentTime).toBeGreaterThan(40);
   expect(currentTime).toBeLessThan(50);
 
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Pause the video, select the Bounding Box tool, draw a box over a subject, and verify the drawing renders correctly. Resume playback and ensure the canvas hides.', async ({ page }) => {
@@ -1469,8 +1469,8 @@ test('Pause the video, select the Bounding Box tool, draw a box over a subject, 
 
   await page.goto(`/review/${assetId}`);
 
-  // Wait for the Review Pipeline text or a basic element to confirm the page has loaded
-  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+  // Wait for the Review & Approval text or a basic element to confirm the page has loaded
+  await expect(page.locator('text=Review & Approval')).toBeVisible();
 
   // Find the video element
   const video = page.locator('video');
@@ -1521,7 +1521,7 @@ test('Pause the video, select the Bounding Box tool, draw a box over a subject, 
   // Ensure the canvas hides
   await expect(canvas).toHaveClass(/hidden/);
 
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify conflicting states in Review Notes panel are fixed', async ({ page }) => {
@@ -1575,7 +1575,7 @@ test('Verify conflicting states in Review Notes panel are fixed', async ({ page 
   await page.goto(`/review/${assetId}`);
 
   // Wait for the UI to load and the first (failed) request to finish
-  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+  await expect(page.locator('text=Review & Approval')).toBeVisible();
 
   // Verify the error banner is visible
   const errorBannerText = page.locator('text=Failed to load review notes. Please check your connection.');
@@ -1596,7 +1596,7 @@ test('Verify conflicting states in Review Notes panel are fixed', async ({ page 
   // Verify the empty state is now visible
   await expect(emptyStateText).toBeVisible();
 
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Draw a box on a frame, resize the browser window, and verify the box scales correctly and remains positioned over the intended video feature.', async ({ page }) => {
@@ -1620,7 +1620,7 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto(`/review/${assetId}`);
 
-  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+  await expect(page.locator('text=Review & Approval')).toBeVisible();
 
   await page.evaluate(() => {
     const vid = document.querySelector('video');
@@ -1700,7 +1700,7 @@ test('Draw a box on a frame, resize the browser window, and verify the box scale
   expect(hasPixels).toBe(true);
 
   // We should rename old evidence files.
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('User selects the Box tool, draws a box with real-time visual resizing feedback, submits the note, and observes the canvas and toolbar instantly resetting to a clean, empty state.', async ({ page }) => {
@@ -1743,7 +1743,7 @@ test('User selects the Box tool, draws a box with real-time visual resizing feed
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto(`/review/${assetId}`);
 
-  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+  await expect(page.locator('text=Review & Approval')).toBeVisible();
 
   // Mock metadata so video size initializes
   await page.evaluate(() => {
@@ -1824,7 +1824,7 @@ test('User selects the Box tool, draws a box with real-time visual resizing feed
   await expect(activeToolButton).toBeVisible();
 
   // Screenshot required by rules
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify the code structure to ensure God Component is decoupled', async () => {
@@ -1895,7 +1895,7 @@ test('User draws on the canvas and submits the note. The canvas should clear ins
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto(`/review/${assetId}`);
 
-  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+  await expect(page.locator('text=Review & Approval')).toBeVisible();
 
   // Mock metadata so video size initializes
   await page.evaluate(() => {
@@ -1949,7 +1949,7 @@ test('User draws on the canvas and submits the note. The canvas should clear ins
   expect(leakWarnings).toHaveLength(0);
 
   // Take screenshot as required
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('User can seamlessly upload a video, wait for the background daemon to extract and transcribe via Gemini, view AI cut suggestions in Prep Mode, switch to Review Mode, and add timestamped canvas annotations without console errors or layout shifts.', async ({ page }) => {
@@ -2081,7 +2081,7 @@ test('User can seamlessly upload a video, wait for the background daemon to extr
 
   // 3. Visit Review Mode
   await page.goto(`/review/${testAssetId}`);
-  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+  await expect(page.locator('text=Review & Approval')).toBeVisible();
 
   // Mock metadata so video size initializes for canvas
   await page.evaluate(() => {
@@ -2115,7 +2115,7 @@ test('User can seamlessly upload a video, wait for the background daemon to extr
   await expect(page.locator('text=Shape_1')).toBeVisible();
 
   // Take screenshot as required
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('User draws a shape on the canvas and comment input is auto-focused', async ({ page }) => {
@@ -2152,7 +2152,7 @@ test('User draws a shape on the canvas and comment input is auto-focused', async
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.goto(`/review/${assetId}`);
 
-  await expect(page.locator('text=Review Pipeline')).toBeVisible();
+  await expect(page.locator('text=Review & Approval')).toBeVisible();
 
   // Mock metadata so video size initializes
   await page.evaluate(() => {
@@ -2192,5 +2192,5 @@ test('User draws a shape on the canvas and comment input is auto-focused', async
   await expect(textarea).toBeFocused();
 
   // Take screenshot as required
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
