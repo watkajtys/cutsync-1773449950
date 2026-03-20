@@ -932,8 +932,8 @@ test('Verify the Prep Mode UI layout and connect it to PocketBase to display sou
   await page.goto(`/prep/${assetId}`);
 
   // Verify Header
-  await expect(page.locator('text=Prep Mode')).toBeVisible();
-  await expect(page.locator('text=AI Analysis Active')).toBeVisible();
+  await expect(page.locator('text=Prep Mode').first()).toBeVisible();
+  await expect(page.locator('text=AI Analysis Active').first()).toBeVisible();
 
   // Verify Player
   const video = page.locator('video').first();
@@ -2362,6 +2362,7 @@ test('Verify ReviewErrorBoundary catches rendering errors in ReviewNotesList', a
   
   
   await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 
@@ -2422,6 +2423,7 @@ test('The React application compiles to production without warnings, all PocketB
 
   // 5. Take screenshot
   await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('The application loads cleanly in production mode with no console errors, and all core workflows (Prep Mode and Review Mode) operate as expected.', async ({ page }) => {
@@ -2515,6 +2517,7 @@ test('The application loads cleanly in production mode with no console errors, a
   const filteredErrors = consoleErrors.filter(err => !err.includes('Failed to fetch asset for review') && !err.includes('Something went wrong while processing your request') && !err.includes('404 (Not Found)'));
   expect(filteredErrors).toHaveLength(0);
   await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Daemon detects a pending source_clip, transitions status to extracting_audio, downloads the video to /tmp, extracts a compressed .mp3/.ogg via ffmpeg, and updates status to analyzing.', async ({ page, request }) => {
@@ -2625,6 +2628,7 @@ with patch.dict('sys.modules', {'google.generativeai': mock_genai}):
   // Take the final screenshot required by the prompt
   await page.goto('/');
   await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Daemon successfully uploads a temporary audio file to Gemini and retrieves a valid JSON response containing transcript and cut suggestion data.', async ({ page }) => {
@@ -2733,4 +2737,5 @@ with patch.dict('sys.modules', {'google.generativeai': mock_genai}):
   // Take the final screenshot
   await page.goto('/');
   await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });

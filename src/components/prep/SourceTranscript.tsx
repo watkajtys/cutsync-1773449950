@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlignLeft, Search } from 'lucide-react';
+import { FileText, Search, X } from 'lucide-react';
 import { usePrep } from '../../contexts/PrepContext';
 import { useVideoPlayback } from '../../contexts/VideoPlaybackContext';
 import { formatTimecode } from '../../utils/timeFormat';
@@ -9,30 +9,24 @@ export const SourceTranscript: React.FC = () => {
   const { currentTime, setCurrentTime } = useVideoPlayback();
 
   return (
-    <div className="w-1/2 flex flex-col bg-surface-accent">
-      <div className="p-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
+    <div className="flex flex-col h-full bg-[#1A1A1A] w-[320px] text-slate-300">
+      <div className="p-4 border-b border-white/5 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <AlignLeft className="text-slate-400" size={14} />
-          <h3 className="text-[10px] font-black uppercase tracking-widest text-white/80">Source Transcript</h3>
+          <FileText className="text-[#A855F7]" size={16} />
+          <h3 className="text-[11px] font-black uppercase tracking-widest text-white/90">Source Transcript</h3>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">English (US)</span>
-          <button className="text-slate-500 hover:text-white transition-colors">
-            <Search size={14} />
-          </button>
-        </div>
+        <button className="text-white/40 hover:text-white transition-colors">
+          <X size={16} />
+        </button>
       </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6 font-display">
+
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-6">
         <div className="space-y-4">
           {transcripts.length > 0 ? (
             transcripts.map((transcript, index) => {
-              // Estimate or parse a timestamp from the transcript data, since raw_text does not have it isolated.
-              // In a real app we'd map srt_payload to UI logic. For now, since transcript only gives us raw_text, we just use index * 5 for a mock timestamp progression,
-              // or just keep it simple. If we want exact time matching, we'd need structured transcript data.
               const mockTime = index * 10;
               const isActive = currentTime >= mockTime && currentTime < mockTime + 10;
               
-              // Parse speaker dynamically safely
               let speaker = "";
               let content = transcript.raw_text || "";
               const speakerMatch = content.match(/^([A-Z\s]+):(.*)/);
@@ -46,21 +40,21 @@ export const SourceTranscript: React.FC = () => {
               return (
               <div 
                 key={transcript.id} 
-                className={`transcript-line group flex gap-6 cursor-pointer ${isActive ? 'bg-primary/5 -mx-6 px-6 py-2 border-l-2 border-primary' : ''}`}
+                className={`transcript-line group flex flex-col gap-2 cursor-pointer ${isActive ? 'bg-[#26212F] p-4 rounded-lg border border-[#A855F7]/30 shadow-[0_4px_20px_rgba(168,85,247,0.05)]' : 'p-2 hover:bg-white/5 rounded-lg transition-colors'}`}
                 onClick={() => setCurrentTime(mockTime)}
               >
-                <span className={`timestamp text-[10px] font-mono font-bold w-16 flex-shrink-0 ${isActive ? 'text-primary' : 'text-primary opacity-40 transition-opacity'}`}>
+                <span className={`timestamp text-[10px] font-mono font-bold ${isActive ? 'text-[#A855F7]' : 'text-[#A855F7] opacity-60'}`}>
                   {formatTimecode(mockTime, false)}
                 </span>
-                <div className="flex-1">
+                <div>
                   <p className={`text-[13px] leading-relaxed ${isActive ? 'text-white' : 'text-slate-400'} ${isItalic ? 'italic' : ''}`}>
-                    {speaker && <span className={`${isActive ? 'text-primary font-bold' : 'text-white font-semibold'}`}>{speaker}: </span>}
+                    {speaker && <span className={`${isActive ? 'text-[#A855F7] font-bold' : 'text-white font-semibold'}`}>{speaker}: </span>}
                     {content}
                   </p>
                   {isActive && (
-                    <div className="mt-2 flex gap-1.5">
-                      <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-[9px] font-bold text-emerald-500 uppercase tracking-tighter">Key Dialogue</span>
-                      <span className="px-1.5 py-0.5 rounded bg-white/5 text-[9px] font-bold text-slate-500 uppercase tracking-tighter">High Confidence</span>
+                    <div className="mt-3 flex gap-2">
+                      <span className="px-2 py-1 rounded bg-[#A855F7]/10 text-[9px] font-bold text-[#A855F7] uppercase tracking-wider">Keywords: Dusty</span>
+                      <span className="px-2 py-1 rounded bg-[#A855F7]/10 text-[9px] font-bold text-[#A855F7] uppercase tracking-wider">Action: Reach</span>
                     </div>
                   )}
                 </div>
@@ -69,6 +63,17 @@ export const SourceTranscript: React.FC = () => {
           ) : (
             <div className="text-center text-slate-500 text-sm mt-10">No transcript available</div>
           )}
+        </div>
+      </div>
+
+      <div className="p-4 border-t border-white/5 bg-black/20">
+        <div className="relative">
+          <input 
+            type="text" 
+            placeholder="Search transcript..." 
+            className="w-full bg-[#111111] border border-white/10 rounded-lg py-2 pl-3 pr-8 text-[11px] text-white/80 focus:outline-none focus:border-[#A855F7]/50 focus:ring-1 focus:ring-[#A855F7]/50 transition-all placeholder:text-white/30"
+          />
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30" size={14} />
         </div>
       </div>
     </div>
