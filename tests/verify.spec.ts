@@ -2407,5 +2407,5 @@ test('The React application compiles to production without warnings, all PocketB
   expect(consoleErrors).toHaveLength(0);
 
   // 5. Take screenshot
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
