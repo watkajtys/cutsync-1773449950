@@ -6,7 +6,17 @@ import { formatTimecode } from '../../utils/timeFormat';
 
 export const CutSuggestions: React.FC = () => {
   const { cutSuggestions } = usePrep();
-  const { setCurrentTime } = useVideoPlayback();
+  const { videoRef, setCurrentTime } = useVideoPlayback();
+
+  const handleScrub = (timecode: number) => {
+    setCurrentTime(timecode);
+    if (videoRef.current) {
+      videoRef.current.currentTime = timecode;
+    } else {
+      const video = document.querySelector('video');
+      if (video) video.currentTime = timecode;
+    }
+  };
 
   return (
     <div className="w-[440px] flex flex-col bg-[#1A1A1A]/90 backdrop-blur-[16px] rounded-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.6)] overflow-hidden">
@@ -26,7 +36,7 @@ export const CutSuggestions: React.FC = () => {
             <div
               key={suggestion.id}
               className="group bg-[#222125] border border-white/5 p-3 rounded-lg hover:border-[#10b981]/40 hover:bg-[#262125] transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
-              onClick={() => setCurrentTime(suggestion.start_timecode)}
+              onClick={() => handleScrub(suggestion.start_timecode)}
             >
               <div className="flex gap-4">
                 <div className="w-[100px] aspect-video bg-black/60 rounded overflow-hidden flex-shrink-0 relative group-hover:ring-1 group-hover:ring-[#10b981]/50 transition-all">

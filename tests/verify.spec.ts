@@ -950,8 +950,22 @@ test('Verify the Prep Mode UI layout and connect it to PocketBase to display sou
   await expect(page.locator('text=DIRECTOR:')).toBeVisible();
   await expect(page.locator("text=We've been tracking these signatures for three weeks.")).toBeVisible();
 
+
+  // Click suggestion and assert scrub
+  const suggestionEl = page.locator('text=High focus on facial expressions. Ideal for transition.');
+  await suggestionEl.click();
+  
+  await page.waitForTimeout(500);
+  
+  const currentTime = await page.evaluate(() => {
+    const v = document.querySelector('video');
+    return v ? v.currentTime : -1;
+  });
+  
+  expect(currentTime).toBe(252);
+
   // Take screenshot
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify Prep Mode video synchronization and click-to-scrub navigation', async ({ page }) => {
