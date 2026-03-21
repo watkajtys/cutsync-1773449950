@@ -26,7 +26,9 @@ export const CutSuggestions: React.FC = () => {
             <div
               key={suggestion.id}
               className="flex items-start gap-3 p-3 bg-white/5 rounded-lg border border-white/5 hover:border-prep-purple/40 transition-all cursor-pointer group"
-              onClick={() => setCurrentTime(suggestion.start_timecode)}
+              onClick={() => {
+                setCurrentTime(suggestion.start_timecode);
+              }}
             >
               <div className="size-12 rounded bg-slate-800 flex-shrink-0 flex items-center justify-center overflow-hidden border border-white/10 relative">
                 <img alt="cut thumb" className="w-full h-full object-cover group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD98H2eY7T-H_6E4XvO6zUj-f1k6xZ9L6mY_H6v-V1Xq4" />
