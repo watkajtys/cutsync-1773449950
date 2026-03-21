@@ -965,7 +965,7 @@ test('Verify the Prep Mode UI layout and connect it to PocketBase to display sou
   expect(currentTime).toBe(252);
 
   // Take screenshot
-  await page.screenshot({ path: 'evidence.png' });
+  await page.screenshot({ path: 'evidence_old.png' });
 });
 
 test('Verify Prep Mode video synchronization and click-to-scrub navigation', async ({ page }) => {
