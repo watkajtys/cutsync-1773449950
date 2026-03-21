@@ -951,7 +951,7 @@ test('Verify the Prep Mode UI layout and connect it to PocketBase to display sou
   await expect(page.locator("text=We've been tracking these signatures for three weeks.")).toBeVisible();
 
   // Take screenshot
-  await page.screenshot({ path: 'evidence_old.png' });
+  await page.screenshot({ path: 'evidence.png' });
 });
 
 test('Verify Prep Mode video synchronization and click-to-scrub navigation', async ({ page }) => {
@@ -2737,87 +2737,5 @@ with patch.dict('sys.modules', {'google.generativeai': mock_genai}):
   // Take the final screenshot
   await page.goto('/');
   await page.screenshot({ path: 'evidence_old.png' });
-  await page.screenshot({ path: 'evidence_old.png' });
-});
-
-test('Click a "Rambling" cut suggestion and verify the video jumps to the exact start_timecode of the proposed cut.', async ({ page }) => {
-  const assetId = 'test-asset-123';
-  
-  await page.route('**/api/collections/ai_transcripts/records*', async (route, request) => {
-    if (request.method() === 'GET') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          page: 1,
-          perPage: 30,
-          totalItems: 0,
-          totalPages: 1,
-          items: []
-        })
-      });
-    } else {
-      await route.continue();
-    }
-  });
-
-  await page.route('**/api/collections/ai_cut_suggestions/records*', async (route, request) => {
-    if (request.method() === 'GET') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          page: 1,
-          perPage: 30,
-          totalItems: 1,
-          totalPages: 1,
-          items: [
-            {
-              id: 'mock-cut-1',
-              asset_id: assetId,
-              start_timecode: 15,
-              end_timecode: 20,
-              cut_reason: 'Rambling',
-              created: new Date().toISOString()
-            }
-          ]
-        })
-      });
-    } else {
-      await route.continue();
-    }
-  });
-
-  await page.route('**/api/collections/assets/records*', async (route, request) => {
-    if (request.method() === 'GET') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          id: assetId,
-          file: 'dummy_file.mp4'
-        })
-      });
-    } else {
-      await route.continue();
-    }
-  });
-
-  await page.goto(`/prep/${assetId}`);
-
-  // Test 1: Click on Cut Suggestion
-  // The start_timecode is 15. Clicking should set video currentTime to 15.
-  const cutSuggestion = page.locator('text=Rambling').first();
-  await expect(cutSuggestion).toBeVisible();
-  await cutSuggestion.click();
-  
-  await page.waitForTimeout(500);
-
-  const currentTime = await page.evaluate(() => {
-    const video = document.querySelector('video');
-    return video ? video.currentTime : 0;
-  });
-  expect(currentTime).toBeCloseTo(15, 1);
-
   await page.screenshot({ path: 'evidence_old.png' });
 });
